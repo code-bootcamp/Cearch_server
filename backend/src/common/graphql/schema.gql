@@ -1,0 +1,52 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type LectureProductCategory {
+  id: String!
+  name: String!
+}
+
+type LectureProduct {
+  id: String!
+  classTitle: String!
+  classDescription: String!
+  classRunTime: Int!
+  classPrice: Int!
+  isApplicable: Boolean!
+  classMaxUser: Int!
+  classAppliedUser: Int!
+  classOpen: Boolean!
+  lectureproductCategory: LectureProductCategory
+}
+
+type Query {
+  lectureProducts(search: String!): [LectureProduct!]!
+  fetchLectureProduct(lectureproductId: String!): LectureProduct!
+}
+
+type Mutation {
+  createLectureProduct(createLectureProductInput: CreateLectureProductInput!): LectureProduct!
+  updateLectureProduct(lectureproductId: String!, updateLectrueProductInput: UpdateLectureProductInput!): LectureProduct!
+  deleteLectureProduct(lectureproductId: String!): LectureProduct!
+  createProductCategory(name: String!): LectureProductCategory!
+  deleteProductCategory(productCategoryId: String!): Boolean!
+}
+
+input CreateLectureProductInput {
+  classTitle: String!
+  classDescription: String
+  classRunTime: Int
+  classPrice: Int
+  classMaxUser: Int
+  classAppliedUser: Int
+}
+
+input UpdateLectureProductInput {
+  classtitle: String
+  classDescription: String
+  classPrice: Int
+  classRunTime: Int
+  classMaxUser: Int
+  classAppliedUser: Int
+}
