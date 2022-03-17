@@ -1,0 +1,29 @@
+version: '3.3'
+
+services:
+  my_backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '3000:3000'
+
+  my_db:
+    platform: linux/amd64
+    image: 'mysql:latest'
+    environment:
+      MYSQL_DATABASE: 'test_db'
+      MYSQL_ROOT_PASSWORD: '0000'
+      TZ: 'Asia/Seoul'
+    cap_add:
+      - SYS_NICE
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    ports:
+      - '3307:3306'
+
+  my_redis:
+    image: 'redis:latest'
+    ports:
+      - '6000:6379'
