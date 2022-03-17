@@ -1,7 +1,6 @@
 import { CacheModule, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { GraphQLModule } from '@nestjs/graphql';
-import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModules } from './apis/auth/auth.module';
 import { UserModules } from './apis/user/user.module';
