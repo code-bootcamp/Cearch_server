@@ -1,37 +1,38 @@
-import { Module } from '@nestjs/common';
+import { CacheModule, Module } from '@nestjs/common';
+import { AppController } from './app.controller';
 import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
-// import { AppController } from './app.controller';
-// import { AppService } from './app.service';
-import { LectureProductModule } from './lectureProduct/lectureProduct.module';
-import { ConfigModule } from '@nestjs/config';
-import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-import { LectureProductCategoryModule } from './lectureproductCategory/lectureproductCategory.module';
-import { LectureReviewModule } from './lectureReview/lectureReview.module';
+import { AuthModules } from './apis/auth/auth.module';
+import { UserModules } from './apis/user/user.module';
+import { RedisClientOptions } from 'redis';
+import * as redisStore from 'cache-manager-redis-store';
+import { AppService } from './app.service';
 
 @Module({
   imports: [
-    LectureProductModule,
-    LectureReviewModule,
-    LectureProductCategoryModule,
-    GraphQLModule.forRoot<ApolloDriverConfig>({
-      driver: ApolloDriver,
-      autoSchemaFile: 'src/common/graphql/schema.gql',
+    AuthModules,
+    UserModules,
+    GraphQLModule.forRoot({
+      autoSchemaFile: '/src/grapqhql/schema.gql',
+      context: ({ req, res }) => ({ req, res }),
     }),
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: 'localhost',
-      port: 3306,
+      host: 'my_db',
+      database: 'test_db',
       username: 'root',
-      password: '1111',
-      database: 'mangosix',
-      entities: [__dirname + '/**/*.entity.*'],
-      synchronize: true,
+      password: '0000',
+      entities: [__dirname + '/apis/**/*.entity.*'],
       logging: true,
+      synchronize: true,
     }),
-    ConfigModule.forRoot({ isGlobal: true }),
+    CacheModule.register<RedisClientOptions>({
+      store: redisStore,
+      url: 'redis://my_redis:6379',
+      isGlobal: true,
+    }),
   ],
-  // controllers: [AppController],
-  // providers: [AppService],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}
