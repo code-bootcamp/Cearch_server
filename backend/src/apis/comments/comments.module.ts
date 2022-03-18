@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Comments } from '../comments/entities/comments.entity';
-import { QtBoard } from '../QtBoard/entities/QTboard.entity';
+import { QtBoard } from '../QtBoard/entities/qt.entity';
 import { CommentsResolver } from './comments.resolver';
 import { CommentsService } from './comments.service';
 

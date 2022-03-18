@@ -18,4 +18,4 @@ import { User } from '../user/entities/user.entity';
     JwtRefreshStrategy,
   ],
 })
-export class AuthModules {}
+export class AuthModule {}

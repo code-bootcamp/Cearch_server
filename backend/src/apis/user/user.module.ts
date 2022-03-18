@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
-// import { JwtModule, JwtService } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthService } from '../auth/auth.service';
 import { AuthTable } from '../auth/entities/auth.entity';
@@ -20,4 +19,4 @@ import { UserService } from './user.service';
   ],
   exports: [AuthService],
 })
-export class UserModules {}
+export class UserModule {}

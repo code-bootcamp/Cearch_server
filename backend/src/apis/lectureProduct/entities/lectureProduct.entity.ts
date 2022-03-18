@@ -1,6 +1,5 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
-import { LectureProductCategory } from 'src/lectureproductCategory/entities/lectureproductCategory.entity';
-import { LectureReview } from 'src/lectureReview/entities/lectureReview.entity';
+import { LectureProductCategory } from 'src/apis/lectureproductCategory/entities/lectureproductCategory.entity';
 import {
   Column,
   CreateDateColumn,
@@ -42,7 +41,7 @@ export class LectureProduct {
 
   @Column({ default: false })
   @Field(() => Boolean)
-  isApplicable: Boolean;
+  isApplicable: boolean;
 
   @Column()
   @Field(() => Int)
@@ -70,10 +69,6 @@ export class LectureProduct {
     onDelete: 'CASCADE',
   })
   //
-  @ManyToOne(() => LectureReview, {
-    cascade: true,
-    onDelete: 'CASCADE',
-  })
   //
   @Field(() => LectureProductCategory, { nullable: true })
   lectureproductCategory?: LectureProductCategory;

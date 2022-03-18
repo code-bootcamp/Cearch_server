@@ -2,19 +2,31 @@ import { CacheModule, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AuthModules } from './apis/auth/auth.module';
-import { UserModules } from './apis/user/user.module';
+import { AuthModule } from './apis/auth/auth.module';
+import { UserModule } from './apis/user/user.module';
 import { RedisClientOptions } from 'redis';
 import * as redisStore from 'cache-manager-redis-store';
 import { AppService } from './app.service';
+import { CommentsModule } from './apis/comments/comments.module';
+import { JwtAccessStrategy } from './common/auth/strategy/refresh.strategy.jwt';
+import { JwtRefreshStrategy } from './common/auth/strategy/refresh.strategy.jwt copy';
+import { LectureProductModule } from './apis/lectureProduct/lectureProduct.module';
+import { LectureProductCategoryModule } from './apis/lectureproductCategory/lectureproductCategory.module';
+import { QtBoardModule } from './apis/QtBoard/QtBoard.module';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 
 @Module({
   imports: [
-    AuthModules,
-    UserModules,
-    GraphQLModule.forRoot({
+    AuthModule,
+    UserModule,
+    QtBoardModule,
+    CommentsModule,
+    LectureProductModule,
+    LectureProductCategoryModule,
+    GraphQLModule.forRoot<ApolloDriverConfig>({
       autoSchemaFile: '/src/grapqhql/schema.gql',
       context: ({ req, res }) => ({ req, res }),
+      driver: ApolloDriver,
     }),
     TypeOrmModule.forRoot({
       type: 'mysql',
@@ -33,6 +45,6 @@ import { AppService } from './app.service';
     }),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, JwtAccessStrategy, JwtRefreshStrategy],
 })
 export class AppModule {}

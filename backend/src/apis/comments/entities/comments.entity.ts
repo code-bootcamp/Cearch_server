@@ -1,5 +1,5 @@
 import { Int, Field, ObjectType } from '@nestjs/graphql';
-import { QtBoard } from 'src/apis/QtBoard/entities/QTboard.entity';
+import { QtBoard } from 'src/apis/QtBoard/entities/qt.entity';
 import {
   Column,
   CreateDateColumn,

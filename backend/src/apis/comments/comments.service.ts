@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Connection, Repository } from 'typeorm';
-import { QtBoard } from '../QtBoard/entities/QTboard.entity';
+import { QtBoard } from '../QtBoard/entities/qt.entity';
 import { Comments, COMMENT_ISPICK_ENUM } from './entities/comments.entity';
 
 @Injectable()

@@ -1,7 +1,7 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { CreateQtBoardInput } from './dto/createQtBoard.input';
 import { UpdateQtBoardInput } from './dto/updateQtBoard.input';
-import { QtBoard } from './entities/QTboard.entity';
+import { QtBoard } from './entities/qt.entity';
 import { QtBoardService } from './QtBoard.service';
 
 @Resolver()

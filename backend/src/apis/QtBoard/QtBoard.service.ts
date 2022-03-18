@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { Comments } from '../comments/entities/comments.entity';
 import { CreateQtBoardInput } from './dto/createQtBoard.input';
 import { UpdateQtBoardInput } from './dto/updateQtBoard.input';
-import { QtBoard } from './entities/QTboard.entity';
+import { QtBoard } from './entities/qt.entity';
 
 interface IFindOne {
   postId: string;
@@ -85,6 +85,6 @@ export class QtBoardService {
 
   // async qtlike({ postId }) {
   //   const post = await this.qtBoardRepository.findOne({ id: postId });
-    
+  //   console.log(post.likes)
   // }
 }
