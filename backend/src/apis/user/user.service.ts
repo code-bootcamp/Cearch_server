@@ -2,11 +2,11 @@ import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { Connection, Repository } from 'typeorm';
-import { UserInput } from './dto/user.input';
+import { UserForm } from './dto/user.input';
 import { User } from './entities/user.entity';
 
 interface IcreateUserForm {
-  userInput: UserInput;
+  userForm: UserForm;
 }
 
 @Injectable()
@@ -17,20 +17,23 @@ export class UserService {
     private readonly connection: Connection,
   ) {} //
 
-  async isCheckId({ email }) {
-    const result = await this.userRepository.find({ where: { email } });
-    if (result) return true;
-    return false;
+  async isCheckEmail({ email }) {
+    const result = await this.userRepository.findOne({ where: { email } });
+    if (result === undefined) {
+      return false;
+    }
+    return true;
   }
 
-  async sendForm({ userInput }: IcreateUserForm) {
-    const { password, ...userInfo } = userInput;
-    const hashedPassword = await bcrypt.hash(password, 100); // 해쉬로 비밀번호 바꿔서 저장
-    userInput = {
+  async saveForm({ userForm }: IcreateUserForm) {
+    const { password, ...userInfo } = userForm;
+    const hashedPassword = await bcrypt.hash(password, 10); // 해쉬로 비밀번호 바꿔서 저장
+    userForm = {
       password: hashedPassword,
       ...userInfo,
     };
-    const result = await this.userRepository.save({ ...userInput });
+    console.log(userForm);
+    const result = await this.userRepository.save({ ...userForm });
     return result;
   }
 
@@ -39,11 +42,11 @@ export class UserService {
     await queryRunner.connect();
     queryRunner.startTransaction('REPEATABLE READ');
 
-    const hashedPassword = bcrypt.hash(newPassword, 100);
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
 
     try {
       const user = await queryRunner.manager.findOne(User, { email });
-      const userUpdated = queryRunner.manager.save(User, {
+      const userUpdated = await queryRunner.manager.save(User, {
         ...user,
         password: hashedPassword,
       });
