@@ -7,13 +7,16 @@ services:
       dockerfile: Dockerfile
     ports:
       - '3000:3000'
+    volumes:
+      - ./src:/backend/src
+      - ./.env:/backend/.env
 
   my_db:
     platform: linux/amd64
     image: 'mysql:latest'
     environment:
       MYSQL_DATABASE: 'test_db'
-      MYSQL_ROOT_PASSWORD: '0000'
+      MYSQL_ROOT_PASSWORD: '852741'
       TZ: 'Asia/Seoul'
     cap_add:
       - SYS_NICE

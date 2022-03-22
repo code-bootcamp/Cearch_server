@@ -17,7 +17,7 @@ export class AuthResolver {
     private readonly authService: AuthService, //
   ) {}
 
-  @Mutation(() => User)
+  @Mutation(() => String) // AccessToken 발급
   async login(
     @Args('email') email: string, //
     @Args('password') password: string,
@@ -32,12 +32,13 @@ export class AuthResolver {
   @Mutation(() => String)
   @UseGuards(GqlRefreshGuard)
   async refreshAccessToken(@CurrentUser() currentUser: IcurrentUser) {
+    console.log('uuussseeer : ', currentUser);
     return await this.authService.getAccessToken({
       user: currentUser,
     });
   }
 
-  @Mutation(() => Boolean)
+  @Mutation(() => String)
   @UseGuards(GqlRefreshGuard)
   async logout(
     @CurrentUser() currentUser: IcurrentUser,

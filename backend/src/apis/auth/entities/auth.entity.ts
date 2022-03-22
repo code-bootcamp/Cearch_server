@@ -7,8 +7,8 @@ import {
 } from 'typeorm';
 
 export enum AUTH_KIND {
-  PHONE,
-  EMAIL,
+  PHONE = 'PHONE',
+  EMAIL = 'EMAIL',
 }
 
 registerEnumType(AUTH_KIND, { name: 'AUTH_KIND' });
@@ -26,7 +26,7 @@ export class AuthTable {
 
   @Column({ type: 'enum', enum: AUTH_KIND })
   @Field(() => AUTH_KIND)
-  kind: AUTH_KIND;
+  kind!: AUTH_KIND;
 
   @Column()
   @Field(() => String)

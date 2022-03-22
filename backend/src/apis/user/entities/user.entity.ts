@@ -1,9 +1,12 @@
 import { Field, Int, ObjectType, registerEnumType } from '@nestjs/graphql';
+import { Comments } from 'src/apis/comments/entities/comments.entity';
+import { QtBoard } from 'src/apis/QtBoard/entities/qt.entity';
 import {
   Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -42,21 +45,21 @@ export class User {
 
   @Column()
   @Field(() => String)
-  phoneNumber: string;
+  phoneNumber!: string;
 
   @Column({ type: 'enum', enum: USER_ROLE, default: USER_ROLE.MENTEE }) //role type 추가
   @Field(() => USER_ROLE)
-  role: USER_ROLE;
+  role!: USER_ROLE;
 
-  @Column('int')
+  @Column('int', { default: 0 })
   @Field(() => Int, { defaultValue: 0 })
   point: number;
 
-  @Column('int')
+  @Column('int', { default: 0 })
   @Field(() => Int, { defaultValue: 0 })
   following: number;
 
-  @Column('int')
+  @Column('int', { default: 0 })
   @Field(() => Int, { defaultValue: 0 })
   answerCount: number;
 
@@ -75,4 +78,16 @@ export class User {
   @DeleteDateColumn()
   @Field(() => Date)
   deleteDate: Date;
+
+  @OneToMany(() => QtBoard, (qt) => qt.user, {
+    cascade: true,
+  })
+  @Field(() => [QtBoard])
+  qtBoard: QtBoard[];
+
+  @OneToMany(() => Comments, (comment) => comment.user, {
+    cascade: true,
+  })
+  @Field(() => [Comments])
+  comments: Comments[];
 }

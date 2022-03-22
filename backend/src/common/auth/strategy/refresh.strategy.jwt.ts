@@ -6,13 +6,12 @@ import {
 } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Cache } from 'cache-manager';
-import { ExtractJwt, Strategy } from 'passport-jwt';
+import { Strategy } from 'passport-jwt';
 
-ExtractJwt.fromAuthHeaderAsBearerToken;
 @Injectable()
-export class JwtAccessStrategy extends PassportStrategy(
+export class JwtRefreshStrategy extends PassportStrategy(
   Strategy,
-  'accessToken',
+  'refreshToken',
 ) {
   constructor(
     @Inject(CACHE_MANAGER)
@@ -20,22 +19,26 @@ export class JwtAccessStrategy extends PassportStrategy(
   ) {
     super({
       jwtFromRequest: (req) => req.headers.cookie.replace('refreshToken=', ''),
-      secretOrKey: 'myAccessKey',
+      secretOrKey: 'myRefreshKey',
       passReqToCallback: true,
     });
   }
   async validate(req, payload) {
+    console.log(req.headers.cookie);
+    const refreshToken = req.headers.cookie.replace('refreshToken=', '');
     try {
-      const refreshToken = req.Headers.cookie.replace('refreshToken=', '');
-      const isRefresh = this.cacheManager.get(`refresh:${refreshToken}`); // refresh가 없는경우 access 와 상관없이 false
-      if (isRefresh) return false;
+      const isRefresh = await this.cacheManager.get(`refresh:${refreshToken}`); // refresh가 없는경우 access 와 상관없이 false
+      console.log(isRefresh);
+      if (isRefresh) {
+        return false;
+      }
       return {
-        id: payload.id,
-        email: payload.sub,
+        id: payload.sub,
+        email: payload.email,
         role: payload.role,
       };
     } catch (error) {
-      throw new UnprocessableEntityException('cannot find at redis');
+      throw new UnprocessableEntityException('REDIS cant get or push info');
     }
   }
 }
