@@ -1,8 +1,5 @@
-
 import { CacheModule, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
-import { GraphQLModule } from '@nestjs/graphql';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './apis/auth/auth.module';
 import { UserModule } from './apis/user/user.module';
 import { RedisClientOptions } from 'redis';
@@ -10,14 +7,14 @@ import * as redisStore from 'cache-manager-redis-store';
 import { AppService } from './app.service';
 import { CommentsModule } from './apis/comments/comments.module';
 import { LectureProductModule } from './apis/lectureProduct/lectureProduct.module';
-import { LectureProductCategoryModule } from './apis/lectureproductCategory/lectureproductCategory.module';
 import { QtBoardModule } from './apis/QtBoard/QtBoard.module';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { JwtAccessStrategy } from './common/auth/strategy/access.strategy.jwt';
 import { JwtRefreshStrategy } from './common/auth/strategy/refresh.strategy.jwt';
 import { FileUploadModule } from './apis/file/file.module';
 import { PointModule } from './apis/point/point.module';
-
+import { GraphQLModule } from '@nestjs/graphql';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
   imports: [
@@ -27,7 +24,6 @@ import { PointModule } from './apis/point/point.module';
     QtBoardModule,
     CommentsModule,
     LectureProductModule,
-    LectureProductCategoryModule,
     FileUploadModule,
     GraphQLModule.forRoot<ApolloDriverConfig>({
       autoSchemaFile: '/src/grapqhql/schema.gql',

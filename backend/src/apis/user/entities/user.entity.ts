@@ -1,4 +1,3 @@
-
 import { Field, Int, ObjectType, registerEnumType } from '@nestjs/graphql';
 import { Comments } from 'src/apis/comments/entities/comments.entity';
 import { QtBoard } from 'src/apis/QtBoard/entities/qt.entity';
@@ -92,4 +91,3 @@ export class User {
   @Field(() => [Comments])
   comments: Comments[];
 }
-
