@@ -16,7 +16,7 @@ services:
     image: 'mysql:latest'
     environment:
       MYSQL_DATABASE: 'test_db'
-      MYSQL_ROOT_PASSWORD: '852741'
+      MYSQL_ROOT_PASSWORD: '0000'
       TZ: 'Asia/Seoul'
     cap_add:
       - SYS_NICE

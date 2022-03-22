@@ -35,7 +35,7 @@ import { PointModule } from './apis/point/point.module';
       host: 'my_db',
       database: 'test_db',
       username: 'root',
-      password: '852741',
+      password: '0000',
       entities: [__dirname + '/apis/**/*.entity.*'],
       logging: true,
       synchronize: true,
