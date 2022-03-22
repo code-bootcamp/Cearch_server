@@ -6,7 +6,7 @@ import { GqlRefreshGuard } from 'src/common/auth/guard/gqlAuthGuard';
 import { User, USER_ROLE } from '../user/entities/user.entity';
 import { AuthService } from './auth.service';
 
-interface IcurrentUser {
+export interface IcurrentUser {
   id: string;
   email: string;
   role: USER_ROLE;

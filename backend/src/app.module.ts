@@ -15,7 +15,9 @@ import { QtBoardModule } from './apis/QtBoard/QtBoard.module';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { JwtAccessStrategy } from './common/auth/strategy/access.strategy.jwt';
 import { JwtRefreshStrategy } from './common/auth/strategy/refresh.strategy.jwt';
+import { FileUploadModule } from './apis/file/file.module';
 import { PointModule } from './apis/point/point.module';
+
 
 @Module({
   imports: [
@@ -26,6 +28,7 @@ import { PointModule } from './apis/point/point.module';
     CommentsModule,
     LectureProductModule,
     LectureProductCategoryModule,
+    FileUploadModule,
     GraphQLModule.forRoot<ApolloDriverConfig>({
       autoSchemaFile: '/src/grapqhql/schema.gql',
       context: ({ req, res }) => ({ req, res }),

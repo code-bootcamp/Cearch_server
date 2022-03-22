@@ -37,6 +37,7 @@
     "@socket.io/redis-adapter": "^7.1.0",
     "@types/uuid": "^8.3.4",
     "apollo-server-express": "^3.6.4",
+    "aws-sdk": "^2.1096.0",
     "axios": "^0.26.0",
     "bcrypt": "^5.0.1",
     "cache-manager": "^3.6.0",
