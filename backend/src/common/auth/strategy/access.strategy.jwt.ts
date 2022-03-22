@@ -6,20 +6,21 @@ import {
 } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Cache } from 'cache-manager';
-import { Strategy } from 'passport-jwt';
+import { ExtractJwt, Strategy } from 'passport-jwt';
 
+ExtractJwt.fromAuthHeaderAsBearerToken;
 @Injectable()
-export class JwtRefreshStrategy extends PassportStrategy(
+export class JwtAccessStrategy extends PassportStrategy(
   Strategy,
-  'refreshToken',
+  'accessToken',
 ) {
   constructor(
     @Inject(CACHE_MANAGER)
     private readonly cacheManager: Cache,
   ) {
     super({
-      jwtFromRequest: (req) => req.headers.cookie.replace('refreshToken=', ''),
-      secretOrKey: 'myRefreshKey',
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      secretOrKey: 'myAccessKey',
       passReqToCallback: true,
     });
   }
@@ -30,6 +31,7 @@ export class JwtRefreshStrategy extends PassportStrategy(
       const isRefresh = await this.cacheManager.get(`refresh:${refreshToken}`); // refresh가 없는경우 access 와 상관없이 false
       console.log(isRefresh);
       if (isRefresh) {
+        console.log('여기로 들어가면 안되는데');
         return false;
       }
       return {

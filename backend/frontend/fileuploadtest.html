@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="kr">
+  <head>
+    <title>FileUpload example</title>
+  </head>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <body>
+    <form>
+      <input
+        type="file"
+        accept="image/*,.txt"
+        multiple
+        required
+        capture="user"
+      />
+      <input type="submit" value="업로드" />
+    </form>
+    <button name="check">check signedUrl</button>
+  </body>
+  <script>
+     // let fileValue = $('#excelFile').val();
+     // console.log(fileValue);
+     // let fileName = fileValue[fileValue.length - 1]; // 파일명
+
+     const A = 'test.txt';
+     const B = 'userTempId';
+     $(document).on('click', 'button[name=check]', async function () {
+       const response = await axios.post('http://localhost:3000/graphql', {
+         query: `
+        query  {
+          putSignedUrl(userId: "${B}" , fileName: "${A}")
+       }
+     `,
+       });
+       console.log(response); // sigend url 을 받는 형식입니다 console 안에서 data signed url 받으시면됩니다
+     });
+
+    // signed URL을 서버로부터 할당받으시고( 위의 response 값 아래 axios put(레포지토리에 등록) axios get(등록사진 가져오기))
+    await axios.put(signed_URL, // 헤더 octet/stream 혹은 video , image 등등)
+    )  // put sigend url api를 axios 에서 받았고 이 signed url 은 이미지를 올리는것밖에 안됩니다.
+
+
+    await axios.get(sigend_URL, // 헤더 octet/stream 혹은 video , image 등등)
+    )  // axios .get 은 받아오는것 즉 axios로 리포지토리서부터 get 으로 받아오는것만 가능합니다.
+    // 즉 처음부터 axios.get(signedUrl) 을 쓸려면 signed URL 이 getSignedUrl 로부터 받아온 signedUrl이어야합니다.
+  </script>
+</html>
