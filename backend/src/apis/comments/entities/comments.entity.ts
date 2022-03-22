@@ -1,4 +1,4 @@
-import { Field, ObjectType } from '@nestjs/graphql';
+import { Field, Int, ObjectType } from '@nestjs/graphql';
 import { QtBoard } from 'src/apis/QtBoard/entities/qt.entity';
 import { User } from 'src/apis/user/entities/user.entity';
 import {
