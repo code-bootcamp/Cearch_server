@@ -1,5 +1,6 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { QtBoard } from 'src/apis/QtBoard/entities/qt.entity';
+import { User } from 'src/apis/user/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
@@ -9,11 +10,6 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-
-export enum COMMENT_ISPICK_ENUM {
-  NORMAL = 'NORMAL',
-  PICK = 'PICK',
-}
 
 @Entity()
 @ObjectType()
@@ -27,12 +23,22 @@ export class Comments {
   contents!: string;
 
   @Column({
-    type: 'enum',
-    enum: COMMENT_ISPICK_ENUM,
-    default: COMMENT_ISPICK_ENUM.NORMAL,
+    default: 0,
   })
+  @Field(() => Int, { nullable: true })
+  isPick!: number;
+
+  @Column({ default: 0 })
+  @Field(() => Int)
+  depth!: number;
+
+  @Column({ nullable: true })
   @Field(() => String, { nullable: true })
-  isPick!: string;
+  parent: string;
+
+  @Column({ nullable: true })
+  @Field(() => Int, { nullable: true })
+  group: number;
 
   @CreateDateColumn()
   @Field(() => Date)
@@ -52,4 +58,11 @@ export class Comments {
   })
   @Field(() => QtBoard)
   qtBoard: QtBoard;
+
+  @ManyToOne(() => User, (user) => user.comments, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
+  @Field(() => User)
+  user: User;
 }

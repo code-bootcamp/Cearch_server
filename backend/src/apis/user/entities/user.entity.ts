@@ -1,9 +1,13 @@
+
 import { Field, Int, ObjectType, registerEnumType } from '@nestjs/graphql';
+import { Comments } from 'src/apis/comments/entities/comments.entity';
+import { QtBoard } from 'src/apis/QtBoard/entities/qt.entity';
 import {
   Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -75,4 +79,17 @@ export class User {
   @DeleteDateColumn()
   @Field(() => Date)
   deleteDate: Date;
+
+  @OneToMany(() => QtBoard, (qt) => qt.user, {
+    cascade: true,
+  })
+  @Field(() => [QtBoard])
+  qtBoard: QtBoard[];
+
+  @OneToMany(() => Comments, (comment) => comment.user, {
+    cascade: true,
+  })
+  @Field(() => [Comments])
+  comments: Comments[];
 }
+

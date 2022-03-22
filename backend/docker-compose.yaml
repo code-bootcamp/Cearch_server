@@ -9,6 +9,9 @@ services:
       - ./src:/backend/src
     ports:
       - '3000:3000'
+    volumes:
+      - ./src:/backend/src
+      - ./.env:/backend/.env
 
   my_db:
     platform: linux/amd64
