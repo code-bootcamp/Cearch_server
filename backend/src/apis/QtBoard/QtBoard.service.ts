@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Comments } from '../comments/entities/comments.entity';
+import { User } from '../user/entities/user.entity';
 import { CreateQtBoardInput } from './dto/createQtBoard.input';
 import { UpdateQtBoardInput } from './dto/updateQtBoard.input';
 import { QtBoard } from './entities/qt.entity';
@@ -11,6 +12,7 @@ interface IFindOne {
 }
 
 interface ICreate {
+  currentuser: any;
   createQtBoardInput: CreateQtBoardInput;
 }
 
@@ -26,6 +28,8 @@ export class QtBoardService {
     private readonly qtBoardRepository: Repository<QtBoard>,
     @InjectRepository(Comments)
     private readonly commentsRepository: Repository<Comments>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
   ) {}
 
   async findAll({ page }) {
@@ -40,11 +44,16 @@ export class QtBoardService {
   }
 
   async findOne({ postId }: IFindOne) {
-    const findOnePost = await this.qtBoardRepository.findOne({
-      where: { id: postId },
-      relations: ['comments', 'likes'],
-    });
-    console.log(findOnePost);
+    const findOnePost = await this.qtBoardRepository
+      .createQueryBuilder('qtBoard')
+      .leftJoinAndSelect('qtBoard.comments', 'comment')
+      .leftJoinAndSelect('qtBoard.likes', 'likes')
+      .where('qtBoard.id = :id', { id: postId })
+      .andWhere(`comment.parent = :parent`, { parent: '1' }) //parent 가 1인 댓글만 찾기
+      .orderBy('comment.isPick', 'DESC')
+      .addOrderBy('comment.createdAt')
+      .getOne();
+
     return findOnePost;
   }
   async findLikePost() {
@@ -57,9 +66,11 @@ export class QtBoardService {
     return findLikePost[0];
   }
 
-  async create({ createQtBoardInput }: ICreate) {
+  async create({ currentuser, createQtBoardInput }: ICreate) {
+    const user = await this.userRepository.findOne({ id: currentuser.id });
     const createPost = await this.qtBoardRepository.save({
       ...createQtBoardInput,
+      user: user,
     });
     return createPost;
   }

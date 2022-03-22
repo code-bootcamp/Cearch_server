@@ -1,11 +1,13 @@
 import { Int, Field, ObjectType } from '@nestjs/graphql';
 import { Comments } from 'src/apis/comments/entities/comments.entity';
 import { Likes } from 'src/apis/likes/entities/likes.entity';
+import { User } from 'src/apis/user/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -46,6 +48,13 @@ export class QtBoard {
   @Field(() => Date)
   deletedAt?: Date;
 
+  @ManyToOne(() => User, (user) => user.qtBoard, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
+  @Field(() => User)
+  user: User;
+
   @OneToMany(() => Comments, (comments) => comments.qtBoard, {
     cascade: true,
   })
@@ -55,6 +64,6 @@ export class QtBoard {
   @OneToMany(() => Likes, (likes) => likes.qtBoard, {
     cascade: true,
   })
-  @Field(() => Likes)
+  @Field(() => [Likes])
   likes?: Likes[];
 }

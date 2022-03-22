@@ -1,3 +1,4 @@
+
 import { CacheModule, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { GraphQLModule } from '@nestjs/graphql';
@@ -15,9 +16,12 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { JwtAccessStrategy } from './common/auth/strategy/access.strategy.jwt';
 import { JwtRefreshStrategy } from './common/auth/strategy/refresh.strategy.jwt';
 import { FileUploadModule } from './apis/file/file.module';
+import { PointModule } from './apis/point/point.module';
+
 
 @Module({
   imports: [
+    PointModule,
     AuthModule,
     UserModule,
     QtBoardModule,

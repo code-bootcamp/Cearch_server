@@ -1,3 +1,4 @@
+
 import {
   CACHE_MANAGER,
   HttpException,
@@ -194,7 +195,7 @@ export class AuthService {
       },
       {
         secret: 'myAccessKey',
-        expiresIn: '10m',
+        expiresIn: '1h',
       },
     );
     return accessToken;
