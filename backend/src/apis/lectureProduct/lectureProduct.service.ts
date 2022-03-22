@@ -1,6 +1,11 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { USER_ROLE } from '../user/entities/user.entity';
 import { CreateLectureProductInput } from './dto/createLectureProduct.input';
 import { UpdateLectureProductInput } from './dto/updateLectureProduct.input';
 import { LectureProduct } from './entities/lectureProduct.entity';
@@ -19,10 +24,6 @@ interface IUpdate {
   updateLectureProductInput: UpdateLectureProductInput;
 }
 
-interface IDelete {
-  lectureproductId: string;
-}
-
 @Injectable()
 export class LectureProductService {
   constructor(
@@ -30,13 +31,15 @@ export class LectureProductService {
     private readonly lectureProductRepository: Repository<LectureProduct>,
   ) {}
 
-  // Create Class
+  // Create Class : only mentor has right to create class
   async create({ createLectureProductInput }: ICreate) {
     try {
       const { classTitle, ...rest } = createLectureProductInput;
 
       if (await this.lectureProductRepository.findOne({ classTitle })) {
-        throw new ConflictException();
+        throw new ConflictException('동일한 이름의 클래스가 존재합니다');
+      } else if (!USER_ROLE.MENTOR) {
+        throw new UnauthorizedException('클래스 개설 권한이 없습니다!');
       }
 
       return await this.lectureProductRepository.save({
@@ -51,9 +54,9 @@ export class LectureProductService {
   async findAll() {
     const result = await this.lectureProductRepository.find({
       relations: ['lectureProduct'],
-      withDeleted: true,
+      withDeleted: false,
     });
-    return await this.lectureProductRepository.find();
+    return await result;
   }
   // Find One Class : ReadOne
   async findOne({ lectureproductId }: IFindOne) {
@@ -61,7 +64,16 @@ export class LectureProductService {
       id: lectureproductId,
     });
   }
-  // Update Class
+  // Find New Classes
+  async findNewClasses() {
+    const findNewClasses = await this.lectureProductRepository.find({
+      take: 5, // 5개
+      order: { createdAt: 'DESC' },
+      where: { deletedAt: null },
+    });
+    return findNewClasses[0];
+  }
+  // Update Class: only mentor has right to update class
   async update({ lectureproductId, updateLectureProductInput }: IUpdate) {
     const currentlectureproduct = await this.lectureProductRepository.findOne({
       id: lectureproductId,
@@ -72,8 +84,8 @@ export class LectureProductService {
     };
     return await this.lectureProductRepository.save(newlectureproduct);
   }
-  // Delete Class
-  async delete({ lectureproductId }: IDelete) {
+  // Delete Class: only mentor has right to delete class
+  async delete({ lectureproductId }) {
     const result = await this.lectureProductRepository.softDelete({
       id: lectureproductId,
     });

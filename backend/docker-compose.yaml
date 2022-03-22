@@ -5,6 +5,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    volumes:
+      - ./src:/backend/src
     ports:
       - '3000:3000'
     volumes:
