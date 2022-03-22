@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { UnprocessableEntityException } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { AuthService } from '../auth/auth.service';
 import { AUTH_KIND } from '../auth/entities/auth.entity';
-import { UserInput } from './dto/user.input';
+import { UserForm } from './dto/user.input';
 import { User } from './entities/user.entity';
 import { UserService } from './user.service';
 
@@ -12,11 +13,12 @@ export class UserResolver {
     private readonly userService: UserService, //
     private readonly authService: AuthService,
   ) {}
+
   @Query(() => Boolean)
   async isCheckEmail(
     @Args('email') email: string, //
   ) {
-    return await this.userService.isCheckId({ email });
+    return await this.userService.isCheckEmail({ email });
   }
 
   @Query(() => Boolean)
@@ -45,13 +47,9 @@ export class UserResolver {
 
   @Mutation(() => User)
   async createUser(
-    @Args('userInput') userInput: UserInput, //
+    @Args('userForm') userForm: UserForm, //
   ) {
-    const isEmail = await this.userService.isCheckId({
-      email: userInput.email,
-    });
-    if (isEmail) throw new UnprocessableEntityException('기존아이디가 존재');
-    await this.userService.sendForm({ userInput });
+    return await this.userService.saveForm({ userForm });
   }
 
   @Mutation(() => String)

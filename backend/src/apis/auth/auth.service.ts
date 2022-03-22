@@ -72,14 +72,14 @@ export class AuthService {
 
   async checkToken({ indexer, kind, inputToken }: ItokenCheck) {
     const result = await this.authTableRepository.findOne({
-      where: { indexer, kind },
+      where: { kind, indexer },
       order: {
         createdAt: 'DESC',
       },
     });
-    console.log(result);
-    if (result) throw new UnprocessableEntityException('해당 인증번호가 없음');
-    // if (result.authNumber != inputToken) return false;
+    if (result === undefined)
+      throw new UnprocessableEntityException('해당 인증번호가 없음');
+    if (result.authNumber != inputToken) return false;
     return true;
   }
 
@@ -105,7 +105,6 @@ export class AuthService {
           },
         },
       );
-      console.log(result);
       return '정상적으로 보내졌습니다';
     } catch (error) {
       throw new HttpException(
@@ -158,10 +157,11 @@ export class AuthService {
 
   async isInfoCheck({ email, password }: IinfoCheck) {
     const user = await this.userRepository.findOne({ where: { email } });
-    if (!user) {
+    if (user === undefined) {
       throw new UnauthorizedException('비밀번호 혹은 아이디가 잘못되었습니다');
     }
-    const passwordCheck = bcrypt.compare(password, user.password);
+    const passwordCheck = await bcrypt.compare(password, user.password);
+    console.log('passwordCheck : ', passwordCheck);
     if (!passwordCheck) {
       throw new UnauthorizedException('비밀번호 혹은 아이디가 잘못되었습니다');
     }

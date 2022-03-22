@@ -1,11 +1,15 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Field, Int, ObjectType } from '@nestjs/graphql';
+import { LectureImage } from 'src/apis/LectureImage/entities/lectureImage.entity';
 import { LectureProductCategory } from 'src/apis/lectureproductCategory/entities/lectureproductCategory.entity';
 import {
   Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
-  ManyToOne,
+  JoinTable,
+  ManyToMany,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -34,9 +38,6 @@ export class LectureProduct {
   classPrice: number;
 
   @UpdateDateColumn()
-  classResgisrationDate: Date;
-
-  @UpdateDateColumn()
   classDuedate: Date;
 
   @Column({ default: false })
@@ -56,20 +57,28 @@ export class LectureProduct {
   classOpen: boolean;
 
   @CreateDateColumn()
-  createdAt: Date;
+  @Field(() => Date)
+  createdAt!: Date;
 
   @UpdateDateColumn()
+  @Field(() => Date)
   updatedAt: Date;
 
   @DeleteDateColumn()
-  deletedAt: Date;
+  @Field(() => Date)
+  deletedAt?: Date;
 
-  @ManyToOne(() => LectureProductCategory, {
+  @OneToMany(() => LectureImage, (image) => image.product, {
     cascade: true,
-    onDelete: 'CASCADE',
   })
-  //
-  //
-  @Field(() => LectureProductCategory, { nullable: true })
-  lectureproductCategory?: LectureProductCategory;
+  @Field(() => [LectureImage])
+  image: LectureImage[];
+
+  // @JoinTable()
+  // @ManyToMany(
+  //   () => LectureProductCategory,
+  //   (lectureCategory) => lectureCategory.product,
+  // )
+  // @Field(() => [LectureProductCategory])
+  // lectureCategory: LectureProductCategory[];
 }
