@@ -1,3 +1,4 @@
+
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthTable } from './entities/auth.entity';
@@ -19,3 +20,4 @@ import { JwtRefreshStrategy } from 'src/common/auth/strategy/refresh.strategy.jw
   ],
 })
 export class AuthModule {}
+

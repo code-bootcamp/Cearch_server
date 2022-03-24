@@ -1,11 +1,12 @@
+
 import { UseGuards } from '@nestjs/common';
 import { Args, Context, Mutation, Resolver } from '@nestjs/graphql';
 import { CurrentUser } from 'src/common/auth/decorate/currentuser.decorate';
 import { GqlRefreshGuard } from 'src/common/auth/guard/gqlAuthGuard';
-import { USER_ROLE } from '../user/entities/user.entity';
+import { User, USER_ROLE } from '../user/entities/user.entity';
 import { AuthService } from './auth.service';
 
-interface IcurrentUser {
+export interface IcurrentUser {
   id: string;
   email: string;
   role: USER_ROLE;

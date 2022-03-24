@@ -23,10 +23,12 @@ import { LectureRegistrationModule } from './apis/lectureRegistration/lectureReg
     UserModule,
     QtBoardModule,
     CommentsModule,
+    PointModule,
     LectureProductModule,
     LectureProductCategoryModule,
     LectureRegistrationModule,
     LectureOrderModule,
+    FileUploadModule,
     GraphQLModule.forRoot<ApolloDriverConfig>({
       autoSchemaFile: '/src/grapqhql/schema.gql',
       context: ({ req, res }) => ({ req, res }),
@@ -52,3 +54,4 @@ import { LectureRegistrationModule } from './apis/lectureRegistration/lectureReg
   providers: [AppService, JwtAccessStrategy, JwtRefreshStrategy],
 })
 export class AppModule {}
+

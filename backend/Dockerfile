@@ -7,4 +7,4 @@ RUN yarn install
 
 COPY . /backend/
 #RUN yarn build
-CMD yarn start
+CMD yarn start:dev
