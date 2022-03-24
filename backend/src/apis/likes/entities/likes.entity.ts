@@ -15,10 +15,7 @@ export class Likes {
   @Field(() => String)
   id!: string;
 
-  @ManyToOne(() => QtBoard, (qtBoard) => qtBoard.likes, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
-  })
+  @ManyToOne(() => QtBoard, (qtBoard) => qtBoard.likes)
   @Field(() => QtBoard)
   qtBoard: QtBoard;
 

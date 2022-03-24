@@ -14,7 +14,6 @@ export class CommentsService {
     private readonly qtBoardRepository: Repository<QtBoard>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-
     private readonly connection: Connection,
   ) {}
 

@@ -170,4 +170,5 @@ export class FileUploadService {
     const result = await Promise.all(imageUrlList);
     return result;
   }
+  //////////////////////////////////////////////////
 }

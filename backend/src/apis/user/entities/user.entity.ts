@@ -6,10 +6,13 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  JoinColumn,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { MentoInfo } from './mento.entity';
 
 export enum USER_ROLE {
   MENTOR = 'MENTOR',
@@ -90,4 +93,8 @@ export class User {
   })
   @Field(() => [Comments])
   comments: Comments[];
+
+  @JoinColumn()
+  @OneToOne(() => MentoInfo)
+  mentor: MentoInfo;
 }
