@@ -2,7 +2,6 @@ import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { Connection, Repository } from 'typeorm';
-import { IcurrentUser } from '../auth/auth.resolver';
 import { MentorForm } from './dto/mentoForm.input';
 import { UserForm } from './dto/user.input';
 import { MentoInfo, MENTOR_AUTH } from './entities/mento.entity';

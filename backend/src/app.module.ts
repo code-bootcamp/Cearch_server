@@ -18,7 +18,7 @@ import { LikesModule } from './apis/likes/likes.module';
 import { PointModule } from './apis/point/point.module';
 import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
-
+import { FileUploadModule } from './apis/file/file.module';
 
 @Module({
   imports: [
@@ -58,4 +58,3 @@ import { TypeOrmModule } from '@nestjs/typeorm';
   providers: [AppService, JwtAccessStrategy, JwtRefreshStrategy],
 })
 export class AppModule {}
-

@@ -1,6 +1,8 @@
 import { Field, Float, Int, ObjectType } from '@nestjs/graphql';
 import { LectureImage } from 'src/apis/LectureImage/entities/lectureImage.entity';
+import { JoinLectureAndProductCategory } from 'src/apis/lectureproductCategory/entities/lectureproductCagtegory.classCategory.entity';
 import { LectureProductCategory } from 'src/apis/lectureproductCategory/entities/lectureproductCategory.entity';
+import { LectureRegistration } from 'src/apis/lectureRegistration/entitites/lectureRegistration.entity';
 import { LectureReview } from 'src/apis/lectureReview/entities/lectureReview.entity';
 import {
   Column,
