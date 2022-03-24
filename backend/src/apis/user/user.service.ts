@@ -1,4 +1,3 @@
-
 import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
@@ -17,6 +16,13 @@ export class UserService {
     private readonly userRepository: Repository<User>,
     private readonly connection: Connection,
   ) {} //
+
+  async findOne({ email }) {
+    const myUser = await this.userRepository.findOne({
+      where: { email: email },
+    });
+    return myUser;
+  }
 
   async isCheckEmail({ email }) {
     const result = await this.userRepository.findOne({ where: { email } });

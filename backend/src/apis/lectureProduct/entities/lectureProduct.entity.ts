@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Field, Int, ObjectType } from '@nestjs/graphql';
+import { Field, Float, Int, ObjectType } from '@nestjs/graphql';
 import { LectureImage } from 'src/apis/LectureImage/entities/lectureImage.entity';
 import { LectureProductCategory } from 'src/apis/lectureproductCategory/entities/lectureproductCategory.entity';
+import { LectureReview } from 'src/apis/lectureReview/entities/lectureReview.entity';
 import {
   Column,
   CreateDateColumn,
@@ -56,6 +57,10 @@ export class LectureProduct {
   @Field(() => Boolean)
   classOpen: boolean;
 
+  @Column({ default: 0 })
+  @Field(() => Float)
+  rating: number;
+
   @CreateDateColumn()
   @Field(() => Date)
   createdAt!: Date;
@@ -73,6 +78,12 @@ export class LectureProduct {
   })
   @Field(() => [LectureImage])
   image: LectureImage[];
+
+  @OneToMany(() => LectureReview, (review) => review.user, {
+    cascade: true,
+  })
+  @Field(() => [LectureReview])
+  reviews: LectureReview[];
 
   // @JoinTable()
   // @ManyToMany(
