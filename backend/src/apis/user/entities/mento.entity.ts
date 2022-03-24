@@ -1,6 +1,14 @@
 import { Field, ObjectType, registerEnumType } from '@nestjs/graphql';
 import { CertificateImage } from 'src/apis/certificateImage/entities/certificate.entity';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { User } from './user.entity';
+import { JoinMentoAndProductCategory } from './workMento.entity';
 
 export enum MENTOR_AUTH {
   PENDING = 'PENDING',
@@ -16,23 +24,33 @@ export class MentoInfo {
   @Field(() => String)
   id: string;
 
-  @Column()
+  @Column({ nullable: true })
   @Field(() => String)
-  companyName: string;
+  companyName!: string;
 
-  @Column()
+  @Column({ nullable: true })
   @Field(() => String)
-  department: string;
+  department!: string;
 
   @Column({ default: MENTOR_AUTH.PENDING })
   @Field(() => MENTOR_AUTH, { defaultValue: MENTOR_AUTH.PENDING })
   mentoStatus: string;
 
-  @Column()
+  @Column({ nullable: true })
   @Field(() => String)
-  selfIntro: string;
+  selfIntro!: string;
 
   @OneToMany(() => CertificateImage, (certificate) => certificate.mento)
   @Field(() => [CertificateImage])
   certificate: CertificateImage[];
+
+  @OneToMany(
+    () => JoinMentoAndProductCategory,
+    (joinMentoAndProductCategory) => joinMentoAndProductCategory.mento,
+  )
+  @Field(() => [JoinMentoAndProductCategory])
+  work: JoinMentoAndProductCategory[];
+
+  @OneToOne(() => User, (user) => user.mentor)
+  user: User;
 }

@@ -2,6 +2,7 @@ import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { Connection, Repository } from 'typeorm';
+import { IcurrentUser } from '../auth/auth.resolver';
 import { MentorForm } from './dto/mentoForm.input';
 import { UserForm } from './dto/user.input';
 import { MentoInfo, MENTOR_AUTH } from './entities/mento.entity';
@@ -12,7 +13,7 @@ interface IcreateUserForm {
 }
 
 interface ImentorForm {
-  mentorId: string;
+  user: IcurrentUser;
   mentorForm: MentorForm;
 }
 
@@ -56,7 +57,7 @@ export class UserService {
   async updatePassword({ email, newPassword }) {
     const queryRunner = this.connection.createQueryRunner();
     await queryRunner.connect();
-    queryRunner.startTransaction('REPEATABLE READ');
+    await queryRunner.startTransaction('REPEATABLE READ');
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
@@ -79,7 +80,7 @@ export class UserService {
   async promoteMento({ mentoId, userId }) {
     const queryRunner = this.connection.createQueryRunner();
     await queryRunner.connect();
-    queryRunner.startTransaction('REPEATABLE READ');
+    await queryRunner.startTransaction('REPEATABLE READ');
     try {
       const mento = await queryRunner.manager.findOne(MentoInfo, {
         id: mentoId,
@@ -106,9 +107,30 @@ export class UserService {
     }
   }
 
-  async sendMentorForm({ mentorForm }: ImentorForm) {
-    const mento = await this.mentoInfoRepository.save({
-      ...mentorForm,
-    });
+  async sendMentorForm({ mentorForm, user }: ImentorForm) {
+    const querryRunner = this.connection.createQueryRunner();
+    await querryRunner.connect();
+    await querryRunner.startTransaction('REPEATABLE READ');
+    try {
+      const userFind = await querryRunner.manager.findOne(User, {
+        where: { id: user.id },
+      });
+      const mento = await querryRunner.manager.save(MentoInfo, {
+        ...mentorForm,
+        user: userFind,
+      });
+      const result = await querryRunner.manager.save(User, {
+        ...userFind,
+        mentor: mento,
+      });
+      await querryRunner.commitTransaction();
+      return mento;
+    } catch (error) {
+      console.log(error);
+      await querryRunner.rollbackTransaction();
+      throw new UnprocessableEntityException('Cant update with mentor Form');
+    } finally {
+      await querryRunner.release();
+    }
   }
 }

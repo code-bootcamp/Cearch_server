@@ -1,6 +1,7 @@
-import { UnprocessableEntityException } from '@nestjs/common';
+import { UnprocessableEntityException, UseGuards } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { CurrentUser } from 'src/common/auth/decorate/currentuser.decorate';
+import { GqlAccessGuard } from 'src/common/auth/guard/gqlAuthGuard';
 import { IcurrentUser } from '../auth/auth.resolver';
 import { AuthService } from '../auth/auth.service';
 import { AUTH_KIND } from '../auth/entities/auth.entity';
@@ -99,13 +100,14 @@ export class UserResolver {
   }
 
   @Mutation(() => MentoInfo)
+  @UseGuards(GqlAccessGuard)
   async sendMentorForm(
     @Args('mentorForm') mentorForm: MentorForm, //
-    @Args('mentorId') mentorId: string,
+    @CurrentUser() currentUser: IcurrentUser,
   ) {
     return await this.userService.sendMentorForm({
       mentorForm,
-      mentorId,
+      user: currentUser,
     });
   }
 }

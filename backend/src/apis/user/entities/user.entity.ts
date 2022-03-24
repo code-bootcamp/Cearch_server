@@ -14,6 +14,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { JoinUserAndProductCategory } from './interestUser.entity';
 import { MentoInfo } from './mento.entity';
 
 export enum USER_ROLE {
@@ -95,7 +96,7 @@ export class User {
   comments: Comments[];
 
   @JoinColumn()
-  @OneToOne(() => MentoInfo)
+  @OneToOne(() => MentoInfo, (mentoInfo) => mentoInfo.user)
   mentor: MentoInfo;
 
   @OneToMany(() => Likes, (like) => like.user)
@@ -105,4 +106,11 @@ export class User {
   @OneToMany(() => LectureReview, (review) => review.user)
   @Field(() => [LectureReview])
   reviews: LectureReview[];
+
+  @OneToMany(
+    () => JoinUserAndProductCategory,
+    (joinUserAndProductCategory) => joinUserAndProductCategory.user,
+  )
+  @Field(() => [JoinUserAndProductCategory])
+  interest: JoinUserAndProductCategory[];
 }

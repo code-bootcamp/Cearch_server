@@ -1,6 +1,12 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { MentoInfo } from 'src/apis/user/entities/mento.entity';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  DeleteDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity()
 @ObjectType()
@@ -16,4 +22,8 @@ export class CertificateImage {
   @ManyToOne(() => MentoInfo, (mento) => mento.certificate)
   @Field(() => MentoInfo)
   mento: MentoInfo;
+
+  @DeleteDateColumn()
+  @Field(() => Date)
+  deleteAt: Date;
 }
