@@ -12,7 +12,7 @@ import {
 
 @Entity()
 @ObjectType()
-export class postImage {
+export class PostImage {
   @PrimaryGeneratedColumn('uuid')
   @Field(() => String)
   id!: string;

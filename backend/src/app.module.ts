@@ -1,7 +1,5 @@
 import { CacheModule, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
-import { GraphQLModule } from '@nestjs/graphql';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './apis/auth/auth.module';
 import { UserModule } from './apis/user/user.module';
 import { RedisClientOptions } from 'redis';
@@ -18,6 +16,9 @@ import { LectureOrderModule } from './apis/lectureOrder/lectureOrder.module';
 import { LectureRegistrationModule } from './apis/lectureRegistration/lectureRegistration.module';
 import { LikesModule } from './apis/likes/likes.module';
 import { PointModule } from './apis/point/point.module';
+import { GraphQLModule } from '@nestjs/graphql';
+import { TypeOrmModule } from '@nestjs/typeorm';
+
 
 @Module({
   imports: [

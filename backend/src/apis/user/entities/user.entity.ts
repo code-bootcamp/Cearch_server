@@ -8,10 +8,13 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  JoinColumn,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { MentoInfo } from './mento.entity';
 
 export enum USER_ROLE {
   MENTOR = 'MENTOR',
@@ -87,21 +90,19 @@ export class User {
   @Field(() => [QtBoard])
   qtBoard: QtBoard[];
 
-  @OneToMany(() => Comments, (comment) => comment.user, {
-    cascade: true,
-  })
+  @OneToMany(() => Comments, (comment) => comment.user)
   @Field(() => [Comments])
   comments: Comments[];
 
-  @OneToMany(() => Likes, (like) => like.user, {
-    cascade: true,
-  })
+  @JoinColumn()
+  @OneToOne(() => MentoInfo)
+  mentor: MentoInfo;
+
+  @OneToMany(() => Likes, (like) => like.user)
   @Field(() => [Likes])
   likes: Likes[];
 
-  @OneToMany(() => LectureReview, (review) => review.user, {
-    cascade: true,
-  })
+  @OneToMany(() => LectureReview, (review) => review.user)
   @Field(() => [LectureReview])
   reviews: LectureReview[];
 }

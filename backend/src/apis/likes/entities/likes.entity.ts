@@ -21,17 +21,11 @@ export class Likes {
   @Field(() => Boolean)
   isLike: boolean;
 
-  @ManyToOne(() => QtBoard, (qtBoard) => qtBoard.likes, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
-  })
+  @ManyToOne(() => QtBoard, (qtBoard) => qtBoard.likes)
   @Field(() => QtBoard)
   qtBoard: QtBoard;
 
-  @ManyToOne(() => User, (user) => user.likes, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
-  })
+  @ManyToOne(() => User, (user) => user.likes)
   @Field(() => User)
   user: User;
 

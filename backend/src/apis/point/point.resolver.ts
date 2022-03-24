@@ -43,7 +43,6 @@ export class PointResolver {
     const token = await this.iamportService.getIamportToken();
 
     const cancelAmount = await this.iamportService.getCancel({ impUid, token });
-    console.log(cancelAmount, '😘');
     return await this.pointService.cancel({
       impUid,
       amount: cancelAmount,

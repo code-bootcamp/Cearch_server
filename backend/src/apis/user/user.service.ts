@@ -2,11 +2,19 @@ import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { Connection, Repository } from 'typeorm';
+import { IcurrentUser } from '../auth/auth.resolver';
+import { MentorForm } from './dto/mentoForm.input';
 import { UserForm } from './dto/user.input';
+import { MentoInfo, MENTOR_AUTH } from './entities/mento.entity';
 import { User } from './entities/user.entity';
 
 interface IcreateUserForm {
   userForm: UserForm;
+}
+
+interface ImentorForm {
+  mentorId: string;
+  mentorForm: MentorForm;
 }
 
 @Injectable()
@@ -14,6 +22,8 @@ export class UserService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(MentoInfo)
+    private readonly mentoInfoRepository: Repository<MentoInfo>,
     private readonly connection: Connection,
   ) {} //
 
@@ -65,5 +75,41 @@ export class UserService {
     } finally {
       await queryRunner.release();
     }
+  }
+
+  async promoteMento({ mentoId, userId }) {
+    const queryRunner = this.connection.createQueryRunner();
+    await queryRunner.connect();
+    queryRunner.startTransaction('REPEATABLE READ');
+    try {
+      const mento = await queryRunner.manager.findOne(MentoInfo, {
+        id: mentoId,
+      });
+      const user = await queryRunner.manager.findOne(User, {
+        id: userId,
+      });
+      const promotedMento = await queryRunner.manager.save(MentoInfo, {
+        ...mento,
+        mentoStatus: MENTOR_AUTH.AUTHROIZED,
+      });
+      await queryRunner.manager.save(User, {
+        ...user,
+        mentor: promotedMento,
+      });
+      await queryRunner.commitTransaction();
+      return promotedMento;
+    } catch (error) {
+      throw new UnprocessableEntityException(
+        'MYSQL CANT UPDATE MENTOR AUTHROIZED',
+      );
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  async sendMentorForm({ mentorForm }: ImentorForm) {
+    const mento = await this.mentoInfoRepository.save({
+      ...mentorForm,
+    });
   }
 }
