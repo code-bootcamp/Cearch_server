@@ -13,6 +13,9 @@ import { QtBoardModule } from './apis/QtBoard/QtBoard.module';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { JwtAccessStrategy } from './common/auth/strategy/access.strategy.jwt';
 import { JwtRefreshStrategy } from './common/auth/strategy/refresh.strategy.jwt';
+import { LectureProductCategoryModule } from './apis/lectureproductCategory/lectureproductCategory.module';
+import { LectureOrderModule } from './apis/lectureOrder/lectureOrder.module';
+import { LectureRegistrationModule } from './apis/lectureRegistration/lectureRegistration.module';
 
 @Module({
   imports: [
@@ -21,6 +24,9 @@ import { JwtRefreshStrategy } from './common/auth/strategy/refresh.strategy.jwt'
     QtBoardModule,
     CommentsModule,
     LectureProductModule,
+    LectureProductCategoryModule,
+    LectureRegistrationModule,
+    LectureOrderModule,
     GraphQLModule.forRoot<ApolloDriverConfig>({
       autoSchemaFile: '/src/grapqhql/schema.gql',
       context: ({ req, res }) => ({ req, res }),
