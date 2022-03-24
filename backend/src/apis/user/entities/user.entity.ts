@@ -1,6 +1,7 @@
-
 import { Field, Int, ObjectType, registerEnumType } from '@nestjs/graphql';
 import { Comments } from 'src/apis/comments/entities/comments.entity';
+import { LectureReview } from 'src/apis/lectureReview/entities/lectureReview.entity';
+import { Likes } from 'src/apis/likes/entities/likes.entity';
 import { QtBoard } from 'src/apis/QtBoard/entities/qt.entity';
 import {
   Column,
@@ -91,5 +92,16 @@ export class User {
   })
   @Field(() => [Comments])
   comments: Comments[];
-}
 
+  @OneToMany(() => Likes, (like) => like.user, {
+    cascade: true,
+  })
+  @Field(() => [Likes])
+  likes: Likes[];
+
+  @OneToMany(() => LectureReview, (review) => review.user, {
+    cascade: true,
+  })
+  @Field(() => [LectureReview])
+  reviews: LectureReview[];
+}

@@ -16,9 +16,12 @@ import { JwtRefreshStrategy } from './common/auth/strategy/refresh.strategy.jwt'
 import { LectureProductCategoryModule } from './apis/lectureproductCategory/lectureproductCategory.module';
 import { LectureOrderModule } from './apis/lectureOrder/lectureOrder.module';
 import { LectureRegistrationModule } from './apis/lectureRegistration/lectureRegistration.module';
+import { LikesModule } from './apis/likes/likes.module';
+import { PointModule } from './apis/point/point.module';
 
 @Module({
   imports: [
+    LikesModule,
     AuthModule,
     UserModule,
     QtBoardModule,

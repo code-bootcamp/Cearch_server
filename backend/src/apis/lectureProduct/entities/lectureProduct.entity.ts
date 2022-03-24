@@ -1,8 +1,7 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { Field, Int, ObjectType } from '@nestjs/graphql';
-import { LectureImage } from 'src/apis/lectureImage/entities/lectureImage.entity';
-import { JoinLectureAndProductCategory } from 'src/apis/lectureproductCategory/entities/lectureproductCagtegory.classCategory.entity';
-import { LectureRegistration } from 'src/apis/lectureRegistration/entitites/lectureRegistration.entity';
+import { Field, Float, Int, ObjectType } from '@nestjs/graphql';
+import { LectureImage } from 'src/apis/LectureImage/entities/lectureImage.entity';
+import { LectureProductCategory } from 'src/apis/lectureproductCategory/entities/lectureproductCategory.entity';
+import { LectureReview } from 'src/apis/lectureReview/entities/lectureReview.entity';
 import {
   Column,
   CreateDateColumn,
@@ -55,6 +54,10 @@ export class LectureProduct {
   @Field(() => Boolean)
   classOpen: boolean;
 
+  @Column({ default: 0 })
+  @Field(() => Float)
+  rating: number;
+
   @CreateDateColumn()
   @Field(() => Date)
   createdAt!: Date;
@@ -73,7 +76,12 @@ export class LectureProduct {
   @Field(() => [LectureImage])
   image: LectureImage[];
 
-  // JoinLectureAndProductCategory와 1:N 연결
+  @OneToMany(() => LectureReview, (review) => review.user, {
+    cascade: true,
+  })
+  @Field(() => [LectureReview])
+  reviews: LectureReview[];
+
   @OneToMany(
     () => JoinLectureAndProductCategory,
     (lecproduct) => lecproduct.linkedToLectureProduct,

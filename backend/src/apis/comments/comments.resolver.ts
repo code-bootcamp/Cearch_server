@@ -12,6 +12,15 @@ import { Comments } from './entities/comments.entity';
 export class CommentsResolver {
   constructor(private readonly commentsService: CommentsService) {}
 
+  @UseGuards(GqlAccessGuard)
+  @Query(() => [Comments])
+  async fetchMyComments(
+    @CurrentUser() currentuser: ICurrentUser,
+    @Args('page') page: number,
+  ) {
+    return await this.commentsService.findMyComments({ currentuser, page });
+  }
+
   @Query(() => [Comments])
   async fetchReComments(@Args('commentId') commentId: string) {
     return await this.commentsService.findAllReComment({ commentId });
@@ -42,8 +51,11 @@ export class CommentsResolver {
 
   @UseGuards(GqlAccessGuard)
   @Mutation(() => Boolean)
-  async deleteComments(@Args('commentId') commentId: string) {
-    return await this.commentsService.delete({ commentId });
+  async deleteComments(
+    @CurrentUser() currentuser: ICurrentUser,
+    @Args('commentId') commentId: string,
+  ) {
+    return await this.commentsService.delete({ currentuser, commentId });
   }
   @UseGuards(GqlAccessGuard)
   @Mutation(() => Comments)
@@ -58,13 +70,11 @@ export class CommentsResolver {
   @Mutation(() => Comments)
   async createReply(
     @CurrentUser() currentuser: ICurrentUser,
-    @Args('postId') postId: string,
     @Args('contents') contents: string,
     @Args('commentId') commentId: string,
   ) {
     return await this.commentsService.createReply({
       currentuser,
-      postId,
       commentId,
       contents,
     });

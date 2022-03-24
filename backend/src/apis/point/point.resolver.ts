@@ -16,11 +16,11 @@ export class PointResolver {
     private readonly iamportService: IamportService,
   ) {}
 
-  // @UseGuards(GqlAccessGuard)
-  // @Query(() => [Point])
-  // async fetchMyPointHistory(@CurrentUser() currentuser: ICurrentUser) {
-  //   return await this.pointService.findAllPoint({ currentuser });
-  // }
+  @UseGuards(GqlAccessGuard)
+  @Query(() => [Point])
+  async fetchMyPointHistory(@CurrentUser() currentuser: ICurrentUser) {
+    return await this.pointService.findAllPoint({ currentuser });
+  }
   @UseGuards(GqlAccessGuard)
   @Mutation(() => Point)
   async chargePoint(
