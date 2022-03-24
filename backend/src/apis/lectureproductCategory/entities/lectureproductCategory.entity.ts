@@ -2,6 +2,7 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { LectureProduct } from 'src/apis/lectureProduct/entities/lectureProduct.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { JoinLectureAndProductCategory } from './lectureproductCagtegory.classCategory.entity';
 
 @Entity()
 @ObjectType()
@@ -10,13 +11,15 @@ export class LectureProductCategory {
   @Field(() => String)
   id: string;
 
-  @Column()
-  @Field(() => String)
+  @Column({ nullable: true })
+  @Field(() => String, { nullable: true })
   categoryname: string;
 
-  // @OneToMany(() => LectureProduct, (product) => product., {
-  //   cascade: true,
-  // })
-  // @Field(() => [LectureProduct])
-  // product: LectureProduct[];
+  // JoinLectureAndProductCategory와 1:N 연결
+  @OneToMany(
+    () => JoinLectureAndProductCategory,
+    (category) => category.linkedToLectureProductCategory,
+  )
+  @Field(() => [JoinLectureAndProductCategory])
+  category: JoinLectureAndProductCategory[];
 }

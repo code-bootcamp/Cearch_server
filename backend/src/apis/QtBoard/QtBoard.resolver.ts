@@ -32,6 +32,15 @@ export class QtBoardResolver {
     return await this.qtBoardService.findOne({ postId });
   }
 
+  @UseGuards(GqlAccessGuard)
+  @Query(() => [QtBoard])
+  async fetchMyQt(
+    @CurrentUser() currentuser: ICurrentUser,
+    @Args('page') page: number,
+  ) {
+    return await this.qtBoardService.findMyQt({ currentuser, page });
+  }
+
   //게시글 생성
   @UseGuards(GqlAccessGuard)
   @Mutation(() => QtBoard)

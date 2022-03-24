@@ -27,6 +27,13 @@ export class UserService {
     private readonly connection: Connection,
   ) {} //
 
+  async findOne({ email }) {
+    const myUser = await this.userRepository.findOne({
+      where: { email: email },
+    });
+    return myUser;
+  }
+
   async isCheckEmail({ email }) {
     const result = await this.userRepository.findOne({ where: { email } });
     if (result === undefined) {

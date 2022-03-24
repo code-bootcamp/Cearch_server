@@ -19,15 +19,16 @@ export class PointService {
     private readonly connection: Connection,
   ) {}
 
-  // async findAllPoint(currentuser) {
-  //   console.log(currentuser);
-  //   const user = await this.pointRepository.find({
-  //     where: {  { id: currentuser.id } },
-  //     relations: ['user'],
-  //   });
-  //   console.log(currentuser.id);
-  //   return user;
-  // }
+  async findAllPoint({ currentuser }) {
+    const history = await this.pointRepository
+      .createQueryBuilder('point')
+      .innerJoinAndSelect('point.user', 'user')
+      .where('user.id = :userId', { userId: currentuser.id })
+      .orderBy('point.createdAt', 'DESC')
+      .getMany();
+
+    return history;
+  }
 
   async create({ impUid, myamount, currentuser }) {
     const queryRunner = this.connection.createQueryRunner();
@@ -76,7 +77,7 @@ export class PointService {
         impUid: impUid,
         status: POINT_STATUS_ENUM.CANCEL,
       });
-      console.log('1111', myPoint);
+
       if (myPoint) throw new ConflictException('이미 취소된 결제아이디입니다.');
 
       //취소하기에 내 포인트 잔액이 충분한지
@@ -87,13 +88,11 @@ export class PointService {
         // user: { id: currentuser.id },
         status: POINT_STATUS_ENUM.PAYMENT,
       });
-      console.log('222', currentPoint);
       if (!currentPoint)
         throw new UnprocessableEntityException('결제기록이 존재하지 않습니다.');
       const user = await queryRunner.manager.findOne(User, {
         id: currentuser.id,
       });
-      console.log(user, '22222');
       if (user.point < currentPoint.amount)
         throw new UnprocessableEntityException('포인트가 부족합니다.');
       //취소기록 생성

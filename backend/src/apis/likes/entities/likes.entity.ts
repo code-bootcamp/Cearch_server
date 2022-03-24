@@ -1,6 +1,8 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { QtBoard } from 'src/apis/QtBoard/entities/qt.entity';
+import { User } from 'src/apis/user/entities/user.entity';
 import {
+  Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
@@ -15,9 +17,17 @@ export class Likes {
   @Field(() => String)
   id!: string;
 
+  @Column()
+  @Field(() => Boolean)
+  isLike: boolean;
+
   @ManyToOne(() => QtBoard, (qtBoard) => qtBoard.likes)
   @Field(() => QtBoard)
   qtBoard: QtBoard;
+
+  @ManyToOne(() => User, (user) => user.likes)
+  @Field(() => User)
+  user: User;
 
   @CreateDateColumn()
   @Field(() => Date)

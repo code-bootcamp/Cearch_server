@@ -26,6 +26,18 @@ export class CommentsService {
     return findAllco;
   }
 
+  async findMyComments({ currentuser, page }) {
+    const myQts = await this.commentsRepository
+      .createQueryBuilder('comments')
+      .innerJoinAndSelect('comments.user', 'user')
+      .where('user.id = :userId', { userId: currentuser.id })
+      .orderBy('comments.createdAt', 'DESC')
+      .limit(15)
+      .offset(15 * (page - 1))
+      .getMany();
+    return myQts;
+  }
+
   //기본 댓글 생성
   async create({ currentuser, postId, contents }) {
     // 포스트 찾기
@@ -33,11 +45,14 @@ export class CommentsService {
     await queryRunner.connect();
     await queryRunner.startTransaction('REPEATABLE READ');
     try {
+      const user = await queryRunner.manager.findOne(User, {
+        id: currentuser.id,
+      });
       const post = await queryRunner.manager.findOne(QtBoard, { id: postId });
       const createcomment = await this.commentsRepository.create({
-        contents: contents,
         qtBoard: post,
-        user: currentuser,
+        contents: contents,
+        user: user,
       });
       console.log(`🔍`, createcomment);
       await queryRunner.manager.save(createcomment);
@@ -61,7 +76,11 @@ export class CommentsService {
         id: commentId,
       });
 
-      const newcontent = { ...comment, user: currentuser, contents: acontents };
+      const user = await queryRunner.manager.findOne(User, {
+        id: currentuser.id,
+      });
+
+      const newcontent = { ...comment, user: user, contents: acontents };
       const result = await this.commentsRepository.create(newcontent);
       await queryRunner.manager.save(result);
       await queryRunner.commitTransaction();
@@ -75,27 +94,56 @@ export class CommentsService {
   }
 
   //기본 댓글 삭제
-  async delete({ commentId }) {
-    const deletsComment = await this.commentsRepository.softDelete({
-      id: commentId,
-    });
-    return deletsComment.affected ? true : false;
+  async delete({ currentuser, commentId }) {
+    const deleteComment = await this.commentsRepository
+      .createQueryBuilder('comments')
+      .innerJoinAndSelect('comments.user', 'user')
+      .where('user.id = :userId', { userId: currentuser.id })
+      .andWhere('comments.id = :Id', { Id: commentId })
+      .getOne();
+    if (deleteComment) {
+      await this.commentsRepository.softDelete({
+        id: commentId,
+      });
+      return true;
+    } else {
+      return false;
+    }
   }
 
   //대댓글 생성
-  async createReply({ currentuser, postId, commentId, contents }) {
-    const post = await this.qtBoardRepository.findOne({ id: postId });
-    const comment = await this.commentsRepository.findOne({ id: commentId });
-    const { id, depth, qtBoard, ...rest } = comment;
-    const createReco = await this.commentsRepository.save({
-      contents: contents,
-      parent: id,
-      depth: depth + 1,
-      qtBoard: post,
-      user: currentuser,
-    });
-    console.log(createReco);
-    return createReco;
+  async createReply({ currentuser, commentId, contents }) {
+    const queryRunner = this.connection.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction('REPEATABLE READ');
+    try {
+      const selectComment = await this.commentsRepository
+        .createQueryBuilder('comments')
+        .innerJoinAndSelect('comments.user', 'user')
+        .innerJoinAndSelect('comments.qtBoard', 'qtBoard')
+        .where('comments.id = :Id', { Id: commentId })
+        .getOne();
+      const user = await queryRunner.manager.findOne(User, {
+        id: currentuser.id,
+      });
+      const { id, depth, qtBoard, ...rest } = selectComment;
+      const createReco = await this.commentsRepository.create({
+        contents: contents,
+        parent: id,
+        depth: depth + 1,
+        qtBoard: qtBoard,
+        user: user,
+      });
+      await queryRunner.manager.save(createReco);
+      await queryRunner.commitTransaction();
+      console.log(createReco);
+      return createReco;
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   //베스트 답변 고르기
@@ -104,29 +152,36 @@ export class CommentsService {
     await queryRunner.connect();
     await queryRunner.startTransaction('REPEATABLE READ');
     try {
-      const selectComment = await queryRunner.manager.findOne(Comments, {
-        id: commentId,
-      });
-      // const user = await queryRunner.manager.findOne(User, {
-      //   id: currentuser.id,
-      // });
-      // if (!user.qtBoard.includes(selectComment.qtBoard))
-      //   throw new UnprocessableEntityException('본인이 아닙니다.');
+      const selectComment = await this.commentsRepository
+        .createQueryBuilder('comments')
+        .innerJoinAndSelect('comments.user', 'user')
+        .innerJoinAndSelect('comments.qtBoard', 'qtBoard')
+        .where('comments.id = :Id', { Id: commentId })
+        .getOne();
+
+      const post = await this.qtBoardRepository
+        .createQueryBuilder('qtBoard')
+        .innerJoinAndSelect('qtBoard.user', 'user')
+        .where('qtBoard.id = :Id', { Id: selectComment.qtBoard.id })
+        .andWhere('user.id = :userId', { userId: currentuser.id })
+        .getOne();
+
+      if (!post) throw new UnprocessableEntityException('본인이 아닙니다.');
       //Pick 상태로 바꾸어주기
       const pick = { ...selectComment, isPick: 1 };
       const result = await this.commentsRepository.create(pick);
       //포인트 플러스해주기~~
-      // console.log(selectComment.user.id);
-      // const commentUser = await queryRunner.manager.findOne(User, {
-      //   id: selectComment.user.id,
-      // });
+      const commentUser = await queryRunner.manager.findOne(User, {
+        id: selectComment.user.id,
+      });
       // console.log(`🔍`, commentUser);
       // const { point, ...rest } = commentUser;
-      // const plusComments = {
-      //   ...rest,
-      //   point: point + 200,
-      // };
-      // await queryRunner.manager.save(plusComments);
+      const plusPoint = this.userRepository.create({
+        ...commentUser,
+        point: commentUser.point + 200,
+      });
+      console.log(plusPoint);
+      await queryRunner.manager.save(plusPoint);
       await queryRunner.manager.save(result);
       await queryRunner.commitTransaction();
       return result;

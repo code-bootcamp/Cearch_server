@@ -56,13 +56,13 @@ export class QtBoard {
   user: User;
 
   @OneToMany(() => Comments, (comments) => comments.qtBoard, {
-    cascade: true,
+    // cascade: true,
   })
   @Field(() => [Comments])
   comments: Comments[];
 
   @OneToMany(() => Likes, (likes) => likes.qtBoard, {
-    cascade: true,
+   cascade: true,
   })
   @Field(() => [Likes])
   likes?: Likes[];
