@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Field, Float, Int, ObjectType } from '@nestjs/graphql';
 import { LectureImage } from 'src/apis/LectureImage/entities/lectureImage.entity';
 import { LectureProductCategory } from 'src/apis/lectureproductCategory/entities/lectureproductCategory.entity';
@@ -8,8 +7,6 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
-  JoinTable,
-  ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -85,11 +82,18 @@ export class LectureProduct {
   @Field(() => [LectureReview])
   reviews: LectureReview[];
 
-  // @JoinTable()
-  // @ManyToMany(
-  //   () => LectureProductCategory,
-  //   (lectureCategory) => lectureCategory.product,
-  // )
-  // @Field(() => [LectureProductCategory])
-  // lectureCategory: LectureProductCategory[];
+  @OneToMany(
+    () => JoinLectureAndProductCategory,
+    (lecproduct) => lecproduct.linkedToLectureProduct,
+  )
+  @Field(() => [JoinLectureAndProductCategory])
+  lecproduct: JoinLectureAndProductCategory[];
+
+  // LectureRegistration과 1:N 연결
+  @OneToMany(
+    () => LectureRegistration,
+    (registration) => registration.linkedToLectureRegistration,
+  )
+  @Field(() => [LectureRegistration])
+  registration: LectureRegistration[];
 }

@@ -13,21 +13,24 @@ import { QtBoardModule } from './apis/QtBoard/QtBoard.module';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { JwtAccessStrategy } from './common/auth/strategy/access.strategy.jwt';
 import { JwtRefreshStrategy } from './common/auth/strategy/refresh.strategy.jwt';
-import { FileUploadModule } from './apis/file/file.module';
-import { PointModule } from './apis/point/point.module';
-import { LectureReviewModule } from './apis/lectureReview/lectureReview.module';
+import { LectureProductCategoryModule } from './apis/lectureproductCategory/lectureproductCategory.module';
+import { LectureOrderModule } from './apis/lectureOrder/lectureOrder.module';
+import { LectureRegistrationModule } from './apis/lectureRegistration/lectureRegistration.module';
 import { LikesModule } from './apis/likes/likes.module';
+import { PointModule } from './apis/point/point.module';
 
 @Module({
   imports: [
     LikesModule,
-    LectureReviewModule,
-    PointModule,
     AuthModule,
     UserModule,
     QtBoardModule,
     CommentsModule,
+    PointModule,
     LectureProductModule,
+    LectureProductCategoryModule,
+    LectureRegistrationModule,
+    LectureOrderModule,
     FileUploadModule,
     GraphQLModule.forRoot<ApolloDriverConfig>({
       autoSchemaFile: '/src/grapqhql/schema.gql',
@@ -54,3 +57,4 @@ import { LikesModule } from './apis/likes/likes.module';
   providers: [AppService, JwtAccessStrategy, JwtRefreshStrategy],
 })
 export class AppModule {}
+
