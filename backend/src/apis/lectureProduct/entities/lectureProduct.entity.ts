@@ -1,14 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Field, Int, ObjectType } from '@nestjs/graphql';
-import { LectureImage } from 'src/apis/LectureImage/entities/lectureImage.entity';
-import { LectureProductCategory } from 'src/apis/lectureproductCategory/entities/lectureproductCategory.entity';
+import { LectureImage } from 'src/apis/lectureImage/entities/lectureImage.entity';
+import { JoinLectureAndProductCategory } from 'src/apis/lectureproductCategory/entities/lectureproductCagtegory.classCategory.entity';
+import { LectureRegistration } from 'src/apis/lectureRegistration/entitites/lectureRegistration.entity';
 import {
   Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
-  JoinTable,
-  ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -74,11 +73,19 @@ export class LectureProduct {
   @Field(() => [LectureImage])
   image: LectureImage[];
 
-  // @JoinTable()
-  // @ManyToMany(
-  //   () => LectureProductCategory,
-  //   (lectureCategory) => lectureCategory.product,
-  // )
-  // @Field(() => [LectureProductCategory])
-  // lectureCategory: LectureProductCategory[];
+  // JoinLectureAndProductCategory와 1:N 연결
+  @OneToMany(
+    () => JoinLectureAndProductCategory,
+    (lecproduct) => lecproduct.linkedToLectureProduct,
+  )
+  @Field(() => [JoinLectureAndProductCategory])
+  lecproduct: JoinLectureAndProductCategory[];
+
+  // LectureRegistration과 1:N 연결
+  @OneToMany(
+    () => LectureRegistration,
+    (registration) => registration.linkedToLectureRegistration,
+  )
+  @Field(() => [LectureRegistration])
+  registration: LectureRegistration[];
 }
