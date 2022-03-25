@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { LectureProduct } from '../lectureProduct/entities/lectureProduct.entity';
+import { User } from '../user/entities/user.entity';
 import { CreateLectureRegistrationInput } from './dto/createLectureRegistration.input';
 import { UpdateLectureRegistrationInput } from './dto/updateLectureRegistration.input';
 import { LectureRegistration } from './entitites/lectureRegistration.entity';
@@ -8,24 +10,36 @@ import { LectureRegistration } from './entitites/lectureRegistration.entity';
 // Interface
 interface ICreate {
   createLectureRegistrationInput: CreateLectureRegistrationInput;
+  lectureproductId: string
+  currentuser: any;
 }
 interface IFindOne {
   lectureRegistrationId: string;
+  // currentuser
 }
 interface IUpdate {
   lectureRegistrationId: string;
   updatelectureRegistrationInput: UpdateLectureRegistrationInput;
+  // currentuser,
 }
 @Injectable()
 export class LectureRegistrationService {
   constructor(
     @InjectRepository(LectureRegistration)
     private readonly lectureRegistrationRepository: Repository<LectureRegistration>,
-  ) {}
+  
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+
+    @InjectRepository(LectureProduct)
+    private readonly lectureproductRepository: Repository<LectureProduct>
+    ){}
 
   // Create Registration Form
-  async create({}: ICreate) {
-    return await this.lectureRegistrationRepository.save;
+  async create({createLectureRegistrationInput, currentuser, lectureproductId}: ICreate) {
+    const user = await this.userRepository.findOne({ id: currentuser.id });
+    const lecture = await this.lectureproductRepository.findOne({ id:lectureproductId })
+    return await this.lectureRegistrationRepository.save({...createLectureRegistrationInput, lecproduct:lecture, user});
   }
 
   // Find All Registration Forms: ReadAll
@@ -41,6 +55,7 @@ export class LectureRegistrationService {
       id: lectureRegistrationId,
     });
   }
+
   // Update Registration Form
   async update({
     lectureRegistrationId,

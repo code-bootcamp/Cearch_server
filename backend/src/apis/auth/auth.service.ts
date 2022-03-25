@@ -202,6 +202,7 @@ export class AuthService {
 
   async enrollBlackList({ user, refreshToken }) {
     try {
+      console.log('useeerrr exp : ', user.exp);
       const result = await this.cacheManager.set(
         `refresh:${refreshToken}`,
         `Token:${user.id}`,

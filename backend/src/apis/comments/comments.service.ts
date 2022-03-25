@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Connection, Repository } from 'typeorm';
 import { QtBoard } from '../QtBoard/entities/qt.entity';
 import { User } from '../user/entities/user.entity';
+import { Wallet } from '../wallet/entities/wallet.entity';
 import { Comments } from './entities/comments.entity';
 
 @Injectable()
@@ -14,6 +15,9 @@ export class CommentsService {
     private readonly qtBoardRepository: Repository<QtBoard>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(Wallet)
+    private readonly walletRepository: Repository<Wallet>,
+
     private readonly connection: Connection,
   ) {}
 
@@ -158,14 +162,14 @@ export class CommentsService {
         .innerJoinAndSelect('comments.qtBoard', 'qtBoard')
         .where('comments.id = :Id', { Id: commentId })
         .getOne();
-
+      console.log(selectComment);
       const post = await this.qtBoardRepository
         .createQueryBuilder('qtBoard')
         .innerJoinAndSelect('qtBoard.user', 'user')
         .where('qtBoard.id = :Id', { Id: selectComment.qtBoard.id })
         .andWhere('user.id = :userId', { userId: currentuser.id })
         .getOne();
-
+      console.log(post);
       if (!post) throw new UnprocessableEntityException('본인이 아닙니다.');
       //Pick 상태로 바꾸어주기
       const pick = { ...selectComment, isPick: 1 };
@@ -180,8 +184,15 @@ export class CommentsService {
         ...commentUser,
         point: commentUser.point + 200,
       });
-      console.log(plusPoint);
+
+      const pointHistory = this.walletRepository.create({
+        division: '획득',
+        description: '답변이 선택되었습니다.',
+        point: +200,
+        user: plusPoint,
+      });
       await queryRunner.manager.save(plusPoint);
+      await queryRunner.manager.save(pointHistory);
       await queryRunner.manager.save(result);
       await queryRunner.commitTransaction();
       return result;

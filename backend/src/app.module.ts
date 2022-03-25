@@ -20,15 +20,19 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { FileUploadModule } from './apis/file/file.module';
 import { FollowModule } from './apis/follow/follow.module';
+import { LectureReviewModule } from './apis/lectureReview/lectureReview.module';
+import { WalletModule } from './apis/wallet/wallet.module';
 
 @Module({
   imports: [
+    WalletModule,
     LikesModule,
     AuthModule,
     UserModule,
     QtBoardModule,
     CommentsModule,
     PointModule,
+    LectureReviewModule,
     LectureProductModule,
     LectureProductCategoryModule,
     LectureRegistrationModule,

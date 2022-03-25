@@ -1,25 +1,31 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import { LectureProduct } from 'src/apis/lectureProduct/entities/lectureProduct.entity';
 import {
   Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
-  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 
 @Entity()
 @ObjectType()
-export class LectureImage {
+export class Notice {
   @PrimaryGeneratedColumn('uuid')
   @Field(() => String)
   id!: string;
 
   @Column()
   @Field(() => String)
-  url!: string;
+  title!: string;
+
+  @Column()
+  @Field(() => String)
+  contents!: string;
+
+  @Column({ default: true })
+  @Field(() => Boolean)
+  isNotice!: boolean;
 
   @CreateDateColumn()
   @Field(() => Date)
@@ -32,8 +38,4 @@ export class LectureImage {
   @DeleteDateColumn()
   @Field(() => Date)
   deletedAt?: Date;
-  
-  @ManyToOne(() => LectureProduct, (lecproduct) => lecproduct.image)
-  @Field(() => LectureProduct)
-  lecproduct: LectureProduct;
 }

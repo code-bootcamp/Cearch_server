@@ -25,6 +25,7 @@ export class JwtRefreshStrategy extends PassportStrategy(
   }
   async validate(req, payload) {
     const refreshToken = req.headers.cookie.replace('refreshToken=', '');
+    console.log('strategy refresh : ', refreshToken);
     try {
       const isRefresh = await this.cacheManager.get(`refresh:${refreshToken}`); // refresh가 없는경우 access 와 상관없이 false
       console.log(isRefresh);

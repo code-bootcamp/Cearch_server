@@ -37,6 +37,10 @@ export class QtBoard {
   @Field(() => Int)
   likescount: number;
 
+  @Column({ default: 0 })
+  // @Field(() => String)
+  password: string;
+
   @CreateDateColumn()
   @Field(() => Date)
   createdAt!: Date;
@@ -56,15 +60,11 @@ export class QtBoard {
   @Field(() => User)
   user: User;
 
-  @OneToMany(() => Comments, (comments) => comments.qtBoard, {
-    // cascade: true,
-  })
+  @OneToMany(() => Comments, (comments) => comments.qtBoard)
   @Field(() => [Comments])
   comments: Comments[];
 
-  @OneToMany(() => Likes, (likes) => likes.qtBoard, {
-    cascade: true,
-  })
+  @OneToMany(() => Likes, (likes) => likes.qtBoard)
   @Field(() => [Likes])
   likes?: Likes[];
 
