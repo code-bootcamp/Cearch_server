@@ -1,7 +1,5 @@
 import { CacheModule, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
-import { GraphQLModule } from '@nestjs/graphql';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './apis/auth/auth.module';
 import { UserModule } from './apis/user/user.module';
 import { RedisClientOptions } from 'redis';
@@ -16,9 +14,15 @@ import { JwtRefreshStrategy } from './common/auth/strategy/refresh.strategy.jwt'
 import { LectureProductCategoryModule } from './apis/lectureproductCategory/lectureproductCategory.module';
 import { LectureOrderModule } from './apis/lectureOrder/lectureOrder.module';
 import { LectureRegistrationModule } from './apis/lectureRegistration/lectureRegistration.module';
+import { LikesModule } from './apis/likes/likes.module';
+import { PointModule } from './apis/point/point.module';
+import { GraphQLModule } from '@nestjs/graphql';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { FileUploadModule } from './apis/file/file.module';
 
 @Module({
   imports: [
+    LikesModule,
     AuthModule,
     UserModule,
     QtBoardModule,
@@ -54,4 +58,3 @@ import { LectureRegistrationModule } from './apis/lectureRegistration/lectureReg
   providers: [AppService, JwtAccessStrategy, JwtRefreshStrategy],
 })
 export class AppModule {}
-

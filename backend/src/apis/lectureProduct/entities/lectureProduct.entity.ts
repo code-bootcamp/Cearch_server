@@ -1,8 +1,9 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { Field, Int, ObjectType } from '@nestjs/graphql';
-import { LectureImage } from 'src/apis/lectureImage/entities/lectureImage.entity';
-import { JoinLectureAndProductCategory } from 'src/apis/lectureproductCategory/entities/lectureproductCagtegory.classCategory.entity';
+import { Field, Float, Int, ObjectType } from '@nestjs/graphql';
+import { LectureImage } from 'src/apis/LectureImage/entities/lectureImage.entity';
+import { JoinLectureAndProductCategory } from 'src/apis/lectureproductCategory/entities/lectureproductCagtegoryclassCategory.entity';
+import { LectureProductCategory } from 'src/apis/lectureproductCategory/entities/lectureproductCategory.entity';
 import { LectureRegistration } from 'src/apis/lectureRegistration/entitites/lectureRegistration.entity';
+import { LectureReview } from 'src/apis/lectureReview/entities/lectureReview.entity';
 import {
   Column,
   CreateDateColumn,
@@ -55,6 +56,10 @@ export class LectureProduct {
   @Field(() => Boolean)
   classOpen: boolean;
 
+  @Column({ default: 0 })
+  @Field(() => Float)
+  rating: number;
+
   @CreateDateColumn()
   @Field(() => Date)
   createdAt!: Date;
@@ -67,13 +72,18 @@ export class LectureProduct {
   @Field(() => Date)
   deletedAt?: Date;
 
-  @OneToMany(() => LectureImage, (image) => image.product, {
+  @OneToMany(() => LectureImage, (image) => image.lecproduct, {
     cascade: true,
   })
   @Field(() => [LectureImage])
   image: LectureImage[];
 
-  // JoinLectureAndProductCategory와 1:N 연결
+  @OneToMany(() => LectureReview, (review) => review.user, {
+    cascade: true,
+  })
+  @Field(() => [LectureReview])
+  reviews: LectureReview[];
+
   @OneToMany(
     () => JoinLectureAndProductCategory,
     (lecproduct) => lecproduct.linkedToLectureProduct,
@@ -84,7 +94,7 @@ export class LectureProduct {
   // LectureRegistration과 1:N 연결
   @OneToMany(
     () => LectureRegistration,
-    (registration) => registration.linkedToLectureRegistration,
+    (registration) => registration.lecproduct,
   )
   @Field(() => [LectureRegistration])
   registration: LectureRegistration[];

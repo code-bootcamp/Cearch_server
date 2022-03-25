@@ -1,6 +1,7 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { LectureOrder } from 'src/apis/lectureOrder/entities/lectureOrder.entity';
 import { LectureProduct } from 'src/apis/lectureProduct/entities/lectureProduct.entity';
+import { User } from 'src/apis/user/entities/user.entity';
 import {
   Column,
   Entity,
@@ -26,15 +27,20 @@ export class LectureRegistration {
 
   @ManyToOne(
     () => LectureProduct,
-    (linkedToLectureRegistration) => linkedToLectureRegistration.registration,
+    (lecproduct) => lecproduct.registration,
   )
   @Field(() => LectureProduct)
-  linkedToLectureRegistration: LectureProduct;
+  lecproduct: LectureProduct;
 
   @OneToMany(
     () => LectureOrder,
-    (linkedToLectureOrder) => linkedToLectureOrder.order,
+    (registration) => registration.order,
   )
   @Field(() => LectureOrder)
-  linkedToLectureOrder: LectureOrder;
+  registration: LectureOrder;
+
+  @ManyToOne(() => User, (user) => user.registration)
+  @Field(() => User)
+  user: User
+
 }

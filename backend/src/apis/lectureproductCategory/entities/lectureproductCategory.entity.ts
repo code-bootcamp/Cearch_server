@@ -2,7 +2,7 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { LectureProduct } from 'src/apis/lectureProduct/entities/lectureProduct.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { JoinLectureAndProductCategory } from './lectureproductCagtegory.classCategory.entity';
+import { JoinLectureAndProductCategory } from './lectureproductCagtegoryclassCategory.entity';
 
 @Entity()
 @ObjectType()

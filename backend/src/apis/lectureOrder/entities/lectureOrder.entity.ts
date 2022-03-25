@@ -34,7 +34,7 @@ export class LectureOrder {
   @Field(() => String, { nullable: true })
   registrationStatus!: string;
 
-  @ManyToOne(() => LectureRegistration, (order) => order.linkedToLectureOrder)
+  @ManyToOne(() => LectureRegistration, (order) => order.registration)
   @Field(() => LectureRegistration)
   order: LectureRegistration;
 }

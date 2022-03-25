@@ -1,4 +1,3 @@
-
 import {
   CACHE_MANAGER,
   HttpException,
@@ -203,11 +202,12 @@ export class AuthService {
 
   async enrollBlackList({ user, refreshToken }) {
     try {
+      console.log('useeerrr exp : ', user.exp);
       const result = await this.cacheManager.set(
         `refresh:${refreshToken}`,
         `Token:${user.id}`,
         {
-          ttl: Math.ceil(Number(user.exp) / 1000) - Date.now(),
+          ttl: user.exp - Math.ceil(Number(Date.now()) / 1000),
         },
       );
       return result;

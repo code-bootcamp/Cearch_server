@@ -36,10 +36,7 @@ export class Point {
   @Field(() => POINT_STATUS_ENUM)
   status: POINT_STATUS_ENUM;
 
-  @ManyToOne(() => User, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
-  })
+  @ManyToOne(() => User)
   @Field(() => User)
   user: User;
 

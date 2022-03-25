@@ -1,9 +1,12 @@
-
 import { UnprocessableEntityException } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { CurrentUser } from 'src/common/auth/decorate/currentuser.decorate';
+import { IcurrentUser } from '../auth/auth.resolver';
 import { AuthService } from '../auth/auth.service';
 import { AUTH_KIND } from '../auth/entities/auth.entity';
+import { MentorForm } from './dto/mentoForm.input';
 import { UserForm } from './dto/user.input';
+import { MentoInfo } from './entities/mento.entity';
 import { User } from './entities/user.entity';
 import { UserService } from './user.service';
 
@@ -85,5 +88,24 @@ export class UserResolver {
     @Args('newPassword') newPassword: string, //
   ) {
     return await this.userService.updatePassword({ email, newPassword });
+  }
+
+  @Mutation(() => MentoInfo)
+  async authMentor(
+    @Args('mentoId') mentoId: string, //
+    @Args('userId') userId: string,
+  ) {
+    return await this.userService.promoteMento({ mentoId, userId });
+  }
+
+  @Mutation(() => MentoInfo)
+  async sendMentorForm(
+    @Args('mentorForm') mentorForm: MentorForm, //
+    @Args('mentorId') mentorId: string,
+  ) {
+    return await this.userService.sendMentorForm({
+      mentorForm,
+      mentorId,
+    });
   }
 }

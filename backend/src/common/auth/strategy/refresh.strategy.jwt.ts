@@ -1,4 +1,3 @@
-
 import {
   CACHE_MANAGER,
   Inject,
@@ -25,8 +24,9 @@ export class JwtRefreshStrategy extends PassportStrategy(
     });
   }
   async validate(req, payload) {
-    console.log(req.headers.cookie);
+    console.log('refressh req header : ', payload);
     const refreshToken = req.headers.cookie.replace('refreshToken=', '');
+    console.log('strategy refresh : ', refreshToken);
     try {
       const isRefresh = await this.cacheManager.get(`refresh:${refreshToken}`); // refresh가 없는경우 access 와 상관없이 false
       console.log(isRefresh);
@@ -37,6 +37,7 @@ export class JwtRefreshStrategy extends PassportStrategy(
         id: payload.sub,
         email: payload.email,
         role: payload.role,
+        exp: payload.exp,
       };
     } catch (error) {
       throw new UnprocessableEntityException('REDIS cant get or push info');

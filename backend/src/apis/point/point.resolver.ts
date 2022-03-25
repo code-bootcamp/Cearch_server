@@ -16,11 +16,11 @@ export class PointResolver {
     private readonly iamportService: IamportService,
   ) {}
 
-  // @UseGuards(GqlAccessGuard)
-  // @Query(() => [Point])
-  // async fetchMyPointHistory(@CurrentUser() currentuser: ICurrentUser) {
-  //   return await this.pointService.findAllPoint({ currentuser });
-  // }
+  @UseGuards(GqlAccessGuard)
+  @Query(() => [Point])
+  async fetchMyPointHistory(@CurrentUser() currentuser: ICurrentUser) {
+    return await this.pointService.findAllPoint({ currentuser });
+  }
   @UseGuards(GqlAccessGuard)
   @Mutation(() => Point)
   async chargePoint(
@@ -43,7 +43,6 @@ export class PointResolver {
     const token = await this.iamportService.getIamportToken();
 
     const cancelAmount = await this.iamportService.getCancel({ impUid, token });
-    console.log(cancelAmount, '😘');
     return await this.pointService.cancel({
       impUid,
       amount: cancelAmount,

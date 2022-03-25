@@ -2,6 +2,7 @@
 import { UseGuards } from '@nestjs/common';
 import { Args, Mutation, Resolver, Query } from '@nestjs/graphql';
 import { Role } from 'src/common/auth/decorate/role.decorate';
+import { GqlAccessGuard } from 'src/common/auth/guard/gqlAuthGuard';
 import { RoleGuard } from 'src/common/auth/guard/roleGuard';
 import { USER_ROLE } from '../user/entities/user.entity';
 import { CreateLectureProductInput } from './dto/createLectureProduct.input';
@@ -14,9 +15,9 @@ export class LectureProductResolver {
   constructor(private readonly lectureProductService: LectureProductService) {}
 
   // Create Class
-  // @UseGuards(RoleGuard)
-  // @Role(USER_ROLE.MENTEE)
   @Mutation(() => LectureProduct)
+  @UseGuards(GqlAccessGuard, RoleGuard)
+  @Role(USER_ROLE.MENTEE)
   async createLectureProduct(
     @Args('createLectureProductInput')
     createLectureProductInput: CreateLectureProductInput,
@@ -26,32 +27,32 @@ export class LectureProductResolver {
     });
   }
   // Find All Class : ReadAll
-  // @UseGuards(RoleGuard)
-  // @Role(USER_ROLE.MENTEE, USER_ROLE.MENTOR)
   @Query(() => [LectureProduct])
+  @UseGuards(GqlAccessGuard, RoleGuard)
+  @Role(USER_ROLE.MENTEE)
   async fetchlectureProducts(@Args('search') search: string) {
     return await this.lectureProductService.findAll();
   }
   // Find One Class : ReadOne
-  // @UseGuards(RoleGuard)
-  // @Role(USER_ROLE.MENTEE, USER_ROLE.MENTOR)
   @Query(() => LectureProduct)
+  @UseGuards(GqlAccessGuard, RoleGuard)
+  @Role(USER_ROLE.MENTOR, USER_ROLE.MENTEE)
   async fetchLectureProduct(
     @Args('lectureproductId') lectureproductId: string, //
   ) {
     return await this.lectureProductService.findOne({ lectureproductId });
   }
   // Find NewClass : fetching new classes
-  // @UseGuards(RoleGuard)
-  // @Role(USER_ROLE.MENTEE, USER_ROLE.MENTOR)
   @Query(() => LectureProduct)
+  @UseGuards(GqlAccessGuard, RoleGuard)
+  @Role(USER_ROLE.MENTOR, USER_ROLE.MENTEE)
   async fetchNewClasses() {
     return await this.lectureProductService.findNewClasses();
   }
   // Update Class
-  // @UseGuards(RoleGuard)
-  // @Role(USER_ROLE.MENTOR)
   @Mutation(() => LectureProduct)
+  @UseGuards(GqlAccessGuard, RoleGuard)
+  @Role(USER_ROLE.MENTOR, USER_ROLE.MENTEE)
   async updateLectureProduct(
     @Args('lectureproductId') lectureproductId: string,
     @Args('updateLectrueProductInput')
@@ -63,9 +64,9 @@ export class LectureProductResolver {
     });
   }
   // Delete Class
-  // @UseGuards(RoleGuard)
-  // @Role(USER_ROLE.MENTOR)
   @Mutation(() => Boolean)
+  @UseGuards(GqlAccessGuard, RoleGuard)
+  @Role(USER_ROLE.MENTOR)
   async deleteLectureProduct(
     @Args('lectureproductId') lectureproductId: string,
   ) {

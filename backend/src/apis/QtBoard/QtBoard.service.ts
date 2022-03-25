@@ -56,6 +56,7 @@ export class QtBoardService {
 
     return findOnePost;
   }
+
   async findLikePost() {
     const findLikePost = await this.qtBoardRepository.findAndCount({
       take: 10, // 한 페이지에 10개
@@ -64,6 +65,19 @@ export class QtBoardService {
       relations: ['comments', 'likes'],
     });
     return findLikePost[0];
+  }
+
+  async findMyQt({ currentuser, page }) {
+    const myQts = await this.qtBoardRepository
+      .createQueryBuilder('qtBoard')
+      .innerJoinAndSelect('qtBoard.user', 'user')
+      .where('user.id = :userId', { userId: currentuser.id })
+      .orderBy('qtBoard.createdAt', 'DESC')
+      .limit(15)
+      .offset(15 * (page - 1))
+      .getMany();
+
+    return myQts;
   }
 
   async create({ currentuser, createQtBoardInput }: ICreate) {
@@ -88,14 +102,15 @@ export class QtBoardService {
     const deletePost = await this.qtBoardRepository.softDelete({
       id: postId,
     });
-    const delteteComment = await this.commentsRepository.softDelete({
-      qtBoard: postId,
-    });
-    return delteteComment.affected && deletePost.affected ? true : false;
+    // const delteteComment = await this.commentsRepository.softDelete({
+    //   qtBoard: postId,
+    // });
+    // return delteteComment.affected && deletePost.affected ? true : false;
+    return deletePost.affected ? true : false;
   }
-
-  // async qtlike({ postId }) {
-  //   const post = await this.qtBoardRepository.findOne({ id: postId });
-  //   console.log(post.likes)
-  // }
 }
+
+// async qtlike({ postId }) {
+//   const post = await this.qtBoardRepository.findOne({ id: postId });
+//   console.log(post.likes)
+// }

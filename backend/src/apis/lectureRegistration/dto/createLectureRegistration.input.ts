@@ -5,6 +5,6 @@ export class CreateLectureRegistrationInput {
   @Field(() => String)
   selfIntroduction: string;
 
-  @Field(() => String)
+  @Field(() => String, {nullable: true})
   preQuestion: string;
 }
