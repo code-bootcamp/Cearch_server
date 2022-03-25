@@ -9,6 +9,10 @@ import { NonMembersQtInput } from './dto/nonMembersQt';
 import { MembersQtInput } from './dto/membersQtBoard.input';
 import { QtBoard } from './entities/qt.entity';
 import { QtBoardService } from './QtBoard.service';
+import { Role } from 'src/common/auth/decorate/role.decorate';
+import { USER_ROLE } from '../user/entities/user.entity';
+import { Notice } from './entities/notice.entity';
+import { title } from 'process';
 
 @Resolver()
 export class QtBoardResolver {
@@ -30,6 +34,32 @@ export class QtBoardResolver {
   @Query(() => QtBoard)
   async fetchQtBoard(@Args('postId') postId: string) {
     return await this.qtBoardService.findOne({ postId });
+  }
+
+  @Query(() => [Notice])
+  async fetchNotices() {
+    return await this.qtBoardService.findNoticeAll();
+  }
+
+  @Query(() => Notice)
+  async fetchNotice(@Args('postId') postId: string) {
+    return await this.qtBoardService.findNotice({ postId });
+  }
+
+  //공지사항 생성하기
+  @UseGuards(GqlAccessGuard)
+  @Role(USER_ROLE.ADMIN)
+  @Mutation(() => Notice)
+  async createNotice(
+    @CurrentUser() currentUser: ICurrentUser,
+    @Args('title') title: string,
+    @Args('contents') contents: string,
+  ) {
+    return await this.qtBoardService.createNotice({
+      currentUser,
+      title,
+      contents,
+    });
   }
 
   //내가 쓴 질문들 보기
@@ -91,6 +121,23 @@ export class QtBoardResolver {
       memberQtInput,
     });
   }
+  //공지사항 수정
+  @UseGuards(GqlAccessGuard)
+  @Role(USER_ROLE.ADMIN)
+  @Mutation(() => Notice)
+  async updateNotice(
+    @CurrentUser() currentUser: ICurrentUser,
+    @Args('postId') postId: string,
+    @Args('title') title: string,
+    @Args('contents') contents: string,
+  ) {
+    return await this.qtBoardService.updateNotice({
+      currentUser,
+      postId,
+      title,
+      contents,
+    });
+  }
 
   //비회원 게시글 삭제
   @Mutation(() => Boolean)
@@ -108,5 +155,16 @@ export class QtBoardResolver {
     @Args('postId') postId: string,
   ) {
     return await this.qtBoardService.delete({ currentuser, postId });
+  }
+
+  //공지사항 삭제
+  @UseGuards(GqlAccessGuard)
+  @Role(USER_ROLE.ADMIN)
+  @Mutation(() => Boolean)
+  async deleteNotice(
+    @CurrentUser() currentUser: ICurrentUser,
+    @Args('postId') postId: string,
+  ) {
+    return await this.qtBoardService.deleteNotice({ currentUser, postId });
   }
 }

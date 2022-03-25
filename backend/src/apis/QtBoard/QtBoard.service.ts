@@ -7,9 +7,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { getConnection, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { Comments } from '../comments/entities/comments.entity';
-import { User } from '../user/entities/user.entity';
+import { User, USER_ROLE } from '../user/entities/user.entity';
 import { MembersQtInput } from './dto/membersQtBoard.input';
 import { QtBoard } from './entities/qt.entity';
+import { Notice } from './entities/notice.entity';
 
 interface IFindOne {
   postId: string;
@@ -33,6 +34,8 @@ export class QtBoardService {
     private readonly qtBoardRepository: Repository<QtBoard>,
     @InjectRepository(Comments)
     private readonly commentsRepository: Repository<Comments>,
+    @InjectRepository(Notice)
+    private readonly noticeRepository: Repository<Notice>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
   ) {}
@@ -60,19 +63,39 @@ export class QtBoardService {
       .orderBy('comment.isPick', 'DESC')
       .addOrderBy('comment.createdAt')
       .getOne();
-
+    if (!findOnePost.deletedAt)
+      throw new UnprocessableEntityException('삭제된 게시물입니다.');
     return findOnePost;
+  }
+
+  //공지사항 10개 가져오기
+  async findNoticeAll() {
+    const findNotice = await this.noticeRepository.find({
+      where: { isNotice: true, deletedAt: null },
+      take: 10,
+    });
+    return findNotice;
+  }
+
+  //공지사항 1개 보기
+  async findNotice({ postId }) {
+    const notice = await this.noticeRepository.findOne({
+      id: postId,
+    });
+    if (!notice.deletedAt)
+      throw new UnprocessableEntityException('삭제된 게시물입니다.');
+    return notice;
   }
 
   //홈화면 좋아요 수가 많은 게시물 10개 가져오기
   async findLikePost() {
-    const findLikePost = await this.qtBoardRepository.findAndCount({
+    const findLikePost = await this.qtBoardRepository.find({
       take: 10, // 한 페이지에 10개
       order: { likescount: 'DESC' },
       where: { deletedAt: null },
       relations: ['comments', 'likes'],
     });
-    return findLikePost[0];
+    return findLikePost;
   }
 
   //내가 한 질문 보기
@@ -87,6 +110,22 @@ export class QtBoardService {
       .getMany();
 
     return myQts;
+  }
+
+  //공지사항생성
+  async createNotice({ currentUser, title, contents }) {
+    const user = await this.userRepository.findOne({ id: currentUser.id });
+    if (user.role !== USER_ROLE.ADMIN) {
+      throw new UnauthorizedException('관리자가 아닙니다.');
+    }
+    const createPost = await this.noticeRepository.save({
+      title: title,
+      contents: contents,
+      isNotice: true,
+      // user: user,
+    });
+    console.log(createPost);
+    return createPost;
   }
 
   //비회원 게시글 생성
@@ -114,6 +153,23 @@ export class QtBoardService {
       user: user,
     });
     return createPost;
+  }
+
+  //공지사항 수정
+  async updateNotice({ currentUser, postId, title, contents }) {
+    const user = await this.userRepository.findOne({ id: currentUser.id });
+    if (user.role !== USER_ROLE.ADMIN) {
+      throw new UnauthorizedException('관리자가 아닙니다.');
+    }
+    const post = await this.noticeRepository.findOne({ id: postId });
+    const newPost = {
+      ...post,
+      title: title,
+      contents: contents,
+    };
+    const result = await this.noticeRepository.save(newPost);
+
+    return result;
   }
 
   //비회원 게시글 수정
@@ -152,7 +208,25 @@ export class QtBoardService {
       const result = await this.qtBoardRepository.save(newPost);
       return result;
     } else {
-      return '내가 쓴 게시글이 아닙니다';
+      throw new UnauthorizedException('내가 쓴 게시글이 아닙니다');
+    }
+  }
+
+  //관리자 데이타 삭제
+  async deleteNotice({ currentUser, postId }) {
+    const user = await this.userRepository.findOne({ id: currentUser.id });
+    if (user.role !== USER_ROLE.ADMIN) {
+      throw new UnauthorizedException('관리자가 아닙니다.');
+    }
+    const post = await this.noticeRepository.findOne({ id: postId });
+    console.log(post);
+    if (post) {
+      await this.noticeRepository.softDelete({
+        id: postId,
+      });
+      return true;
+    } else {
+      return false;
     }
   }
 
