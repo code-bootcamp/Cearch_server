@@ -109,5 +109,6 @@ export class User {
 
   @OneToMany(() => LectureRegistration, (registration) => registration.user)
   @Field(() =>[LectureRegistration])
-  registration: LectureRegistration[]
+  registration: LectureRegistration[];
+
 }
