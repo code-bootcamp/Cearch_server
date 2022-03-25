@@ -13,6 +13,12 @@ import { LectureProductService } from './lectureProduct.service';
 export class LectureProductResolver {
   constructor(private readonly lectureProductService: LectureProductService) {}
 
+  //홈화면 인기있는 클래스 10개불러오기
+  @Query(() => [LectureProduct])
+  async fetchLectureRating() {
+    return await this.lectureProductService.findPopular();
+  }
+
   // Create Class
   // @UseGuards(RoleGuard)
   // @Role(USER_ROLE.MENTEE)

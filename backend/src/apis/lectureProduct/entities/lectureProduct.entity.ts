@@ -56,7 +56,7 @@ export class LectureProduct {
   @Field(() => Boolean)
   classOpen: boolean;
 
-  @Column({ default: 0 })
+  @Column({ default: 0, type: 'float' })
   @Field(() => Float)
   rating: number;
 

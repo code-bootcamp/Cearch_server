@@ -5,8 +5,8 @@ import {
   ICurrentUser,
 } from 'src/common/auth/decorate/currentuser.decorate';
 import { GqlAccessGuard } from 'src/common/auth/guard/gqlAuthGuard';
-import { CreateQtBoardInput } from './dto/createQtBoard.input';
-import { UpdateQtBoardInput } from './dto/updateQtBoard.input';
+import { NonMembersQtInput } from './dto/nonMembersQt';
+import { MembersQtInput } from './dto/membersQtBoard.input';
 import { QtBoard } from './entities/qt.entity';
 import { QtBoardService } from './QtBoard.service';
 
@@ -32,6 +32,7 @@ export class QtBoardResolver {
     return await this.qtBoardService.findOne({ postId });
   }
 
+  //내가 쓴 질문들 보기
   @UseGuards(GqlAccessGuard)
   @Query(() => [QtBoard])
   async fetchMyQt(
@@ -46,38 +47,66 @@ export class QtBoardResolver {
   @Mutation(() => QtBoard)
   async createQtBoard(
     @CurrentUser() currentuser: ICurrentUser,
-    @Args('createQtBoardInput') createQtBoardInput: CreateQtBoardInput,
+    @Args('memberQtInput') memberQtInput: MembersQtInput,
   ) {
     return await this.qtBoardService.create({
       currentuser,
-      createQtBoardInput,
+      memberQtInput,
     });
   }
-  //게시글 수정
+
+  //비회원 게시글 생성
+  @Mutation(() => QtBoard)
+  async createNonMembersQtBoard(
+    @Args('nonMembersQtInput') nonMembersQtInput: NonMembersQtInput,
+  ) {
+    return await this.qtBoardService.nonMemberCreate({
+      nonMembersQtInput,
+    });
+  }
+
+  //비회원 게시글 수정
+  @Mutation(() => QtBoard)
+  async updateNonMembersQtBoard(
+    @Args('postId') postId: string,
+    @Args('nonMembersQtInput') nonMembersQtInput: NonMembersQtInput,
+  ) {
+    return await this.qtBoardService.nonMembersUpdate({
+      postId,
+      nonMembersQtInput,
+    });
+  }
+
+  //회원 게시글 수정
   @UseGuards(GqlAccessGuard)
   @Mutation(() => QtBoard)
   async updateQtBoard(
+    @CurrentUser() currentUser: ICurrentUser,
     @Args('postId') postId: string,
-    @Args('updateQtBoardInput') updateQtBoardInput: UpdateQtBoardInput,
+    @Args('memberQtInput') memberQtInput: MembersQtInput,
   ) {
     return await this.qtBoardService.update({
+      currentUser,
       postId,
-      updateQtBoardInput,
+      memberQtInput,
     });
+  }
+
+  //비회원 게시글 삭제
+  @Mutation(() => Boolean)
+  async deleteNonMembersQtBoard(
+    @Args('password') password: string,
+    @Args('postId') postId: string,
+  ) {
+    return await this.qtBoardService.nonMembersdelete({ postId, password });
   }
   //게시글 삭제
   @UseGuards(GqlAccessGuard)
   @Mutation(() => Boolean)
-  async deleteQtBoard(@Args('postId') postId: string) {
-    return await this.qtBoardService.delete({ postId });
+  async deleteQtBoard(
+    @CurrentUser() currentuser: ICurrentUser,
+    @Args('postId') postId: string,
+  ) {
+    return await this.qtBoardService.delete({ currentuser, postId });
   }
-
-  // @Mutation(() => Boolean)
-  // async updateQtLike(@Args('postId') postId: string) {
-  //   return await this.qtBoardService.qtlike({ postId });
-  // }
-  // @Mutation(() => QtBoard)
-  // async updateLikePost(@Args('postId') postId: string) {
-  //   return await this.qtBoardService.like({ postId });
-  // }
 }

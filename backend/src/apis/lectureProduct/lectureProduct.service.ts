@@ -30,6 +30,14 @@ export class LectureProductService {
     @InjectRepository(LectureProduct)
     private readonly lectureProductRepository: Repository<LectureProduct>,
   ) {}
+  async findPopular() {
+    const popular = this.lectureProductRepository.find({
+      take: 10,
+      order: { rating: 'DESC' },
+      where: { deletedAt: null },
+    });
+    return popular;
+  }
 
   // Create Class : only mentor has right to create class
   async create({ createLectureProductInput }: ICreate) {
