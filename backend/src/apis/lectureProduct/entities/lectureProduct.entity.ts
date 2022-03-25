@@ -72,7 +72,7 @@ export class LectureProduct {
   @Field(() => Date)
   deletedAt?: Date;
 
-  @OneToMany(() => LectureImage, (image) => image.product, {
+  @OneToMany(() => LectureImage, (image) => image.lecproduct, {
     cascade: true,
   })
   @Field(() => [LectureImage])
@@ -94,7 +94,7 @@ export class LectureProduct {
   // LectureRegistration과 1:N 연결
   @OneToMany(
     () => LectureRegistration,
-    (registration) => registration.linkedToLectureRegistration,
+    (registration) => registration.lecproduct,
   )
   @Field(() => [LectureRegistration])
   registration: LectureRegistration[];
