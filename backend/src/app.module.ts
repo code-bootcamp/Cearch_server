@@ -19,6 +19,7 @@ import { PointModule } from './apis/point/point.module';
 import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { FileUploadModule } from './apis/file/file.module';
+import { FollowModule } from './apis/follow/follow.module';
 import { LectureReviewModule } from './apis/lectureReview/lectureReview.module';
 import { WalletModule } from './apis/wallet/wallet.module';
 
@@ -37,6 +38,7 @@ import { WalletModule } from './apis/wallet/wallet.module';
     LectureRegistrationModule,
     LectureOrderModule,
     FileUploadModule,
+    FollowModule,
     GraphQLModule.forRoot<ApolloDriverConfig>({
       autoSchemaFile: '/src/grapqhql/schema.gql',
       context: ({ req, res }) => ({ req, res }),

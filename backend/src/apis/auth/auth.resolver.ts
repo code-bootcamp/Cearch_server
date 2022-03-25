@@ -1,7 +1,9 @@
 import { UseGuards } from '@nestjs/common';
 import { Args, Context, Mutation, Resolver } from '@nestjs/graphql';
 import { CurrentUser } from 'src/common/auth/decorate/currentuser.decorate';
+import { Role } from 'src/common/auth/decorate/role.decorate';
 import { GqlRefreshGuard } from 'src/common/auth/guard/gqlAuthGuard';
+import { RoleGuard } from 'src/common/auth/guard/roleGuard';
 import { User, USER_ROLE } from '../user/entities/user.entity';
 import { AuthService } from './auth.service';
 
@@ -46,6 +48,7 @@ export class AuthResolver {
   ) {
     const cookie = context.req.headers.cookie;
     const refreshToken = cookie.replace('refreshToken=', '');
+    console.log('cooookiiiieeee', refreshToken);
     return await this.authService.enrollBlackList({
       user: currentUser,
       refreshToken,
