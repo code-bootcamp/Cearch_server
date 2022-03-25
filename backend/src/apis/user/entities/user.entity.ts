@@ -116,7 +116,6 @@ export class User {
   interest: JoinUserAndProductCategory[];
 
   @OneToMany(() => LectureRegistration, (registration) => registration.user)
-  @Field(() =>[LectureRegistration])
+  @Field(() => [LectureRegistration])
   registration: LectureRegistration[];
-
 }

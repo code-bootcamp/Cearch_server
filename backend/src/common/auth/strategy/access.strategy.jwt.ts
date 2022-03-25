@@ -43,4 +43,3 @@ export class JwtAccessStrategy extends PassportStrategy(
     }
   }
 }
-
