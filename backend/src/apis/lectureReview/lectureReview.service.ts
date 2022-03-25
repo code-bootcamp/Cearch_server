@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Connection, Repository } from 'typeorm';
+import { Connection, getConnection, Repository } from 'typeorm';
 import { LectureProduct } from '../lectureProduct/entities/lectureProduct.entity';
 import { User } from '../user/entities/user.entity';
 import { LectureReview } from './entities/lectureReview.entity';
@@ -46,14 +46,25 @@ export class LectureReviewService {
         id: createReviewInput.lectureProductId,
       });
 
+      const reviews = await getConnection()
+        .createQueryBuilder(LectureReview, 'lecture_review')
+        .innerJoinAndSelect('lecture_review.lecture', 'lecture')
+        .where('lecture.id = :Id', { Id: createReviewInput.lectureProductId })
+        .getMany();
+
       const user = await queryRunner.manager.findOne(User, {
         id: currentuser.id,
       });
-      const { rating, reviews, ...rest } = lecture;
-      console.log(rating, '🎁', reviews);
+
+      const { rating, ...rest } = lecture;
+      const updateRating = (
+        (rating * reviews.length + createReviewInput.starRating) /
+        (reviews.length + 1)
+      ).toFixed(2);
+      console.log(updateRating, typeof updateRating);
       const updateLecture = await this.lectureProductRepository.create({
         ...lecture,
-        rating: rating + createReviewInput.starRating / reviews.length + 1,
+        rating: Number(updateRating),
       });
 
       const createReview = await this.lectureReviewRepository.create({
@@ -61,6 +72,7 @@ export class LectureReviewService {
         lecture: updateLecture,
         user: user,
       });
+
       await queryRunner.manager.save(updateLecture);
       await queryRunner.manager.save(createReview);
       await queryRunner.commitTransaction();
@@ -77,19 +89,40 @@ export class LectureReviewService {
     await queryRunner.connect();
     await queryRunner.startTransaction('REPEATABLE READ');
     try {
-      const review = await queryRunner.manager.findOne(LectureReview, {
-        id: updateReviewInput.reviewId,
-      });
+      const myReview = await getConnection()
+        .createQueryBuilder(LectureReview, 'lecture_review')
+        .innerJoinAndSelect('lecture_review.lecture', 'lecture')
+        .where('lecture_review.id = :Id', { Id: updateReviewInput.reviewId })
+        .getOne();
+      console.log(myReview);
       const user = await queryRunner.manager.findOne(User, {
         id: currentuser.id,
       });
 
-      const createReview = await this.lectureReviewRepository.create({
-        ...review,
-        ...updateReviewInput,
-        user: user,
+      const reviews = await getConnection()
+        .createQueryBuilder(LectureReview, 'lecture_review')
+        .innerJoinAndSelect('lecture_review.lecture', 'lecture')
+        .where('lecture.id = :Id', { Id: myReview.lecture.id })
+        .getMany();
+
+      const { rating, ...rest } = myReview.lecture;
+      const updateRating = (
+        (rating * reviews.length + updateReviewInput.starRating) /
+        (reviews.length + 1)
+      ).toFixed(2);
+      const updateLecture = await this.lectureProductRepository.create({
+        ...myReview.lecture,
+
+        rating: Number(updateRating),
       });
 
+      const createReview = await this.lectureReviewRepository.create({
+        ...myReview,
+        ...updateReviewInput,
+        lecture: updateLecture,
+        user: user,
+      });
+      await queryRunner.manager.save(updateLecture);
       await queryRunner.manager.save(createReview);
       await queryRunner.commitTransaction();
       return createReview;
