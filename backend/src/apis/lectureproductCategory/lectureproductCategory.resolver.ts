@@ -1,5 +1,4 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { CreateLectureProductCategoryInput } from './dto/createLectureProductCategory.input';
 import { LectureProductCategory } from './entities/lectureproductCategory.entity';
 import { LectureProductCategoryService } from './lectureproductCategory.service';
 
@@ -21,7 +20,7 @@ export class LectureProductCategoryResolver {
   }
 
   @Query(() => [LectureProductCategory])
-  async fetchlectureproductCategories(@Args('search') search: string) {
+  async fetchlectureproductCategories() {
     return await this.lectureproductCategoryService.findAll();
   }
 
@@ -33,6 +32,7 @@ export class LectureProductCategoryResolver {
       lectureproductCategoryId,
     });
   }
+
   @Mutation(() => Boolean)
   async deletelectureproductCategory(
     @Args('lectureproductCategoryId') lectureproductCategoryId: string,

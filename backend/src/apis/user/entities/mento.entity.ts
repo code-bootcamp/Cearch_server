@@ -1,5 +1,6 @@
 import { Field, ObjectType, registerEnumType } from '@nestjs/graphql';
 import { CertificateImage } from 'src/apis/certificateImage/entities/certificate.entity';
+import { LectureProduct } from 'src/apis/lectureProduct/entities/lectureProduct.entity';
 import {
   Column,
   Entity,
@@ -34,7 +35,7 @@ export class MentoInfo {
 
   @Column({ default: MENTOR_AUTH.PENDING })
   @Field(() => MENTOR_AUTH, { defaultValue: MENTOR_AUTH.PENDING })
-  mentoStatus: string;
+  mentoStatus: MENTOR_AUTH;
 
   @Column({ nullable: true })
   @Field(() => String)
@@ -52,5 +53,14 @@ export class MentoInfo {
   work: JoinMentoAndProductCategory[];
 
   @OneToOne(() => User, (user) => user.mentor)
+  @Field(() => User)
   user: User;
+
+  @Column({ nullable: true })
+  @Field(() => String)
+  onlineTime: string;
+
+  @OneToMany(() => LectureProduct, (lecutre) => lecutre.mentor)
+  @Field(() => [LectureProduct])
+  lecture: LectureProduct[];
 }

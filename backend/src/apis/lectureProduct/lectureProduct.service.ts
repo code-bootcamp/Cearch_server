@@ -4,8 +4,9 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { USER_ROLE } from '../user/entities/user.entity';
+import { Connection, Repository } from 'typeorm';
+import { IcurrentUser } from '../auth/auth.resolver';
+import { User, USER_ROLE } from '../user/entities/user.entity';
 import { CreateLectureProductInput } from './dto/createLectureProduct.input';
 import { UpdateLectureProductInput } from './dto/updateLectureProduct.input';
 import { LectureProduct } from './entities/lectureProduct.entity';
@@ -13,6 +14,7 @@ import { LectureProduct } from './entities/lectureProduct.entity';
 // Interface
 interface ICreate {
   createLectureProductInput: CreateLectureProductInput;
+  user: IcurrentUser;
 }
 
 interface IFindOne {
@@ -29,6 +31,9 @@ export class LectureProductService {
   constructor(
     @InjectRepository(LectureProduct)
     private readonly lectureProductRepository: Repository<LectureProduct>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+    private readonly connection: Connection,
   ) {}
   async findPopular() {
     const popular = this.lectureProductRepository.find({
@@ -40,22 +45,30 @@ export class LectureProductService {
   }
 
   // Create Class : only mentor has right to create class
-  async create({ createLectureProductInput }: ICreate) {
+  async create({ createLectureProductInput, user }: ICreate) {
+    const queryRunner = this.connection.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction('REPEATABLE READ');
     try {
-      const { classTitle, ...rest } = createLectureProductInput;
+      const query = await this.userRepository
+        .createQueryBuilder('user')
+        .innerJoinAndSelect('user.mentor', 'mentor')
+        .where('user.id = :id', { id: user.id })
+        .getOne();
+      const mentor = query.mentor;
+      console.log('mentor : ', mentor);
 
-      if (await this.lectureProductRepository.findOne({ classTitle })) {
-        throw new ConflictException('동일한 이름의 클래스가 존재합니다');
-      } else if (!USER_ROLE.MENTOR) {
-        throw new UnauthorizedException('클래스 개설 권한이 없습니다!');
-      }
-
-      return await this.lectureProductRepository.save({
-        ...rest,
-        classTitle,
+      const result = await queryRunner.manager.save(LectureProduct, {
+        ...createLectureProductInput,
+        mentor,
       });
+      await queryRunner.commitTransaction();
+      return result;
     } catch (error) {
+      await queryRunner.rollbackTransaction();
       throw error;
+    } finally {
+      await queryRunner.release();
     }
   }
   // Find All Class : ReadAll
@@ -98,5 +111,16 @@ export class LectureProductService {
       id: lectureproductId,
     });
     return result.affected ? true : false;
+  }
+
+  async fetchLectureDetail({ lectureId }) {
+    const lectureDetail = await this.lectureProductRepository
+      .createQueryBuilder('lecture')
+      .innerJoinAndSelect('lecture.mentor', 'mentor')
+      .innerJoinAndSelect('mentor.user', 'user')
+      .where('lecture.id = :lectureId', { lectureId })
+      .getOne();
+    console.log('lectureDetail : ', lectureDetail);
+    return lectureDetail;
   }
 }

@@ -1,6 +1,9 @@
 import { UseGuards } from '@nestjs/common';
 import { Args, Mutation, Resolver, Query } from '@nestjs/graphql';
-import { CurrentUser, ICurrentUser } from 'src/common/auth/decorate/currentuser.decorate';
+import {
+  CurrentUser,
+  ICurrentUser,
+} from 'src/common/auth/decorate/currentuser.decorate';
 import { Role } from 'src/common/auth/decorate/role.decorate';
 import { GqlAccessGuard } from 'src/common/auth/guard/gqlAuthGuard';
 import { RoleGuard } from 'src/common/auth/guard/roleGuard';
@@ -16,7 +19,6 @@ export class LectureRegistrationResolver {
     private readonly lectureRegistrationService: LectureRegistrationService,
   ) {}
 
-
   // Create Registration
   @Mutation(() => LectureRegistration)
   @UseGuards(GqlAccessGuard, RoleGuard)
@@ -25,9 +27,8 @@ export class LectureRegistrationResolver {
     @CurrentUser() currentuser: ICurrentUser,
     @Args('createLectureRegistrationInput')
     createLectureRegistrationInput: CreateLectureRegistrationInput,
-    @Args('lectureproductId') 
-    lectureproductId:string,
-
+    @Args('lectureproductId')
+    lectureproductId: string,
   ) {
     return await this.lectureRegistrationService.create({
       currentuser,
@@ -42,7 +43,8 @@ export class LectureRegistrationResolver {
   @Role(USER_ROLE.MENTEE)
   async fetchlectureRegistrations(
     @CurrentUser() currentuser: ICurrentUser,
-    @Args('search') search: string) {
+    @Args('search') search: string,
+  ) {
     return await this.lectureRegistrationService.findAll();
   }
 

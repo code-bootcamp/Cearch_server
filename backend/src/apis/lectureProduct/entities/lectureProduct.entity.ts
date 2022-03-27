@@ -3,11 +3,13 @@ import { LectureImage } from 'src/apis/LectureImage/entities/lectureImage.entity
 import { JoinLectureAndProductCategory } from 'src/apis/lectureproductCategory/entities/lectureproductCagtegoryclassCategory.entity';
 import { LectureRegistration } from 'src/apis/lectureRegistration/entitites/lectureRegistration.entity';
 import { LectureReview } from 'src/apis/lectureReview/entities/lectureReview.entity';
+import { MentoInfo } from 'src/apis/user/entities/mento.entity';
 import {
   Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -71,15 +73,11 @@ export class LectureProduct {
   @Field(() => Date)
   deletedAt?: Date;
 
-  @OneToMany(() => LectureImage, (image) => image.lecproduct, {
-    cascade: true,
-  })
+  @OneToMany(() => LectureImage, (image) => image.lecproduct)
   @Field(() => [LectureImage])
   image: LectureImage[];
 
-  @OneToMany(() => LectureReview, (review) => review.user, {
-    cascade: true,
-  })
+  @OneToMany(() => LectureReview, (review) => review.user)
   @Field(() => [LectureReview])
   reviews: LectureReview[];
 
@@ -97,4 +95,8 @@ export class LectureProduct {
   )
   @Field(() => [LectureRegistration])
   registration: LectureRegistration[];
+
+  @ManyToOne(() => MentoInfo, (mentoInfo) => mentoInfo.lecture)
+  @Field(() => MentoInfo)
+  mentor: MentoInfo;
 }
