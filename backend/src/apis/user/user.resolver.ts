@@ -1,6 +1,7 @@
 import { UnprocessableEntityException, UseGuards } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { CurrentUser } from 'src/common/auth/decorate/currentuser.decorate';
+import { Role } from 'src/common/auth/decorate/role.decorate';
 import { GqlAccessGuard } from 'src/common/auth/guard/gqlAuthGuard';
 import { IcurrentUser } from '../auth/auth.resolver';
 import { AuthService } from '../auth/auth.service';
@@ -8,7 +9,7 @@ import { AUTH_KIND } from '../auth/entities/auth.entity';
 import { MentorForm } from './dto/mentoForm.input';
 import { UserForm } from './dto/user.input';
 import { MentoInfo } from './entities/mento.entity';
-import { User } from './entities/user.entity';
+import { User, USER_ROLE } from './entities/user.entity';
 import { UserService } from './user.service';
 
 @Resolver()
@@ -17,6 +18,17 @@ export class UserResolver {
     private readonly userService: UserService, //
     private readonly authService: AuthService,
   ) {}
+  @Query(() => User)
+  @UseGuards(GqlAccessGuard)
+  @Role(USER_ROLE.MENTOR)
+  async fetchMentorUser(@CurrentUser() currentUser: IcurrentUser) {
+    return await this.userService.findMentoPage({ currentUser });
+  }
+  @Query(() => User)
+  @UseGuards(GqlAccessGuard)
+  async fetchUser(@CurrentUser() currentUser: IcurrentUser) {
+    return await this.userService.findMyPage({ currentUser });
+  }
 
   @Query(() => Boolean)
   async isCheckEmail(
@@ -148,6 +160,19 @@ export class UserResolver {
       user: currentUser,
       mentorForm,
       category,
+    });
+  }
+
+  @Mutation(() => Boolean)
+  @UseGuards(GqlAccessGuard)
+  @Role(USER_ROLE.ADMIN)
+  async deleteUser(
+    @CurrentUser() currentUser: IcurrentUser,
+    @Args('userId') userId: string,
+  ) {
+    return await this.userService.delete({
+      currentUser,
+      userId,
     });
   }
 }

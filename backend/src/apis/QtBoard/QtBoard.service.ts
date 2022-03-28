@@ -11,6 +11,7 @@ import { User, USER_ROLE } from '../user/entities/user.entity';
 import { MembersQtInput } from './dto/membersQtBoard.input';
 import { QtBoard } from './entities/qt.entity';
 import { Notice } from './entities/notice.entity';
+import { LectureProductCategory } from '../lectureproductCategory/entities/lectureproductCategory.entity';
 
 interface IFindOne {
   postId: string;
@@ -38,7 +39,15 @@ export class QtBoardService {
     private readonly noticeRepository: Repository<Notice>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(LectureProductCategory)
+    private readonly lectureCategoryRepository: Repository<LectureProductCategory>,
   ) {}
+
+  //게시글 총 갯수
+  async findCount() {
+    const count = await this.qtBoardRepository.count();
+    return count;
+  }
 
   //게시판 보기
   async findAll({ page }) {
@@ -46,8 +55,7 @@ export class QtBoardService {
       take: 10, // 한 페이지에 10개
       skip: 10 * (page - 1),
       order: { createdAt: 'DESC' },
-      where: { deletedAt: null },
-      relations: ['comments', 'likes'],
+      relations: ['comments', 'likes', 'user'],
     });
     return findAllPost;
   }
@@ -58,13 +66,20 @@ export class QtBoardService {
       .createQueryBuilder('qtBoard')
       .leftJoinAndSelect('qtBoard.comments', 'comment')
       .leftJoinAndSelect('qtBoard.likes', 'likes')
+      .leftJoinAndSelect('qtBoard.qtTags', 'qtTags')
+      .leftJoinAndSelect('qtBoard.user', 'user')
       .where('qtBoard.id = :id', { id: postId })
       .andWhere(`comment.parent = :parent`, { parent: '1' }) //parent 가 1인 댓글만 찾기
       .orderBy('comment.isPick', 'DESC')
       .addOrderBy('comment.createdAt')
       .getOne();
-    if (!findOnePost.deletedAt)
-      throw new UnprocessableEntityException('삭제된 게시물입니다.');
+
+    if (findOnePost === undefined)
+      return await this.qtBoardRepository.findOne({
+        where: { id: postId },
+        relations: ['user', 'likes'],
+      });
+    console.log('😂', findOnePost);
     return findOnePost;
   }
 
@@ -122,7 +137,7 @@ export class QtBoardService {
       title: title,
       contents: contents,
       isNotice: true,
-      // user: user,
+      user: user,
     });
     console.log(createPost);
     return createPost;
@@ -130,12 +145,30 @@ export class QtBoardService {
 
   //비회원 게시글 생성
   async nonMemberCreate({ nonMembersQtInput }) {
-    const { password, ...userInfo } = nonMembersQtInput;
+    const { password, qtTags, ...userInfo } = nonMembersQtInput;
     if (password.length < 4) {
       throw new UnprocessableEntityException('4글자 이상 입력해주세요');
     }
+
+    const tags = [];
+    for (let i = 0; i < qtTags.length; i++) {
+      const tagname = qtTags[i].replace('#', '');
+      const prevTag = await this.lectureCategoryRepository.findOne({
+        categoryname: tagname,
+      });
+      if (prevTag) {
+        tags.push(prevTag);
+        //존재하지 않는 태그라면
+      } else {
+        const newTag = await this.lectureCategoryRepository.save({
+          categoryname: tagname,
+        });
+        tags.push(newTag);
+      }
+    }
     const hashedPassword = await bcrypt.hash(password, 10); // 해쉬로 비밀번호 바꿔서 저장
     nonMembersQtInput = {
+      qtTags: tags,
       password: hashedPassword,
       ...userInfo,
     };
@@ -148,10 +181,33 @@ export class QtBoardService {
   //회원 게시글 생성
   async create({ currentuser, memberQtInput }: ICreate) {
     const user = await this.userRepository.findOne({ id: currentuser.id });
+    const { qtTags, ...rest } = memberQtInput;
+    console.log('💕', qtTags);
+    const tags = [];
+    for (let i = 0; i < qtTags.length; i++) {
+      const tagname = qtTags[i].replace('#', '');
+      console.log('📅', tagname);
+      const prevTag = await this.lectureCategoryRepository.findOne({
+        categoryname: tagname,
+      });
+      if (prevTag) {
+        tags.push(prevTag);
+        //존재하지 않는 태그라면
+      } else {
+        const newTag = await this.lectureCategoryRepository.save({
+          categoryname: tagname,
+        });
+        tags.push(newTag);
+      }
+    }
+    console.log('😊', user.name);
     const createPost = await this.qtBoardRepository.save({
-      ...memberQtInput,
+      ...rest,
+      name: user.name,
       user: user,
+      qtTags: tags,
     });
+    console.log(createPost);
     return createPost;
   }
 
@@ -185,8 +241,8 @@ export class QtBoardService {
     }
     const newPost = {
       ...post,
-      ...nonMembersQtInput,
       password: post.password,
+      ...nonMembersQtInput,
     };
     const result = await this.qtBoardRepository.save(newPost);
     return result;
@@ -201,9 +257,29 @@ export class QtBoardService {
       .andWhere('qtBoard.id = :Id', { Id: postId })
       .getOne();
     if (post) {
+      const { qtTags, ...rest } = memberQtInput;
+      console.log('💕', qtTags);
+      const tags = [];
+      for (let i = 0; i < qtTags.length; i++) {
+        const tagname = qtTags[i].replace('#', '');
+        console.log('📅', tagname);
+        const prevTag = await this.lectureCategoryRepository.findOne({
+          categoryname: tagname,
+        });
+        if (prevTag) {
+          tags.push(prevTag);
+          //존재하지 않는 태그라면
+        } else {
+          const newTag = await this.lectureCategoryRepository.save({
+            categoryname: tagname,
+          });
+          tags.push(newTag);
+        }
+      }
       const newPost = {
         ...post,
         ...memberQtInput,
+        qtTags: tags,
       };
       const result = await this.qtBoardRepository.save(newPost);
       return result;

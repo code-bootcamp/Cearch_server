@@ -15,12 +15,10 @@ interface ICreate {
 }
 interface IFindOne {
   lectureRegistrationId: string;
-  // currentuser
 }
 interface IUpdate {
   lectureRegistrationId: string;
   updatelectureRegistrationInput: UpdateLectureRegistrationInput;
-  // currentuser,
 }
 @Injectable()
 export class LectureRegistrationService {

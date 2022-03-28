@@ -10,6 +10,7 @@ import { MentoInfo, MENTOR_AUTH } from './entities/mento.entity';
 import { User } from './entities/user.entity';
 import { JoinMentoAndProductCategory } from './entities/workMento.entity';
 
+
 interface IcreateUserForm {
   userForm: UserForm;
 }
@@ -37,6 +38,20 @@ export class UserService {
     private readonly joinMentoAndProductCtgRepository: Repository<JoinMentoAndProductCategory>,
     private readonly connection: Connection,
   ) {} //
+
+  async findMyPage({ currentUser }) {
+    const myUser = await this.userRepository.findOne({
+      where: { id: currentUser.id },
+    });
+    return myUser;
+  }
+  async findMentoPage({ currentUser }) {
+    const myUser = getConnection()
+      .createQueryBuilder(User, 'user')
+      .innerJoinAndSelect('user.mentor', 'mentor')
+      .where('user.id = :id', { id: currentUser.id });
+    return myUser;
+  }
 
   async findOne({ email }) {
     const myUser = await this.userRepository.findOne({
@@ -272,6 +287,65 @@ export class UserService {
       throw new UnprocessableEntityException("can't update MentoInfo");
     } finally {
       await queryRunner.release();
+
+  async permitLecture({ currentUser, mentorId, lectureId }) {
+    const querryRunner = this.connection.createQueryRunner();
+    await querryRunner.connect();
+    await querryRunner.startTransaction('REPEATABLE READ');
+    try {
+      const user = await querryRunner.manager.findOne(User, {
+        id: currentUser.id,
+      });
+      if (user.role !== USER_ROLE.ADMIN) {
+        throw new UnauthorizedException('관리자가 아닙니다.');
+      }
+
+      const lecture = await getConnection()
+        .createQueryBuilder(MentoInfo, 'mentoinfo')
+        .innerJoinAndSelect('mentoinfo.lecture', 'lecture')
+        .where('mento.id = :mentoId', { mentoId: mentorId })
+        .andWhere('lecture.id = :id', { id: lectureId })
+        .getOne();
+      if (!lecture) {
+        throw new UnprocessableEntityException('허가할 강의가 없습니다.');
+      }
+      await querryRunner.manager.save(LectureProduct, {
+        ...lecture,
+        classOpen: true,
+      });
+    } catch (error) {
+      console.log(error);
+      await querryRunner.rollbackTransaction();
+      throw new UnprocessableEntityException('강의를 허가할 수 없습니다.');
+    } finally {
+      await querryRunner.release();
+    }
+  }
+
+  async delete({ currentUser, userId }) {
+    const querryRunner = this.connection.createQueryRunner();
+    await querryRunner.connect();
+    await querryRunner.startTransaction('REPEATABLE READ');
+    try {
+      const user = await querryRunner.manager.findOne(User, {
+        id: currentUser.id,
+      });
+      if (user.role !== USER_ROLE.ADMIN) {
+        throw new UnauthorizedException('관리자가 아닙니다.');
+      }
+
+      const result = await querryRunner.manager.softDelete(User, {
+        id: userId,
+      });
+      await querryRunner.commitTransaction();
+      return result.affected ? true : false;
+    } catch (error) {
+      console.log(error);
+      await querryRunner.rollbackTransaction();
+      throw new UnprocessableEntityException('유저를 삭제 할 수 없습니다.');
+    } finally {
+      await querryRunner.release();
+
     }
   }
 }

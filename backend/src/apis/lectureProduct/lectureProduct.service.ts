@@ -120,3 +120,4 @@ export class LectureProductService {
     return lectureDetail;
   }
 }
+

@@ -28,3 +28,5 @@ import { LectureRegistrationService } from './lectureRegistration.service';
   ],
 })
 export class LectureRegistrationModule {}
+
+

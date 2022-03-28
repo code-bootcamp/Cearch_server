@@ -86,9 +86,7 @@ export class User {
   @Field(() => Date)
   deleteDate: Date;
 
-  @OneToMany(() => QtBoard, (qt) => qt.user, {
-    cascade: true,
-  })
+  @OneToMany(() => QtBoard, (qt) => qt.user, {})
   @Field(() => [QtBoard])
   qtBoard: QtBoard[];
 
@@ -112,8 +110,9 @@ export class User {
   @OneToMany(
     () => JoinUserAndProductCategory,
     (joinUserAndProductCategory) => joinUserAndProductCategory.user,
+    { nullable: true },
   )
-  @Field(() => [JoinUserAndProductCategory])
+  @Field(() => [JoinUserAndProductCategory], { nullable: true })
   interest: JoinUserAndProductCategory[];
 
   @OneToMany(() => LectureRegistration, (registration) => registration.user)

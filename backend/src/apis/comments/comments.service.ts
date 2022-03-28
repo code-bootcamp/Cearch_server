@@ -49,16 +49,14 @@ export class CommentsService {
     await queryRunner.connect();
     await queryRunner.startTransaction('REPEATABLE READ');
     try {
-      const user = await queryRunner.manager.findOne(User, {
-        id: currentuser.id,
-      });
+      const user = await queryRunner.manager.findOne(User, {id: currentuser.id});
       const post = await queryRunner.manager.findOne(QtBoard, { id: postId });
       const createcomment = await this.commentsRepository.create({
         qtBoard: post,
         contents: contents,
         user: user,
       });
-      console.log(`🔍`, createcomment);
+      console.log(`🍳`, createcomment);
       await queryRunner.manager.save(createcomment);
       await queryRunner.commitTransaction();
       return createcomment;
