@@ -10,7 +10,7 @@ import { LectureRegistration } from './entitites/lectureRegistration.entity';
 // Interface
 interface ICreate {
   createLectureRegistrationInput: CreateLectureRegistrationInput;
-  lectureproductId: string
+  lectureproductId: string;
   currentuser: any;
 }
 interface IFindOne {
@@ -25,19 +25,29 @@ export class LectureRegistrationService {
   constructor(
     @InjectRepository(LectureRegistration)
     private readonly lectureRegistrationRepository: Repository<LectureRegistration>,
-  
+
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
 
     @InjectRepository(LectureProduct)
-    private readonly lectureproductRepository: Repository<LectureProduct>
-    ){}
+    private readonly lectureproductRepository: Repository<LectureProduct>,
+  ) {}
 
   // Create Registration Form
-  async create({createLectureRegistrationInput, currentuser, lectureproductId}: ICreate) {
+  async create({
+    createLectureRegistrationInput,
+    currentuser,
+    lectureproductId,
+  }: ICreate) {
     const user = await this.userRepository.findOne({ id: currentuser.id });
-    const lecture = await this.lectureproductRepository.findOne({ id:lectureproductId })
-    return await this.lectureRegistrationRepository.save({...createLectureRegistrationInput, lecproduct:lecture, user});
+    const lecture = await this.lectureproductRepository.findOne({
+      id: lectureproductId,
+    });
+    return await this.lectureRegistrationRepository.save({
+      ...createLectureRegistrationInput,
+      lecproduct: lecture,
+      user,
+    });
   }
 
   // Find All Registration Forms: ReadAll

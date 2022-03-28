@@ -1,0 +1,13 @@
+{
+  "template": "*",
+  "order": 1,
+  "mappings": {
+    "my_type": {
+      "properties": {
+        "createdAt": {
+          "type": "date"
+        }
+      }
+    }
+  }
+}

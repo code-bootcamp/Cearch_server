@@ -1,4 +1,6 @@
-import { Field, Int, InputType } from '@nestjs/graphql';
+import { Field, InputType, PickType } from '@nestjs/graphql';
+import { LectureProductCategory } from 'src/apis/lectureproductCategory/entities/lectureproductCategory.entity';
+import { QtBoard } from '../entities/qt.entity';
 
 @InputType()
 export class MembersQtInput {
@@ -7,4 +9,7 @@ export class MembersQtInput {
 
   @Field(() => String)
   contents!: string;
+
+  @Field(() => [String])
+  qtTags: string[];
 }
