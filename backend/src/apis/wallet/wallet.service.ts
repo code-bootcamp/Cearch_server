@@ -44,4 +44,5 @@ export class WalletService {
       .getMany();
     return minus;
   }
+
 }

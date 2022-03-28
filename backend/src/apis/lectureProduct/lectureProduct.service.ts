@@ -79,7 +79,7 @@ export class LectureProductService {
       order: { createdAt: 'DESC' },
       where: { deletedAt: null },
     });
-    return findNewClasses[0];
+    return findNewClasses;
   }
   // Update Class: only mentor has right to update class
   async update({ lectureproductId, updateLectureProductInput }: IUpdate) {

@@ -1,6 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Field, ObjectType } from '@nestjs/graphql';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { QtBoard } from 'src/apis/QtBoard/entities/qt.entity';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { JoinLectureAndProductCategory } from './lectureproductCagtegoryclassCategory.entity';
 
 @Entity()
@@ -21,4 +28,8 @@ export class LectureProductCategory {
   )
   @Field(() => [JoinLectureAndProductCategory])
   category: JoinLectureAndProductCategory[];
+
+  @ManyToOne(() => QtBoard, (qt) => qt.qtTags)
+  @Field(() => QtBoard)
+  qtBoard: QtBoard;
 }
