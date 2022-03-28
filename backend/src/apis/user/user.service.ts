@@ -1,15 +1,15 @@
 import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
-import { Connection, Repository } from 'typeorm';
+import { Connection, getConnection, Repository } from 'typeorm';
 import { IcurrentUser } from '../auth/auth.resolver';
+import { LectureProduct } from '../lectureProduct/entities/lectureProduct.entity';
 import { LectureProductCategory } from '../lectureproductCategory/entities/lectureproductCategory.entity';
 import { MentorForm } from './dto/mentoForm.input';
 import { UserForm } from './dto/user.input';
 import { MentoInfo, MENTOR_AUTH } from './entities/mento.entity';
 import { User } from './entities/user.entity';
 import { JoinMentoAndProductCategory } from './entities/workMento.entity';
-
 
 interface IcreateUserForm {
   userForm: UserForm;
@@ -287,6 +287,8 @@ export class UserService {
       throw new UnprocessableEntityException("can't update MentoInfo");
     } finally {
       await queryRunner.release();
+    }
+  }
 
   async permitLecture({ currentUser, mentorId, lectureId }) {
     const querryRunner = this.connection.createQueryRunner();
@@ -296,10 +298,6 @@ export class UserService {
       const user = await querryRunner.manager.findOne(User, {
         id: currentUser.id,
       });
-      if (user.role !== USER_ROLE.ADMIN) {
-        throw new UnauthorizedException('관리자가 아닙니다.');
-      }
-
       const lecture = await getConnection()
         .createQueryBuilder(MentoInfo, 'mentoinfo')
         .innerJoinAndSelect('mentoinfo.lecture', 'lecture')
@@ -330,9 +328,6 @@ export class UserService {
       const user = await querryRunner.manager.findOne(User, {
         id: currentUser.id,
       });
-      if (user.role !== USER_ROLE.ADMIN) {
-        throw new UnauthorizedException('관리자가 아닙니다.');
-      }
 
       const result = await querryRunner.manager.softDelete(User, {
         id: userId,
@@ -345,7 +340,6 @@ export class UserService {
       throw new UnprocessableEntityException('유저를 삭제 할 수 없습니다.');
     } finally {
       await querryRunner.release();
-
     }
   }
 }

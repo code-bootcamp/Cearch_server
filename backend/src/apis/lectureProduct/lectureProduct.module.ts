@@ -13,20 +13,22 @@ import { LectureProductResolver } from './lectureProduct.resolver';
 import { LectureProductService } from './lectureProduct.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([
-    LectureProduct, 
-    LectureRegistration, 
-    User, 
-    LectureProductCategory,
-    MentoInfo
-  ])],
+  imports: [
+    TypeOrmModule.forFeature([
+      LectureProduct,
+      LectureRegistration,
+      User,
+      LectureProductCategory,
+      MentoInfo,
+    ]),
+  ],
   providers: [
     LectureProductResolver,
     LectureProductService,
     JoinLectureAndProductCategory,
     LectureRegistrationService,
     LectureProductCategoryService,
-    LectureProductCategoryResolver
+    LectureProductCategoryResolver,
   ],
 })
 export class LectureProductModule {}

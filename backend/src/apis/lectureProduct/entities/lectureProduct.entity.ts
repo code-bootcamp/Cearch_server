@@ -23,47 +23,47 @@ export class LectureProduct {
   id: string;
 
   @Column()
-  @Field(() => String, {nullable:true})
+  @Field(() => String, { nullable: true })
   classTitle: string;
 
   @Column()
-  @Field(() => String, {nullable:true})
+  @Field(() => String, { nullable: true })
   classDescription: string;
 
   @Column()
-  @Field(() => Int, {nullable:true})
+  @Field(() => Int, { nullable: true })
   classRunTime: number;
 
   @Column()
-  @Field(() => Int, {nullable:true})
+  @Field(() => Int, { nullable: true })
   classPrice: number;
 
   @UpdateDateColumn()
   classDuedate: Date;
 
   @Column({ default: false })
-  @Field(() => Boolean, {nullable:true})
+  @Field(() => Boolean, { nullable: true })
   isApplicable: boolean;
 
   @Column()
-  @Field(() => Int, {nullable:true})
+  @Field(() => Int, { nullable: true })
   classMaxUser: number;
 
   @Column()
-  @Field(() => Int, {nullable:true})
+  @Field(() => Int, { nullable: true })
   classAppliedUser: number;
 
   @Column({ default: false })
-  @Field(() => Boolean, {nullable:true})
+  @Field(() => Boolean, { nullable: true })
   classOpen: boolean;
 
   @Column({ default: 0, type: 'float' })
-  @Field(() => Float, {nullable:true})
+  @Field(() => Float, { nullable: true })
   rating: number;
-  
+
   @Column()
   @Field(() => String)
-  classCategory: string
+  classCategory: string;
 
   @CreateDateColumn()
   @Field(() => Date)
