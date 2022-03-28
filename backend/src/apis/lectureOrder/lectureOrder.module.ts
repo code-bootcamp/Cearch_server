@@ -1,11 +1,38 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { LectureProduct } from '../lectureProduct/entities/lectureProduct.entity';
+import { LectureProductResolver } from '../lectureProduct/lectureProduct.resolver';
+import { LectureProductService } from '../lectureProduct/lectureProduct.service';
+import { LectureProductCategory } from '../lectureproductCategory/entities/lectureproductCategory.entity';
+import { LectureRegistration } from '../lectureRegistration/entitites/lectureRegistration.entity';
+import { LectureRegistrationResolver } from '../lectureRegistration/lectureRegistration.resolver';
+import { LectureRegistrationService } from '../lectureRegistration/lectureRegistration.service';
+import { MentoInfo } from '../user/entities/mento.entity';
+import { User } from '../user/entities/user.entity';
+import { UserService } from '../user/user.service';
+import { Wallet } from '../wallet/entities/wallet.entity';
 import { LectureOrder } from './entities/lectureOrder.entity';
 import { LectureOrderResolver } from './lectureOrder.resolver';
 import { LectureOrderService } from './lectureOrder.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([LectureOrder])],
-  providers: [LectureOrderResolver, LectureOrderService],
+  imports: [TypeOrmModule.forFeature([
+    LectureOrder, 
+    LectureRegistration,
+    User,
+    LectureProduct,
+    MentoInfo,
+    Wallet,
+    LectureProductCategory
+  ])],
+  providers: [
+    LectureOrderResolver, 
+    LectureOrderService, 
+    LectureRegistrationService, 
+    LectureRegistrationResolver,
+    LectureProductService, 
+    LectureProductResolver,
+    UserService
+  ],
 })
 export class LectureOrderModule {}

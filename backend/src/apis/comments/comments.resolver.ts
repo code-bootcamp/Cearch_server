@@ -35,6 +35,7 @@ export class CommentsResolver {
   ) {
     return await this.commentsService.create({ currentuser, postId, contents });
   }
+  
   @Mutation(() => Comments)
   @UseGuards(GqlAccessGuard)
   async updateComments(

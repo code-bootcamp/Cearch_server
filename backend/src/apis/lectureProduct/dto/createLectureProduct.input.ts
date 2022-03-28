@@ -19,4 +19,7 @@ export class CreateLectureProductInput {
 
   @Field(() => Int, { nullable: true })
   classAppliedUser: number;
+
+  @Field(() => String)
+  classCategory: string
 }
