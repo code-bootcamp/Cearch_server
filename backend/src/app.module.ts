@@ -22,6 +22,8 @@ import { FileUploadModule } from './apis/file/file.module';
 import { FollowModule } from './apis/follow/follow.module';
 import { LectureReviewModule } from './apis/lectureReview/lectureReview.module';
 import { WalletModule } from './apis/wallet/wallet.module';
+import { ConfigModule } from '@nestjs/config';
+import { SocketModule } from './socket.io/module.socket';
 
 @Module({
   imports: [
@@ -39,6 +41,7 @@ import { WalletModule } from './apis/wallet/wallet.module';
     LectureOrderModule,
     FileUploadModule,
     FollowModule,
+    SocketModule,
     GraphQLModule.forRoot<ApolloDriverConfig>({
       autoSchemaFile: '/src/grapqhql/schema.gql',
       context: ({ req, res }) => ({ req, res }),
@@ -59,6 +62,9 @@ import { WalletModule } from './apis/wallet/wallet.module';
       url: 'redis://my_redis:6379',
       isGlobal: true,
     }),
+    // ConfigModule.forRoot({
+    //   isGlobal: true,
+    // }),
   ],
   controllers: [AppController],
   providers: [AppService, JwtAccessStrategy, JwtRefreshStrategy],
