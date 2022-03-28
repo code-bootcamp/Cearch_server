@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JoinLectureAndProductCategory } from '../lectureproductCategory/entities/lectureproductCagtegoryclassCategory.entity';
+import { MentoInfo } from '../user/entities/mento.entity';
 import { LectureProductCategory } from '../lectureproductCategory/entities/lectureproductCategory.entity';
 import { LectureProductCategoryResolver } from '../lectureproductCategory/lectureproductCategory.resolver';
 import { LectureProductCategoryService } from '../lectureproductCategory/lectureproductCategory.service';
@@ -16,7 +17,8 @@ import { LectureProductService } from './lectureProduct.service';
     LectureProduct, 
     LectureRegistration, 
     User, 
-    LectureProductCategory
+    LectureProductCategory,
+    MentoInfo
   ])],
   providers: [
     LectureProductResolver,

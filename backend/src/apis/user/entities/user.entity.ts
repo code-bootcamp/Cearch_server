@@ -96,6 +96,7 @@ export class User {
 
   @JoinColumn()
   @OneToOne(() => MentoInfo, (mentoInfo) => mentoInfo.user)
+  @Field(() => MentoInfo)
   mentor: MentoInfo;
 
   @OneToMany(() => Likes, (like) => like.user)

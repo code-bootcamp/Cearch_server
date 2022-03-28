@@ -1,14 +1,12 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { LectureProductCategory } from 'src/apis/lectureproductCategory/entities/lectureproductCategory.entity';
 import {
+  DeleteDateColumn,
   Entity,
-  JoinColumn,
   ManyToOne,
-  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { MentoInfo } from './mento.entity';
-import { User } from './user.entity';
 
 @Entity()
 @ObjectType()
@@ -23,10 +21,14 @@ export class JoinMentoAndProductCategory {
     (linkedToLectureProductCategory) => linkedToLectureProductCategory.category,
   )
   @Field(() => LectureProductCategory)
-  linkedToLectureProductCategory: LectureProductCategory;
+  category: LectureProductCategory;
 
   // LectureProduct와 N:1 연결
   @ManyToOne(() => MentoInfo, (mento) => mento.work)
   @Field(() => MentoInfo)
-  mento: User;
+  mento: MentoInfo;
+
+  @DeleteDateColumn()
+  @Field(() => Date)
+  deleteAt: Date;
 }

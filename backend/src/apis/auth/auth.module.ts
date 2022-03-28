@@ -10,10 +10,16 @@ import { AuthController } from './auth.controller';
 import { JwtGooglestrategy } from 'src/common/auth/strategy/social-google.strategy.jwt';
 import { UserService } from '../user/user.service';
 import { MentoInfo } from '../user/entities/mento.entity';
+import { JoinMentoAndProductCategory } from '../user/entities/workMento.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([AuthTable, User, MentoInfo]), //
+    TypeOrmModule.forFeature([
+      AuthTable,
+      User,
+      MentoInfo,
+      JoinMentoAndProductCategory,
+    ]), //
     JwtModule.register({}),
   ],
   providers: [

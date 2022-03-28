@@ -115,11 +115,51 @@ export class UserResolver {
   @UseGuards(GqlAccessGuard)
   async sendMentorForm(
     @Args('mentorForm') mentorForm: MentorForm, //
-    @CurrentUser() currentUser: IcurrentUser,
+    @Args({ name: 'category', type: () => [String] }) category: string[],
+    @CurrentUser()
+    currentUser: IcurrentUser,
   ) {
     return await this.userService.sendMentorForm({
       mentorForm,
       user: currentUser,
+      category,
+    });
+  }
+
+  @Query(() => [MentoInfo])
+  async fetchMentor(
+    @Args('page') page: number, //
+  ) {
+    return await this.userService.fetchMentor({ page });
+  }
+
+  @Query(() => [MentoInfo])
+  async fetchSelectedTagMentor(
+    @Args('page') page: number, //
+    @Args('categoryName') categoryName: string,
+  ) {
+    return await this.userService.fetchMentorWithCategory({
+      page,
+      categoryName,
+    });
+  }
+
+  @Query(() => [MentoInfo])
+  async fetchAuthorMentor() {
+    return await this.userService.fetchAuthorMentor();
+  }
+
+  @Mutation(() => MentoInfo)
+  @UseGuards(GqlAccessGuard)
+  async updateMentorInfo(
+    @Args('mentorForm') mentorForm: MentorForm,
+    @Args({ name: 'category', type: () => [String] }) category: string[],
+    @CurrentUser() currentUser: IcurrentUser,
+  ) {
+    return await this.userService.updateMentoForm({
+      user: currentUser,
+      mentorForm,
+      category,
     });
   }
 
