@@ -25,11 +25,14 @@ export class JwtAccessStrategy extends PassportStrategy(
     });
   }
   async validate(req, payload) {
-    const refreshToken = req.headers.cookie.replace('refreshToken=', '');
+    console.log(req.headers.cookie);
+    const accessToken = req.headers.authorization.replace('Bearer ', '');
     try {
-      const isRefresh = await this.cacheManager.get(`refresh:${refreshToken}`); // refresh가 없는경우 access 와 상관없이 false
-      console.log(isRefresh);
-      if (isRefresh) {
+      const isAccess = await this.cacheManager.get(
+        `accessToken:${accessToken}`,
+      ); // refresh가 없는경우 access 와 상관없이 false
+      console.log(isAccess);
+      if (isAccess) {
         console.log('여기로 들어가면 안되는데');
         return false;
       }
