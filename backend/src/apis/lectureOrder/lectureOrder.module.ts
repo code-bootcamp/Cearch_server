@@ -18,7 +18,6 @@ import { LectureOrderResolver } from './lectureOrder.resolver';
 import { LectureOrderService } from './lectureOrder.service';
 
 @Module({
-
   imports: [
     TypeOrmModule.forFeature([
       LectureOrder,
@@ -31,7 +30,6 @@ import { LectureOrderService } from './lectureOrder.service';
       JoinMentoAndProductCategory,
     ]),
   ],
-
   providers: [
     LectureOrderResolver,
     LectureOrderService,

@@ -46,10 +46,15 @@ import { SocketModule } from './socket.io/module.socket';
       autoSchemaFile: '/src/grapqhql/schema.gql',
       context: ({ req, res }) => ({ req, res }),
       driver: ApolloDriver,
+      cors: {
+        credential: true,
+        origin: true,
+      },
     }),
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: 'my_db',
+      host: 'my-db',
+      port: 3306,
       database: 'test_db',
       username: 'root',
       password: '0000',
@@ -59,7 +64,7 @@ import { SocketModule } from './socket.io/module.socket';
     }),
     CacheModule.register<RedisClientOptions>({
       store: redisStore,
-      url: 'redis://my_redis:6379',
+      url: 'redis://my-redis:6379',
       isGlobal: true,
     }),
     // ConfigModule.forRoot({
