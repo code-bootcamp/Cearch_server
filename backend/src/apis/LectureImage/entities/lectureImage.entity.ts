@@ -33,7 +33,7 @@ export class LectureImage {
   @Field(() => Date)
   deletedAt?: Date;
 
-  @ManyToOne(() => LectureProduct, (lecproduct) => lecproduct.image)
+  @ManyToOne(() => LectureProduct, (product) => product.image)
   @Field(() => LectureProduct)
-  lecproduct: LectureProduct;
+  product: LectureProduct;
 }

@@ -1,19 +1,22 @@
 import { Field, InputType, Int } from '@nestjs/graphql';
-
+import { CLASS_CATEGORY } from '../entities/lectureProduct.entity';
 @InputType()
 export class UpdateLectureProductInput {
-  @Field(() => String, { nullable: true })
+  @Field(() => String)
   classTitle!: string;
 
-  @Field(() => String, { nullable: true })
-  classDescription!: string;
+  @Field(() => CLASS_CATEGORY)
+  classCategory!: CLASS_CATEGORY;
 
-  @Field(() => Int, { nullable: true })
-  classRunTime!: number;
+  @Field(() => String)
+  classDescription: string;
 
-  @Field(() => Int, { nullable: true })
-  classPrice!: number;
+  @Field(() => Int)
+  classPrice: number;
 
-  @Field(() => Int, { nullable: true })
-  classMaxUser!: number;
+  @Field(() => Int)
+  classMaxUser: number;
+
+  @Field(() => Int)
+  classStartDate: number;
 }

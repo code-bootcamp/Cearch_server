@@ -5,13 +5,16 @@ import { LectureProduct } from '../lectureProduct/entities/lectureProduct.entity
 import { LectureRegistration } from '../lectureRegistration/entitites/lectureRegistration.entity';
 import { User } from '../user/entities/user.entity';
 import { Wallet } from '../wallet/entities/wallet.entity';
-import { LectureOrder, REGISTRATION_STATUS_ENUM } from './entities/lectureOrder.entity';
+import {
+  LectureOrder,
+  REGISTRATION_STATUS_ENUM,
+} from './entities/lectureOrder.entity';
 
 // Interface
 interface IFindOne {
   lectureorderId: string;
-  lectureRegistrationId,
-  currentuser
+  lectureRegistrationId;
+  currentuser;
 }
 interface IUpdate {
   lectureOrderId: string;
@@ -34,45 +37,44 @@ export class LectureOrderService {
   ) {}
 
   // Placing order
-  async create({lectureRegistrationId, currentuser}) {
+  async create({ lectureRegistrationId, currentuser }) {
     // 멘티가 신청서ID 중 하나를 찾아 맞으면 결제
-    const queryRunner = this.connection.createQueryRunner()
-    await queryRunner.connect()
-    await queryRunner.startTransaction('REPEATABLE READ')
-    try{
+    const queryRunner = this.connection.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction('REPEATABLE READ');
+    try {
       // Find currentuser
-      console.log(currentuser)
+      console.log(currentuser);
       const user = await queryRunner.manager.findOne(User, {
-        id: currentuser.id
-      })
+        id: currentuser.id,
+      });
       // Find registrationId
       const registration = await getRepository(LectureRegistration)
-      .createQueryBuilder('lectureregistration')
-      .leftJoinAndSelect('lectureregistration.lecproduct','lecproduct')
-      .getOne();
-      console.log(user)
-      if(user.point >= registration.lecproduct.classPrice){
+        .createQueryBuilder('lectureregistration')
+        .leftJoinAndSelect('lectureregistration.lecproduct', 'lecproduct')
+        .getOne();
+      console.log(user);
+      if (user.point >= registration.lecproduct.classPrice) {
         const payment = await this.lectureOrderRepository.create({
           registrationStatus: REGISTRATION_STATUS_ENUM.PAID,
-          order:registration
-        })
+          order: registration,
+        });
         const updateNewuser = await this.userRepository.create({
           ...user,
-          point:user.point - registration.lecproduct.classPrice
-        })
-        const balance = await queryRunner.manager.save(updateNewuser)
-        console.log('결제진행')
-        const result = await queryRunner.manager.save(payment)
-        await queryRunner.commitTransaction()
-        return result
+          point: user.point - registration.lecproduct.classPrice,
+        });
+        const balance = await queryRunner.manager.save(updateNewuser);
+        console.log('결제진행');
+        const result = await queryRunner.manager.save(payment);
+        await queryRunner.commitTransaction();
+        return result;
       }
-    } catch (error){
-      await queryRunner.rollbackTransaction()
-      throw new NotAcceptableException('잔액이 부족합니다')
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw new NotAcceptableException('잔액이 부족합니다');
     } finally {
-      await queryRunner.release()
+      await queryRunner.release();
     }
-
   }
   // finding all orders
   async findAll() {
@@ -88,9 +90,7 @@ export class LectureOrderService {
     });
   }
   // Update lectureOrder
-  async update({
-    lectureOrderId,
-  }: IUpdate) {
+  async update({ lectureOrderId }: IUpdate) {
     const currentlectureRegistration =
       await this.lectureOrderRepository.findOne({
         id: lectureOrderId,
@@ -98,9 +98,7 @@ export class LectureOrderService {
     const newlectureOrder = {
       ...currentlectureRegistration,
     };
-    return await this.lectureOrderRepository.save(
-      newlectureOrder,
-    );
+    return await this.lectureOrderRepository.save(newlectureOrder);
   }
   // Cancel order
   async delete({ lectureorderId }) {

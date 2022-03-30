@@ -45,7 +45,7 @@ export class LectureRegistrationService {
     });
     return await this.lectureRegistrationRepository.save({
       ...createLectureRegistrationInput,
-      lecproduct: lecture,
+      product: lecture,
       user,
     });
   }

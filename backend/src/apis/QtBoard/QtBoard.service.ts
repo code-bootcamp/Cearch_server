@@ -11,7 +11,7 @@ import { User, USER_ROLE } from '../user/entities/user.entity';
 import { MembersQtInput } from './dto/membersQtBoard.input';
 import { QtBoard } from './entities/qt.entity';
 import { Notice } from './entities/notice.entity';
-import { LectureProductCategory } from '../lectureproductCategory/entities/lectureproductCategory.entity';
+import { JoinQtBoardAndProductCategory } from './entities/qtTags.entity';
 
 interface IFindOne {
   postId: string;
@@ -39,8 +39,8 @@ export class QtBoardService {
     private readonly noticeRepository: Repository<Notice>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-    @InjectRepository(LectureProductCategory)
-    private readonly lectureCategoryRepository: Repository<LectureProductCategory>,
+    @InjectRepository(JoinQtBoardAndProductCategory)
+    private readonly qtTagsRepository: Repository<JoinQtBoardAndProductCategory>,
   ) {}
 
   //게시글 총 갯수
@@ -55,7 +55,7 @@ export class QtBoardService {
       take: 10, // 한 페이지에 10개
       skip: 10 * (page - 1),
       order: { createdAt: 'DESC' },
-      relations: ['comments', 'likes', 'user'],
+      relations: ['comments', 'likes', 'user', 'qtTags'],
     });
     return findAllPost;
   }
@@ -77,7 +77,7 @@ export class QtBoardService {
     if (findOnePost === undefined)
       return await this.qtBoardRepository.findOne({
         where: { id: postId },
-        relations: ['user', 'likes'],
+        relations: ['user', 'likes', 'qtTags'],
       });
     console.log('😂', findOnePost);
     return findOnePost;
@@ -108,7 +108,7 @@ export class QtBoardService {
       take: 10, // 한 페이지에 10개
       order: { likescount: 'DESC' },
       where: { deletedAt: null },
-      relations: ['comments', 'likes'],
+      relations: ['comments', 'likes', 'qtTags'],
     });
     return findLikePost;
   }
@@ -125,6 +125,32 @@ export class QtBoardService {
       .getMany();
 
     return myQts;
+  }
+
+  async findMyQtComment({ currentuser, page }) {
+    const myQts = await this.qtBoardRepository
+      .createQueryBuilder('qtBoard')
+      .innerJoinAndSelect('qtBoard.user', 'user')
+      .where('user.id = :userId', { userId: currentuser.id })
+      .orderBy('qtBoard.createdAt', 'DESC')
+      .getMany();
+
+      const myCo = await this.commentsRepository
+      .createQueryBuilder('comments')
+      .leftJoinAndSelect('comments.qtBoard', 'qtBoard')
+      .innerJoinAndSelect('comments.user', 'user')
+      .where('user.id = :userId', { userId: currentuser.id })
+      .orderBy('comments.createdAt', 'DESC')
+      .limit(15)
+      .offset(15 * (page - 1))
+      .getMany();
+      const array = [...myQts, ...myCo].sort(function(a, b){ 
+      if(a.createdAt > b.createdAt) return 1; 
+      if(a.createdAt === b.createdAt) return 0; 
+      if(a.createdAt < b.createdAt) return 1; 
+    })
+    console.log(array)
+      return array
   }
 
   //공지사항생성
@@ -153,15 +179,15 @@ export class QtBoardService {
     const tags = [];
     for (let i = 0; i < qtTags.length; i++) {
       const tagname = qtTags[i].replace('#', '');
-      const prevTag = await this.lectureCategoryRepository.findOne({
-        categoryname: tagname,
+      const prevTag = await this.qtTagsRepository.findOne({
+        tagname: tagname,
       });
       if (prevTag) {
         tags.push(prevTag);
         //존재하지 않는 태그라면
       } else {
-        const newTag = await this.lectureCategoryRepository.save({
-          categoryname: tagname,
+        const newTag = await this.qtTagsRepository.save({
+          tagname: tagname,
         });
         tags.push(newTag);
       }
@@ -187,15 +213,15 @@ export class QtBoardService {
     for (let i = 0; i < qtTags.length; i++) {
       const tagname = qtTags[i].replace('#', '');
       console.log('📅', tagname);
-      const prevTag = await this.lectureCategoryRepository.findOne({
-        categoryname: tagname,
+      const prevTag = await this.qtTagsRepository.findOne({
+        tagname: tagname,
       });
       if (prevTag) {
         tags.push(prevTag);
         //존재하지 않는 태그라면
       } else {
-        const newTag = await this.lectureCategoryRepository.save({
-          categoryname: tagname,
+        const newTag = await this.qtTagsRepository.save({
+          tagname: tagname,
         });
         tags.push(newTag);
       }
@@ -263,15 +289,15 @@ export class QtBoardService {
       for (let i = 0; i < qtTags.length; i++) {
         const tagname = qtTags[i].replace('#', '');
         console.log('📅', tagname);
-        const prevTag = await this.lectureCategoryRepository.findOne({
-          categoryname: tagname,
+        const prevTag = await this.qtTagsRepository.findOne({
+          tagname: tagname,
         });
         if (prevTag) {
           tags.push(prevTag);
           //존재하지 않는 태그라면
         } else {
-          const newTag = await this.lectureCategoryRepository.save({
-            categoryname: tagname,
+          const newTag = await this.qtTagsRepository.save({
+            tagname: tagname,
           });
           tags.push(newTag);
         }

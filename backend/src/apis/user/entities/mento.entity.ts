@@ -7,6 +7,8 @@ import {
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
+  CreateDateColumn
 } from 'typeorm';
 import { User } from './user.entity';
 import { JoinMentoAndProductCategory } from './workMento.entity';
@@ -41,6 +43,14 @@ export class MentoInfo {
   @Field(() => String)
   selfIntro!: string;
 
+  @CreateDateColumn()
+  @Field(() => Date)
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  @Field(() => Date)
+  updatedAt: Date;
+
   @OneToMany(() => CertificateImage, (certificate) => certificate.mento)
   @Field(() => [CertificateImage])
   certificate: CertificateImage[];
@@ -63,4 +73,6 @@ export class MentoInfo {
   @OneToMany(() => LectureProduct, (lecutre) => lecutre.mentor)
   @Field(() => [LectureProduct])
   lecture: LectureProduct[];
+
+  
 }

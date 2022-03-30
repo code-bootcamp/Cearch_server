@@ -10,9 +10,9 @@ services:
     ports:
       - '3000:3000'
       - '5000:5000'
-    volumes:
-      - ./src:/backend/src
-      - ./.env:/backend/.env
+  # volumes:
+  #   - ./src:/backend/src
+  #   - ./.env:/backend/.env
 
   my-db:
     platform: linux/amd64
@@ -34,16 +34,17 @@ services:
     ports:
       - '6000:6379'
 
-  # elasticsearch:
-  #   image: elasticsearch:7.17.0
-  #   environment:
-  #     discovery.type: single-node
-  #   ports:
-  #     - 9200:9200  
+  elasticsearch:
+    image: elasticsearch:7.17.0
+    environment:
+      discovery.type: single-node
+    ports:
+      - 9200:9200  
 
-  # logstash:
-  #   image: logstash:7.17.0
-  #   volumes:
-  #     - ./elk/logstash/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
-  #     - ./elk/logstash/mysql-connector-java-8.0.28.jar:/usr/share/logstash/mysql-connector-java-8.0.28.jar  
-  #     - ./elk/logstash/custom_template.json:/_templates/custom_template.json
+  logstash:
+    image: logstash:7.17.0
+    volumes:
+      - ./elk/logstash/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+      - ./elk/logstash/mysql-connector-java-8.0.28.jar:/usr/share/logstash/mysql-connector-java-8.0.28.jar  
+      - ./elk/logstash/custom_template.json:/_templates/custom_template.json
+      # - ./elk/logstash/mentor_template.json:/_templates/mentor_template.json
