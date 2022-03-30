@@ -295,43 +295,43 @@ export class UserService {
     const queryRunner = this.connection.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction('REPEATABLE READ');
-    try{
-    const userFind = await queryRunner.manager.findOne(User, { id: user.id });
-    const userUpdate = await queryRunner.manager.save(User,{
-      ...userFind,
-      ...userForm
-    })
-    const joinedCtg = category.map(async (ctg) => {
-      const ctgFind = await queryRunner.manager.findOne(
-        LectureProductCategory,
-        {
-          categoryname: ctg,
-        },
-      );
-      const joinProductCtg = await queryRunner.manager.save(
-        JoinUserAndProductCategory,
-        {
-          category: ctgFind,
-          user: userUpdate,
-        },
-      );
-      return joinProductCtg;
-    });
-    const joinedCtgPromise = await Promise.all(joinedCtg);
-    const saveUserInfo = await queryRunner.manager.save(MentoInfo, {
-      ...userUpdate,
-      interest: joinedCtgPromise,
-    });
-    await queryRunner.commitTransaction();
-    return saveUserInfo;
-  } catch (error) {
-    console.log(error);
-    await queryRunner.rollbackTransaction();
-    throw new UnprocessableEntityException("can't update MentoInfo");
-  } finally {
-    await queryRunner.release();
+    try {
+      const userFind = await queryRunner.manager.findOne(User, { id: user.id });
+      const userUpdate = await queryRunner.manager.save(User, {
+        ...userFind,
+        ...userForm,
+      });
+      const joinedCtg = category.map(async (ctg) => {
+        const ctgFind = await queryRunner.manager.findOne(
+          LectureProductCategory,
+          {
+            categoryname: ctg,
+          },
+        );
+        const joinProductCtg = await queryRunner.manager.save(
+          JoinUserAndProductCategory,
+          {
+            category: ctgFind,
+            user: userUpdate,
+          },
+        );
+        return joinProductCtg;
+      });
+      const joinedCtgPromise = await Promise.all(joinedCtg);
+      const saveUserInfo = await queryRunner.manager.save(MentoInfo, {
+        ...userUpdate,
+        interest: joinedCtgPromise,
+      });
+      await queryRunner.commitTransaction();
+      return saveUserInfo;
+    } catch (error) {
+      console.log(error);
+      await queryRunner.rollbackTransaction();
+      throw new UnprocessableEntityException("can't update MentoInfo");
+    } finally {
+      await queryRunner.release();
+    }
   }
-}
   async permitLecture({ currentUser, mentorId, lectureId }) {
     const querryRunner = this.connection.createQueryRunner();
     await querryRunner.connect();

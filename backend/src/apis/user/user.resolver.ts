@@ -21,35 +21,31 @@ export class UserResolver {
     private readonly elasticsearchService: ElasticsearchService,
   ) {}
 
-  @Query(()=>[MentoInfo])
+  @Query(() => [MentoInfo])
   async fetchHomeSearch(@Args('search') search: string) {
     const result = await this.elasticsearchService.search({
       index: 'mentor', // 테이블명
       query: {
         bool: {
-          should: [
-            { match: { name: search } }
+          should: [{ match: { name: search } }],
+          must: [
+            { match: { role: 'MENTOR' } },
+            { match: { mentostatus: 'AUTHORIZED' } },
           ],
-          must : [
-            { match : { role : "MENTOR" }},
-            { match : { mentostatus: "AUTHORIZED"}}
-          ],
+        },
       },
-    }}
-    )
-    console.log(    result.hits.hits)
+    });
+    console.log(result.hits.hits);
     const resultarray = result.hits.hits.map((ele: any) => ({
       id: ele._source.id,
       companyname: ele._source.companyname,
       department: ele._source.department,
       name: ele._source.name,
     }));
-    console.log(resultarray)
-    if(!resultarray)
-    throw ('검색결과가 없습니다.')
+    console.log(resultarray);
+    if (!resultarray) throw '검색결과가 없습니다.';
     return resultarray;
   }
-
 
   @Query(() => User)
   @UseGuards(GqlAccessGuard)
