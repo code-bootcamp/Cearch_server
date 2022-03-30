@@ -73,10 +73,4 @@ export class QtBoard {
   @OneToMany(() => PostImage, (postImage) => postImage.qtBoard)
   @Field(() => [PostImage])
   image: PostImage[];
-
-  @OneToMany(() => LectureProductCategory, (category) => category.qtBoard, {
-    nullable: true,
-  })
-  @Field(() => [LectureProductCategory], { nullable: true })
-  qtTags: LectureProductCategory[];
 }

@@ -24,12 +24,9 @@ export class LectureProductCategory {
   // JoinLectureAndProductCategory와 1:N 연결
   @OneToMany(
     () => JoinLectureAndProductCategory,
-    (category) => category.linkedToLectureProductCategory,
+    (category) => category.lectureproductcategory,
   )
   @Field(() => [JoinLectureAndProductCategory])
   category: JoinLectureAndProductCategory[];
 
-  @ManyToOne(() => QtBoard, (qt) => qt.qtTags)
-  @Field(() => QtBoard)
-  qtBoard: QtBoard;
 }

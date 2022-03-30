@@ -3,12 +3,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { LectureProduct } from '../lectureProduct/entities/lectureProduct.entity';
 import { LectureProductResolver } from '../lectureProduct/lectureProduct.resolver';
 import { LectureProductService } from '../lectureProduct/lectureProduct.service';
+import { JoinLectureAndProductCategory } from '../lectureproductCategory/entities/lectureproductCagtegoryclassCategory.entity';
 import { LectureProductCategory } from '../lectureproductCategory/entities/lectureproductCategory.entity';
 import { LectureRegistration } from '../lectureRegistration/entitites/lectureRegistration.entity';
 import { LectureRegistrationResolver } from '../lectureRegistration/lectureRegistration.resolver';
 import { LectureRegistrationService } from '../lectureRegistration/lectureRegistration.service';
 import { MentoInfo } from '../user/entities/mento.entity';
 import { User } from '../user/entities/user.entity';
+import { JoinMentoAndProductCategory } from '../user/entities/workMento.entity';
 import { UserService } from '../user/user.service';
 import { Wallet } from '../wallet/entities/wallet.entity';
 import { LectureOrder } from './entities/lectureOrder.entity';
@@ -23,7 +25,8 @@ import { LectureOrderService } from './lectureOrder.service';
     LectureProduct,
     MentoInfo,
     Wallet,
-    LectureProductCategory
+    LectureProductCategory,
+    JoinMentoAndProductCategory
   ])],
   providers: [
     LectureOrderResolver, 
@@ -32,7 +35,7 @@ import { LectureOrderService } from './lectureOrder.service';
     LectureRegistrationResolver,
     LectureProductService, 
     LectureProductResolver,
-    UserService
+    UserService,
   ],
 })
 export class LectureOrderModule {}
