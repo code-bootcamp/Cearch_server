@@ -1,6 +1,5 @@
 import { Int, Field, ObjectType } from '@nestjs/graphql';
 import { Comments } from 'src/apis/comments/entities/comments.entity';
-import { LectureProductCategory } from 'src/apis/lectureproductCategory/entities/lectureproductCategory.entity';
 import { Likes } from 'src/apis/likes/entities/likes.entity';
 import { PostImage } from 'src/apis/postImage/entities/postImage.entity';
 import { User } from 'src/apis/user/entities/user.entity';
@@ -14,6 +13,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { JoinQtBoardAndProductCategory } from './qtTags.entity';
 
 @Entity()
 @ObjectType()
@@ -41,6 +41,10 @@ export class QtBoard {
   @Column({ default: 0 })
   @Field(() => Int)
   likescount: number;
+
+  @Column({ default: 0 })
+  @Field(() => Int)
+  commentsCount: number;
 
   @Column({ default: 0 })
   // @Field(() => String)
@@ -73,4 +77,16 @@ export class QtBoard {
   @OneToMany(() => PostImage, (postImage) => postImage.qtBoard)
   @Field(() => [PostImage])
   image: PostImage[];
+
+
+  @OneToMany(
+    () => JoinQtBoardAndProductCategory,
+    (category) => category.qtBoard,
+    {
+      nullable: true,
+    },
+  )
+  @Field(() => [JoinQtBoardAndProductCategory], { nullable: true })
+  qtTags: JoinQtBoardAndProductCategory[];
+
 }

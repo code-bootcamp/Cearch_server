@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Field, ObjectType } from '@nestjs/graphql';
-import { QtBoard } from 'src/apis/QtBoard/entities/qt.entity';
+import { JoinQtBoardAndProductCategory } from 'src/apis/QtBoard/entities/qtTags.entity';
 import {
   Column,
   Entity,
@@ -28,5 +28,4 @@ export class LectureProductCategory {
   )
   @Field(() => [JoinLectureAndProductCategory])
   category: JoinLectureAndProductCategory[];
-
 }

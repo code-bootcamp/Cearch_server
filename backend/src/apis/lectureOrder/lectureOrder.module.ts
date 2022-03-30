@@ -18,22 +18,26 @@ import { LectureOrderResolver } from './lectureOrder.resolver';
 import { LectureOrderService } from './lectureOrder.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([
-    LectureOrder, 
-    LectureRegistration,
-    User,
-    LectureProduct,
-    MentoInfo,
-    Wallet,
-    LectureProductCategory,
-    JoinMentoAndProductCategory
-  ])],
+
+  imports: [
+    TypeOrmModule.forFeature([
+      LectureOrder,
+      LectureRegistration,
+      User,
+      LectureProduct,
+      MentoInfo,
+      Wallet,
+      LectureProductCategory,
+      JoinMentoAndProductCategory,
+    ]),
+  ],
+
   providers: [
-    LectureOrderResolver, 
-    LectureOrderService, 
-    LectureRegistrationService, 
+    LectureOrderResolver,
+    LectureOrderService,
+    LectureRegistrationService,
     LectureRegistrationResolver,
-    LectureProductService, 
+    LectureProductService,
     LectureProductResolver,
     UserService,
   ],
