@@ -108,12 +108,6 @@ export class UserService {
     await queryRunner.connect();
     await queryRunner.startTransaction('REPEATABLE READ');
     try {
-      // const mento = await queryRunner.manager.findOne(MentoInfo, {
-      //   id: mentoId,
-      // });
-      // const user = await queryRunner.manager.findOne(User, {
-      //   id: userId,
-      // });
       const userApplier = await this.userRepository
         .createQueryBuilder('user')
         .innerJoinAndSelect('user.mentor', 'mentor')
