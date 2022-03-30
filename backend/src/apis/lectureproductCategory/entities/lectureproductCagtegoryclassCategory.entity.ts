@@ -10,19 +10,21 @@ export class JoinLectureAndProductCategory {
   @Field(() => String)
   id: string;
 
-  // LectureProductCategory와 N:1 연결
-  @ManyToOne(
-    () => LectureProductCategory,
-    (linkedToLectureProductCategory) => linkedToLectureProductCategory.category,
-  )
-  @Field(() => LectureProductCategory)
-  linkedToLectureProductCategory: LectureProductCategory;
-
   // LectureProduct와 N:1 연결
   @ManyToOne(
     () => LectureProduct,
-    (linkedToLectureProduct) => linkedToLectureProduct.lecproduct,
+    (lectureproduct) => lectureproduct.joinproductandproductcategory,
   )
   @Field(() => LectureProduct)
-  linkedToLectureProduct: LectureProduct;
+  lectureproduct: LectureProduct;
+
+  // LectureProductCategory와 N:1 연결
+  @ManyToOne(
+    () => LectureProductCategory,
+    (lectureproductcategory) => lectureproductcategory.category,
+  )
+  @Field(() => LectureProductCategory)
+  lectureproductcategory: LectureProductCategory;
+
+
 }

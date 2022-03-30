@@ -20,6 +20,7 @@ import { LectureProductService } from './lectureProduct.service';
       User,
       LectureProductCategory,
       MentoInfo,
+      // JoinLectureAndProductCategory
     ]),
   ],
   providers: [

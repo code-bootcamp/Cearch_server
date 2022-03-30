@@ -51,14 +51,14 @@ export class LectureOrderService {
       .leftJoinAndSelect('lectureregistration.lecproduct','lecproduct')
       .getOne();
       console.log(user)
-      if(user.point >= registration.lecproduct.classPrice){
+      if(user.point >= registration.product.classPrice){
         const payment = await this.lectureOrderRepository.create({
           registrationStatus: REGISTRATION_STATUS_ENUM.PAID,
           order:registration
         })
         const updateNewuser = await this.userRepository.create({
           ...user,
-          point:user.point - registration.lecproduct.classPrice
+          point:user.point - registration.product.classPrice
         })
         const balance = await queryRunner.manager.save(updateNewuser)
         console.log('결제진행')
