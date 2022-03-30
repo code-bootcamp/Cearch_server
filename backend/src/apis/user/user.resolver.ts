@@ -11,13 +11,46 @@ import { UserForm } from './dto/user.input';
 import { MentoInfo } from './entities/mento.entity';
 import { User, USER_ROLE } from './entities/user.entity';
 import { UserService } from './user.service';
+import { ElasticsearchService } from '@nestjs/elasticsearch';
 
 @Resolver()
 export class UserResolver {
   constructor(
     private readonly userService: UserService, //
     private readonly authService: AuthService,
+    private readonly elasticsearchService: ElasticsearchService,
   ) {}
+
+  @Query(()=>[MentoInfo])
+  async fetchHomeSearch(@Args('search') search: string) {
+    const result = await this.elasticsearchService.search({
+      index: 'mentor', // 테이블명
+      query: {
+        bool: {
+          should: [
+            { match: { name: search } }
+          ],
+          must : [
+            { match : { role : "MENTOR" }},
+            { match : { mentostatus: "AUTHORIZED"}}
+          ],
+      },
+    }}
+    )
+    console.log(    result.hits.hits)
+    const resultarray = result.hits.hits.map((ele: any) => ({
+      id: ele._source.id,
+      companyname: ele._source.companyname,
+      department: ele._source.department,
+      name: ele._source.name,
+    }));
+    console.log(resultarray)
+    if(!resultarray)
+    throw ('검색결과가 없습니다.')
+    return resultarray;
+  }
+
+
   @Query(() => User)
   @UseGuards(GqlAccessGuard)
   @Role(USER_ROLE.MENTOR)
@@ -65,6 +98,13 @@ export class UserResolver {
   async createUser(
     @Args('userForm') userForm: UserForm, //
   ) {
+    //   await this.elasticsearchService.create({
+    //   id: 'myid1', //nosql
+    //   index: 'mentor', // 테이블이나 컬렉션을 의미
+    //   document: {
+    //     ...userForm,
+    //   },
+    // });
     return await this.userService.saveForm({ userForm });
   }
 
@@ -160,6 +200,20 @@ export class UserResolver {
       user: currentUser,
       mentorForm,
       category,
+    });
+  }
+
+  @Mutation(() => User)
+  @UseGuards(GqlAccessGuard)
+  async updateUserInfo(
+    @Args('userForm') userForm: UserForm,
+    @Args({ name: 'category', type: () => [String] }) category: string[],
+    @CurrentUser() currentUser: IcurrentUser,
+  ) {
+    return await this.userService.updateUserForm({
+      user: currentUser,
+      category,
+      userForm,
     });
   }
 

@@ -20,6 +20,12 @@ export class LectureReviewResolver {
       lectureId,
     });
   }
+  @Query(() => [LectureReview])
+  async fetchReviewCount(@Args('lectureId') lectureId: string) {
+    return await this.lectureReviewService.findReviewCount({
+      lectureId,
+    });
+  }
 
   @UseGuards(GqlAccessGuard)
   @Query(() => LectureReview)
@@ -29,6 +35,20 @@ export class LectureReviewResolver {
   ) {
     return await this.lectureReviewService.findOne({
       currentuser,
+      reviewId,
+    });
+  }
+
+  @UseGuards(GqlAccessGuard)
+  @Query(() => Boolean)
+  async fetchisReview(
+    @CurrentUser() currentuser: ICurrentUser,
+    @Args('lectureId') lectureId: string,
+    @Args('reviewId') reviewId: string,
+  ) {
+    return await this.lectureReviewService.findisReview({
+      currentuser,
+      lectureId,
       reviewId,
     });
   }

@@ -21,9 +21,33 @@ export class LectureReviewService {
     const findAllReview = await this.lectureReviewRepository.find({
       where: { lecture: { id: lectureId } },
       order: { createdAt: 'DESC' },
+      relations: ['user', 'lecture'],
     });
     console.log(findAllReview);
     return findAllReview;
+  }
+
+  async findReviewCount({ lectureId }) {
+    const findAllReview = await this.lectureReviewRepository.count({
+      where: { lecture: { id: lectureId } },
+      order: { createdAt: 'DESC' },
+      relations: ['user', 'lecture'],
+    });
+    console.log(findAllReview);
+    return findAllReview;
+  }
+
+  async findisReview({ currentuser, lectureId ,reviewId }) {
+    const findOneReview = await this.lectureReviewRepository
+      .createQueryBuilder('review')
+      .innerJoinAndSelect('review.user', 'user')
+      .innerJoinAndSelect('review.lecture', 'lecture')
+      .where('user.id = :userId', { userId: currentuser.id })
+      .andWhere('lecture.id = :id' ,{id: lectureId})
+      .andWhere('review.id = :reviewId', { reviewId: reviewId })
+      .orderBy('review.createdAt', 'DESC')
+      .getOne();
+      return findOneReview ? true : false
   }
 
   async findOne({ currentuser, reviewId }) {

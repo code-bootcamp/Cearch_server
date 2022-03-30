@@ -28,11 +28,6 @@ export class QtBoardResolver {
 
   @Query(() => [QtBoard]) // Query graphql에서 임포트 되는지 잘 보자
   async fetchProducts(@Args('search') search: string) {
-    //1. Redis에 캐시되어 있는 지  확인하기
-    // const searchCache = await this.cacheManager.get(`qtBoard:${search}`);
-    //2. Redis에 캐시되어 있지 않다면, 엘라스틱 서치에서 조회하기 (유저가 검색한 검색어로 조회하기)
-    // if (searchCache) return searchCache;
-    // else {
     const result = await this.elasticsearchService.search({
       index: 'qtboard', // 테이블명
       query: {
@@ -44,24 +39,15 @@ export class QtBoardResolver {
         },
       },
     });
-    // console.log(JSON.stringify(result, null, ' '));
     const resultarray = result.hits.hits.map((ele: any) => ({
       id: ele._source.id,
       title: ele._source.title,
       contents: ele._source.contents,
       name: ele._source.name,
     }));
-    // console.log(resultarray)
-    //3. 엘라스틱 서치에서 조회 결과가 있다면, Redis에 검색결과 캐싱해놓기
-    // await this.cacheManager.set(`qtBoard:${search}`, resultarray, {
-    //   ttl: 0,
-    // });
-    // await this.productService.findAll();
-    // 4. 최종결과 브라우저에 리턴해주기
+    if(!resultarray)
+    throw ('검색결과가 없습니다.')
     return resultarray;
-    // }
-
-    // await this.productService.findAll();
   }
 
   //총 게시글 수
@@ -124,6 +110,15 @@ export class QtBoardResolver {
     return await this.qtBoardService.findMyQt({ currentuser, page });
   }
 
+
+  @UseGuards(GqlAccessGuard)
+  @Query(() => [QtBoard]||[Comment])
+  async fetchMyQtComments(
+    @CurrentUser() currentuser: ICurrentUser,
+    @Args('page') page: number,
+  ) {
+    return await this.qtBoardService.findMyQtComment({ currentuser, page });
+  }
   // 게시글 생성
   @UseGuards(GqlAccessGuard)
   @Mutation(() => QtBoard)
@@ -143,13 +138,13 @@ export class QtBoardResolver {
     @Args('nonMembersQtInput') nonMembersQtInput: NonMembersQtInput,
   ) {
     // 엘라스틱 서치 등록하기 연습 => 실제로는 MySQL에 저장할 예정!
-    await this.elasticsearchService.create({
-      id: 'myid1', //nosql
-      index: 'qtboard', // 테이블이나 컬렉션을 의미
-      document: {
-        ...nonMembersQtInput,
-      },
-    });
+    // await this.elasticsearchService.create({
+    //   id: 'myid1', //nosql
+    //   index: 'qtboard', // 테이블이나 컬렉션을 의미
+    //   document: {
+    //     ...nonMembersQtInput,
+    //   },
+    // });
 
     return await this.qtBoardService.nonMemberCreate({
       nonMembersQtInput,
