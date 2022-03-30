@@ -16,9 +16,10 @@ export class AuthController {
     const user = await this.userService.findOne({ email: req.user.email });
     // 2.회원가입
     if (!user) {
-      const { password, ...rest } = req.user;
-      const userForm = { ...rest, password };
-      await this.userService.saveForm({ userForm });
+      // const { password, ...rest } = req.user;
+      // const userForm = { ...rest, password };
+      // await this.userService.saveForm({ userForm });
+      return req.user
     }
     this.authService.setRefreshToken({ user, res });
     res.redirect('http://localhost:5501/backend/frontend/login/index.html');
@@ -30,6 +31,8 @@ export class AuthController {
     @Req() req: Request, //
     @Res() res: Response,
   ) {
-    await this.login(req, res);
+    // const user = await this.userService.findOne({ email: req.user.email })
+    // if(!user) return req.user
+    return await this.login(req, res);
   }
 }

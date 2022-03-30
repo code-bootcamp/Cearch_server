@@ -9,6 +9,7 @@ import { User } from './entities/user.entity';
 import { JoinMentoAndProductCategory } from './entities/workMento.entity';
 import { UserResolver } from './user.resolver';
 import { UserService } from './user.service';
+import { ElasticsearchModule } from '@nestjs/elasticsearch';
 
 @Module({
   imports: [
@@ -20,6 +21,9 @@ import { UserService } from './user.service';
       LectureProductCategory,
     ]),
     JwtModule.register({}),
+    ElasticsearchModule.register({
+      node: 'http://elasticsearch:9200',
+    }),
   ],
   providers: [
     UserService, //

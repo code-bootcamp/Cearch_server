@@ -14,7 +14,7 @@ import {
 } from 'typeorm';
 
 export enum JOB {
-  DEFAULT = '선택',
+  DEFAULT = '직업선택',
   STUDENT = '학생',
   EMPLOYEED = '직장인',
   JOBSEEKER = '구직자',
@@ -34,7 +34,7 @@ export class LectureRegistration {
   id: string;
 
   @Column()
-  @Field(() => String)
+  @Field(() => String, {nullable: true})
   name: string
 
   @Column()
@@ -71,10 +71,10 @@ export class LectureRegistration {
 
   @ManyToOne(
     () => LectureProduct,
-    (lecproduct) => lecproduct.registration,
+    (product) => product.registration,
   )
   @Field(() => LectureProduct)
-  lecproduct: LectureProduct;
+  product: LectureProduct;
 
   @OneToMany(
     () => LectureOrder,

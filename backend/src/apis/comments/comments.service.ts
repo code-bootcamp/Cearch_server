@@ -33,6 +33,7 @@ export class CommentsService {
   async findMyComments({ currentuser, page }) {
     const myQts = await this.commentsRepository
       .createQueryBuilder('comments')
+      .leftJoinAndSelect('comments.qtBoard', 'qtBoard')
       .innerJoinAndSelect('comments.user', 'user')
       .where('user.id = :userId', { userId: currentuser.id })
       .orderBy('comments.createdAt', 'DESC')
@@ -56,6 +57,10 @@ export class CommentsService {
         contents: contents,
         user: user,
       });
+      // const createQtBoard = await this.qtBoardRepository`.create({
+      //   ...post
+      // });
+
       console.log(`🍳`, createcomment);
       await queryRunner.manager.save(createcomment);
       await queryRunner.commitTransaction();
