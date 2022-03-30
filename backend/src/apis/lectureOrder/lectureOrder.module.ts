@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { LectureProduct } from '../lectureProduct/entities/lectureProduct.entity';
 import { LectureProductResolver } from '../lectureProduct/lectureProduct.resolver';
 import { LectureProductService } from '../lectureProduct/lectureProduct.service';
+import { JoinLectureAndProductCategory } from '../lectureproductCategory/entities/lectureproductCagtegoryclassCategory.entity';
 import { LectureProductCategory } from '../lectureproductCategory/entities/lectureproductCategory.entity';
 import { LectureRegistration } from '../lectureRegistration/entitites/lectureRegistration.entity';
 import { LectureRegistrationResolver } from '../lectureRegistration/lectureRegistration.resolver';
@@ -17,6 +18,7 @@ import { LectureOrderResolver } from './lectureOrder.resolver';
 import { LectureOrderService } from './lectureOrder.service';
 
 @Module({
+
   imports: [
     TypeOrmModule.forFeature([
       LectureOrder,
@@ -29,6 +31,7 @@ import { LectureOrderService } from './lectureOrder.service';
       JoinMentoAndProductCategory,
     ]),
   ],
+
   providers: [
     LectureOrderResolver,
     LectureOrderService,

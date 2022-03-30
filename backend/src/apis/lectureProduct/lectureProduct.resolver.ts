@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { UseGuards } from '@nestjs/common';
 import { Args, Mutation, Resolver, Query } from '@nestjs/graphql';
-import { CurrentUser } from 'src/common/auth/decorate/currentuser.decorate';
+import { CurrentUser, ICurrentUser } from 'src/common/auth/decorate/currentuser.decorate';
 import { Role } from 'src/common/auth/decorate/role.decorate';
 import { GqlAccessGuard } from 'src/common/auth/guard/gqlAuthGuard';
 import { RoleGuard } from 'src/common/auth/guard/roleGuard';
@@ -16,9 +16,9 @@ import { LectureProductService } from './lectureProduct.service';
 export class LectureProductResolver {
   constructor(private readonly lectureProductService: LectureProductService) {}
 
-  // 홈화면 인기있는 클래스 10개불러오기: 수강신청 수 기준: registrationid 갯수 찾아서
+  // Find Popular Classes
   @Query(() => [LectureProduct])
-  async fetchLectureRating() {
+  async fetchPopularClass() {
     return await this.lectureProductService.findPopular();
   }
 
@@ -37,8 +37,6 @@ export class LectureProductResolver {
   }
   // Find All Class : ReadAll
   @Query(() => [LectureProduct])
-  @UseGuards(GqlAccessGuard, RoleGuard)
-  @Role(USER_ROLE.MENTEE)
   async fetchlectureProducts() {
     return await this.lectureProductService.findAll();
   }
@@ -58,12 +56,38 @@ export class LectureProductResolver {
   }
 
   // Fetch Selected Tag Class
-  // @Query(() => [LectureProduct])
-  // async fetchSelectedTagLectures(
-  //   @Args('lectureproductCategoryId') lectureproductCategory: string
-  // ){
-  //   return await this.lectureProductService.findSelectedTagLecture({lectureproductCategory})
-  // }
+  @Query(() => [LectureProduct])
+  async fetchSelectedTagLectures(
+    @Args('lectureproductcategoryname') lectureproductcategoryname: string,
+  ){
+    return await this.lectureProductService.fetchSelectedTagLectures({
+      lectureproduct: lectureproductcategoryname
+    })
+  }
+
+  // FetchLectureWithMentor : 멘토가 본인이 개설한 수업 찾기
+  @Query(() => [LectureProduct])
+  @UseGuards(GqlAccessGuard, RoleGuard)
+  @Role(USER_ROLE.MENTOR) // 테스트할땐 Mentee로
+  async fetchLectureWithMentor(
+    @CurrentUser() currentuser: IcurrentUser,
+  ){
+    return await this.lectureProductService.findLectureWithMentor({
+      currentuser
+    })
+  }
+
+  // FetchLectureWithMentee : 수강중인 수업 찾기
+  @Query(() => [LectureProduct])
+  @UseGuards(GqlAccessGuard, RoleGuard)
+  @Role(USER_ROLE.MENTEE) // 테스트할땐 Mentee로
+  async fetchLectureWithMentee(
+    @CurrentUser() currentuser: IcurrentUser,
+  ){
+    return await this.lectureProductService.findLectureWithMentor({
+      currentuser
+    })
+  }
 
   // Update Class
   @Mutation(() => LectureProduct)
