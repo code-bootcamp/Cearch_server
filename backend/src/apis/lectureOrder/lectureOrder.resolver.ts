@@ -1,6 +1,9 @@
 import { UseGuards } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { CurrentUser, ICurrentUser } from 'src/common/auth/decorate/currentuser.decorate';
+import {
+  CurrentUser,
+  ICurrentUser,
+} from 'src/common/auth/decorate/currentuser.decorate';
 import { Role } from 'src/common/auth/decorate/role.decorate';
 import { GqlAccessGuard } from 'src/common/auth/guard/gqlAuthGuard';
 import { RoleGuard } from 'src/common/auth/guard/roleGuard';
@@ -10,9 +13,7 @@ import { LectureOrderService } from './lectureOrder.service';
 
 @Resolver()
 export class LectureOrderResolver {
-  constructor(
-    private readonly lectureOrderService: LectureOrderService
-  ) {}
+  constructor(private readonly lectureOrderService: LectureOrderService) {}
 
   // Placing Order
   @Mutation(() => LectureOrder)
@@ -44,11 +45,11 @@ export class LectureOrderResolver {
     @Args('lectureorderId') lectureorderId: string,
     @Args('lectureRegistrationId') lectureRegistrationId: string,
     @CurrentUser() currentuser: ICurrentUser,
-    ) {
+  ) {
     return await this.lectureOrderService.findOne({
       lectureorderId,
       lectureRegistrationId,
-      currentuser
+      currentuser,
     });
   }
 
@@ -67,9 +68,7 @@ export class LectureOrderResolver {
   @Mutation(() => Boolean)
   @UseGuards(GqlAccessGuard, RoleGuard)
   @Role(USER_ROLE.MENTEE)
-  async deleteLectureOrder(
-    @Args('lectureorderId') lectureorderId: string
-    ) {
+  async deleteLectureOrder(@Args('lectureorderId') lectureorderId: string) {
     return await this.lectureOrderService.delete({ lectureorderId });
   }
 }

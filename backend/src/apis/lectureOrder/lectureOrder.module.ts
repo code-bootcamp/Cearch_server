@@ -9,6 +9,7 @@ import { LectureRegistrationResolver } from '../lectureRegistration/lectureRegis
 import { LectureRegistrationService } from '../lectureRegistration/lectureRegistration.service';
 import { MentoInfo } from '../user/entities/mento.entity';
 import { User } from '../user/entities/user.entity';
+import { JoinMentoAndProductCategory } from '../user/entities/workMento.entity';
 import { UserService } from '../user/user.service';
 import { Wallet } from '../wallet/entities/wallet.entity';
 import { LectureOrder } from './entities/lectureOrder.entity';
@@ -16,23 +17,26 @@ import { LectureOrderResolver } from './lectureOrder.resolver';
 import { LectureOrderService } from './lectureOrder.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([
-    LectureOrder, 
-    LectureRegistration,
-    User,
-    LectureProduct,
-    MentoInfo,
-    Wallet,
-    LectureProductCategory
-  ])],
+  imports: [
+    TypeOrmModule.forFeature([
+      LectureOrder,
+      LectureRegistration,
+      User,
+      LectureProduct,
+      MentoInfo,
+      Wallet,
+      LectureProductCategory,
+      JoinMentoAndProductCategory,
+    ]),
+  ],
   providers: [
-    LectureOrderResolver, 
-    LectureOrderService, 
-    LectureRegistrationService, 
+    LectureOrderResolver,
+    LectureOrderService,
+    LectureRegistrationService,
     LectureRegistrationResolver,
-    LectureProductService, 
+    LectureProductService,
     LectureProductResolver,
-    UserService
+    UserService,
   ],
 })
 export class LectureOrderModule {}

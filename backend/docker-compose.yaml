@@ -14,7 +14,7 @@ services:
       - ./src:/backend/src
       - ./.env:/backend/.env
 
-  my_db:
+  my-db:
     platform: linux/amd64
     image: 'mysql:latest'
     environment:
@@ -29,7 +29,7 @@ services:
     ports:
       - '3307:3306'
 
-  my_redis:
+  my-redis:
     image: 'redis:latest'
     ports:
       - '6000:6379'

@@ -104,11 +104,8 @@ export class UserResolver {
   }
 
   @Mutation(() => MentoInfo)
-  async authMentor(
-    @Args('mentoId') mentoId: string, //
-    @Args('userId') userId: string,
-  ) {
-    return await this.userService.promoteMento({ mentoId, userId });
+  async authMentor(@Args('userId') userId: string) {
+    return await this.userService.promoteMento({ userId });
   }
 
   @Mutation(() => MentoInfo)

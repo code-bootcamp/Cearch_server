@@ -8,7 +8,7 @@ import { LectureProductCategory } from '../lectureproductCategory/entities/lectu
 import { MentorForm } from './dto/mentoForm.input';
 import { UserForm } from './dto/user.input';
 import { MentoInfo, MENTOR_AUTH } from './entities/mento.entity';
-import { User } from './entities/user.entity';
+import { User, USER_ROLE } from './entities/user.entity';
 import { JoinMentoAndProductCategory } from './entities/workMento.entity';
 
 interface IcreateUserForm {
@@ -103,23 +103,30 @@ export class UserService {
     }
   }
 
-  async promoteMento({ mentoId, userId }) {
+  async promoteMento({ userId }) {
     const queryRunner = this.connection.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction('REPEATABLE READ');
     try {
-      const mento = await queryRunner.manager.findOne(MentoInfo, {
-        id: mentoId,
-      });
-      const user = await queryRunner.manager.findOne(User, {
-        id: userId,
-      });
+      // const mento = await queryRunner.manager.findOne(MentoInfo, {
+      //   id: mentoId,
+      // });
+      // const user = await queryRunner.manager.findOne(User, {
+      //   id: userId,
+      // });
+      const userApplier = await this.userRepository
+        .createQueryBuilder('user')
+        .innerJoinAndSelect('user.mentor', 'mentor')
+        .where('user.id = :id', { id: userId })
+        .getOne();
+      console.log('userApplier', userApplier);
       const promotedMento = await queryRunner.manager.save(MentoInfo, {
-        ...mento,
+        ...userApplier.mentor,
         mentoStatus: MENTOR_AUTH.AUTHROIZED,
       });
       await queryRunner.manager.save(User, {
-        ...user,
+        ...userApplier,
+        role: USER_ROLE.MENTOR,
         mentor: promotedMento,
       });
       await queryRunner.commitTransaction();
