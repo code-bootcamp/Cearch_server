@@ -9,7 +9,10 @@ import { MentoInfo } from '../user/entities/mento.entity';
 import { User, USER_ROLE } from '../user/entities/user.entity';
 import { CreateLectureProductInput } from './dto/createLectureProduct.input';
 import { UpdateLectureProductInput } from './dto/updateLectureProduct.input';
-import { LectureProduct, CLASS_CATEGORY } from './entities/lectureProduct.entity';
+import {
+  LectureProduct,
+  CLASS_CATEGORY,
+} from './entities/lectureProduct.entity';
 
 // Interface
 interface ICreate {
@@ -39,15 +42,18 @@ export class LectureProductService {
     private readonly mentoinfoRepository: Repository<MentoInfo>,
 
     private readonly connection: Connection,
-    
   ) {}
 
   async findPopular() {
-    const popular = this.lectureProductRepository.find({
-      take: 10,
-      order: { rating: 'DESC' },
-      where: { deletedAt: null },
-    });
+    const popular = await this.lectureProductRepository
+      .createQueryBuilder('lecture')
+      .leftJoinAndSelect('lecture.mentor', 'mentor')
+      .leftJoinAndSelect('mentor.user', 'user')
+      .orderBy('lecture.rating', 'DESC')
+      .take(10)
+      .getMany();
+
+    console.log('popular : ', popular);
     return popular;
   }
 
@@ -62,18 +68,17 @@ export class LectureProductService {
         .innerJoinAndSelect('user.mentor', 'mentor')
         .where('user.id = :id', { id: user.id })
         .getOne();
-    // const mentor = await this.mentoinfoRepository
-    // .createQueryBuilder('mentor')
-    // .leftJoinAndSelect("mentor.user",'user')
-    // .where('user.id = :id' , {id : user.id})
-    // .getOne()
+      // const mentor = await this.mentoinfoRepository
+      // .createQueryBuilder('mentor')
+      // .leftJoinAndSelect("mentor.user",'user')
+      // .where('user.id = :id' , {id : user.id})
+      // .getOne()
       const mentor = query.mentor;
       console.log('mentor : ', mentor);
 
       const result = await queryRunner.manager.save(LectureProduct, {
         ...createLectureProductInput,
         mentor,
-        
       });
       await queryRunner.commitTransaction();
       return result;
@@ -87,15 +92,23 @@ export class LectureProductService {
 
   // Find All Class : ReadAll
   async findAll() {
-    const result = await this.lectureProductRepository.find({});
+    const result = await this.lectureProductRepository
+      .createQueryBuilder('product')
+      .leftJoinAndSelect('product.mentor', 'mentor')
+      .leftJoinAndSelect('mentor.user', 'user')
+      .getMany();
+    console.log('result : ', result);
     return result;
   }
 
   // Find One Class : ReadOne
   async findOne({ lectureproductId }: IFindOne) {
-    return await this.lectureProductRepository.findOne({
-      id: lectureproductId,
-    });
+    return await this.lectureProductRepository
+      .createQueryBuilder('product')
+      .leftJoinAndSelect('product.mentor', 'mentor')
+      .leftJoinAndSelect('mentor.user', 'user')
+      .where('product.id = :id', { id: lectureproductId })
+      .getOne();
   }
 
   // Find New Classes
@@ -109,37 +122,42 @@ export class LectureProductService {
   }
 
   // Find SelectedTag Classes
-  async fetchSelectedTagLectures({lectureproduct}){
+  async fetchSelectedTagLectures({ lectureproduct }) {
     const select = await getConnection()
       .createQueryBuilder(LectureProduct, 'lectureproduct')
-      .innerJoinAndSelect('lectureproduct.joinproductandproductcategory', 'lecture')
+      .innerJoinAndSelect(
+        'lectureproduct.joinproductandproductcategory',
+        'lecture',
+      )
       .innerJoinAndSelect('lecture.lectureproductcategory', 'lpcategory')
       // .innerJoinAndSelect('lpcategory.category', 'category')
-      .where('lpcategory.categoryname = :categoryname', {categoryname: lectureproduct.classCategory})
+      .where('lpcategory.categoryname = :categoryname', {
+        categoryname: lectureproduct.classCategory,
+      })
       .orderBy('lectureproduct.createdAt', 'DESC')
       .limit(3)
-      .getMany()
-    return select
+      .getMany();
+    return select;
   }
 
   // Find Lectures with Mentor
-  async findLectureWithMentor({ currentuser }){
+  async findLectureWithMentor({ currentuser }) {
     const mylecturefinder = await this.lectureProductRepository
       .createQueryBuilder('lecture')
       .innerJoinAndSelect('lecture.mentor', 'mentor')
-      .where('mentor.id = :id', {id: currentuser.id})
-      .getMany()
-    return mylecturefinder
+      .where('mentor.id = :id', { id: currentuser.id })
+      .getMany();
+    return mylecturefinder;
   }
 
   // Find registered Lectures
-  async findLectureWithMentee({ currentuser }){
+  async findLectureWithMentee({ currentuser }) {
     const registeredlecturefinder = await this.lectureProductRepository
       .createQueryBuilder('lecture')
       .innerJoinAndSelect('lecture.user', 'user')
-      .where('user.id = :id', {id: currentuser.id})
-      .getMany()
-    return registeredlecturefinder
+      .where('user.id = :id', { id: currentuser.id })
+      .getMany();
+    return registeredlecturefinder;
   }
 
   // Update Class: only mentor has right to update class

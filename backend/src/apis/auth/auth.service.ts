@@ -212,6 +212,7 @@ export class AuthService {
       );
       return result;
     } catch (error) {
+      console.log(error);
       throw new UnprocessableEntityException('Redis error occured');
     }
   }

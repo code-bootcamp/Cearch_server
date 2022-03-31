@@ -19,7 +19,7 @@ export class Notice {
   @Field(() => String)
   title!: string;
 
-  @Column()
+  @Column({ length: 1000 })
   @Field(() => String)
   contents!: string;
 

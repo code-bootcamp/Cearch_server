@@ -135,7 +135,7 @@ export class QtBoardService {
       .orderBy('qtBoard.createdAt', 'DESC')
       .getMany();
 
-      const myCo = await this.commentsRepository
+    const myCo = await this.commentsRepository
       .createQueryBuilder('comments')
       .leftJoinAndSelect('comments.qtBoard', 'qtBoard')
       .innerJoinAndSelect('comments.user', 'user')
@@ -144,13 +144,13 @@ export class QtBoardService {
       .limit(15)
       .offset(15 * (page - 1))
       .getMany();
-      const array = [...myQts, ...myCo].sort(function(a, b){ 
-      if(a.createdAt > b.createdAt) return 1; 
-      if(a.createdAt === b.createdAt) return 0; 
-      if(a.createdAt < b.createdAt) return 1; 
-    })
-    console.log(array)
-      return array
+    const array = [...myQts, ...myCo].sort(function (a, b) {
+      if (a.createdAt > b.createdAt) return 1;
+      if (a.createdAt === b.createdAt) return 0;
+      if (a.createdAt < b.createdAt) return 1;
+    });
+    console.log(array);
+    return array;
   }
 
   //공지사항생성

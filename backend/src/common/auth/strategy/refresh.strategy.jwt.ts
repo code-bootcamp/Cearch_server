@@ -39,6 +39,7 @@ export class JwtRefreshStrategy extends PassportStrategy(
         exp: payload.exp,
       };
     } catch (error) {
+      console.log(error);
       throw new UnprocessableEntityException('REDIS cant get or push info');
     }
   }

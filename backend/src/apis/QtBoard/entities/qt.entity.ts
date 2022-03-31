@@ -78,7 +78,6 @@ export class QtBoard {
   @Field(() => [PostImage])
   image: PostImage[];
 
-
   @OneToMany(
     () => JoinQtBoardAndProductCategory,
     (category) => category.qtBoard,
@@ -88,5 +87,4 @@ export class QtBoard {
   )
   @Field(() => [JoinQtBoardAndProductCategory], { nullable: true })
   qtTags: JoinQtBoardAndProductCategory[];
-
 }

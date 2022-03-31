@@ -20,7 +20,7 @@ import { LectureRegistrationService } from './lectureRegistration.service';
       LectureProduct,
       MentoInfo,
       JoinMentoAndProductCategory,
-      LectureProductCategory
+      LectureProductCategory,
     ]),
   ],
   providers: [
@@ -31,5 +31,3 @@ import { LectureRegistrationService } from './lectureRegistration.service';
   ],
 })
 export class LectureRegistrationModule {}
-
-

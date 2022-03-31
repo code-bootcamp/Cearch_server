@@ -1,4 +1,10 @@
-import { Field, Float, Int, ObjectType, registerEnumType } from '@nestjs/graphql';
+import {
+  Field,
+  Float,
+  Int,
+  ObjectType,
+  registerEnumType,
+} from '@nestjs/graphql';
 import { LectureImage } from 'src/apis/LectureImage/entities/lectureImage.entity';
 import { JoinLectureAndProductCategory } from 'src/apis/lectureproductCategory/entities/lectureproductCagtegoryclassCategory.entity';
 import { LectureRegistration } from 'src/apis/lectureRegistration/entitites/lectureRegistration.entity';
@@ -16,18 +22,32 @@ import {
 } from 'typeorm';
 
 export enum CLASS_CATEGORY {
-  DEFAULT = '카테고리 선택', HTML = 'HTML', CSS = 'CSS',
-  JS = 'JS', TS = 'TS', REACT = 'REACT', PYTHON = 'PYTHON',
-  C = 'C', CSHARP = 'C#', PHP = 'PHP', NODEJS = 'NODE.JS',
-  MYSQL = 'MySQL', DOCKER = 'DOCKER', LIB = 'LIBRARY',
-  REACTNATIVE = 'REACT-NATIVE', RUBY = 'RUBY', MONGODB = 'MONGODB',
-  VUEJS = 'VUE.JS', GRAPHQL = 'GraphQL', RESTAPI = 'RestAPI',
-  SERVICE = 'AWS/GCP/AZURE'
+  DEFAULT = '카테고리 선택',
+  HTML = 'HTML',
+  CSS = 'CSS',
+  JS = 'JS',
+  TS = 'TS',
+  REACT = 'REACT',
+  PYTHON = 'PYTHON',
+  C = 'C',
+  CSHARP = 'C#',
+  PHP = 'PHP',
+  NODEJS = 'NODE.JS',
+  MYSQL = 'MySQL',
+  DOCKER = 'DOCKER',
+  LIB = 'LIBRARY',
+  REACTNATIVE = 'REACT-NATIVE',
+  RUBY = 'RUBY',
+  MONGODB = 'MONGODB',
+  VUEJS = 'VUE.JS',
+  GRAPHQL = 'GraphQL',
+  RESTAPI = 'RestAPI',
+  SERVICE = 'AWS/GCP/AZURE',
 }
 
 registerEnumType(CLASS_CATEGORY, {
-  name: 'CLASS_CATEGORY'
-})
+  name: 'CLASS_CATEGORY',
+});
 @Entity()
 @ObjectType()
 export class LectureProduct {
@@ -39,7 +59,11 @@ export class LectureProduct {
   @Field(() => String)
   classTitle: string;
 
-  @Column({type: 'enum', enum: CLASS_CATEGORY, default: CLASS_CATEGORY.DEFAULT})
+  @Column({
+    type: 'enum',
+    enum: CLASS_CATEGORY,
+    default: CLASS_CATEGORY.DEFAULT,
+  })
   @Field(() => CLASS_CATEGORY)
   classCategory!: CLASS_CATEGORY;
 
@@ -59,9 +83,9 @@ export class LectureProduct {
   @Field(() => Int)
   classStartDate: number;
 
-  @Column({default: 0, type: 'float'})
-  @Field(() => Float, {nullable: true})
-  rating: number
+  @Column({ default: 0, type: 'float' })
+  @Field(() => Float, { nullable: true })
+  rating: number;
 
   @CreateDateColumn()
   @Field(() => Date)
@@ -86,16 +110,14 @@ export class LectureProduct {
   // Lecture Product Category와 중간 테이블과 1:N 연결
   @OneToMany(
     () => JoinLectureAndProductCategory,
-    (joinproductandproductcategory) => joinproductandproductcategory.lectureproduct,
+    (joinproductandproductcategory) =>
+      joinproductandproductcategory.lectureproduct,
   )
   @Field(() => [JoinLectureAndProductCategory])
   joinproductandproductcategory: JoinLectureAndProductCategory[];
 
   // LectureRegistration과 1:N 연결
-  @OneToMany(
-    () => LectureRegistration,
-    (registration) => registration.product,
-  )
+  @OneToMany(() => LectureRegistration, (registration) => registration.product)
   @Field(() => [LectureRegistration])
   registration: LectureRegistration[];
 

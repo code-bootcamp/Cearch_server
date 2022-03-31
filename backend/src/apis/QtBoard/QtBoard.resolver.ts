@@ -45,8 +45,7 @@ export class QtBoardResolver {
       contents: ele._source.contents,
       name: ele._source.name,
     }));
-    if(!resultarray)
-    throw ('검색결과가 없습니다.')
+    if (!resultarray) throw '검색결과가 없습니다.';
     return resultarray;
   }
 
@@ -110,9 +109,8 @@ export class QtBoardResolver {
     return await this.qtBoardService.findMyQt({ currentuser, page });
   }
 
-
   @UseGuards(GqlAccessGuard)
-  @Query(() => [QtBoard]||[Comment])
+  @Query(() => [QtBoard] || [Comment])
   async fetchMyQtComments(
     @CurrentUser() currentuser: ICurrentUser,
     @Args('page') page: number,

@@ -8,7 +8,7 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
-  CreateDateColumn
+  CreateDateColumn,
 } from 'typeorm';
 import { User } from './user.entity';
 import { JoinMentoAndProductCategory } from './workMento.entity';
@@ -73,6 +73,4 @@ export class MentoInfo {
   @OneToMany(() => LectureProduct, (lecutre) => lecutre.mentor)
   @Field(() => [LectureProduct])
   lecture: LectureProduct[];
-
-  
 }

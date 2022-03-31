@@ -21,11 +21,11 @@ export enum JOB {
   YOUNGAPPLICANT = '취업준비생',
   OWNER_FREELANCER = '창업/프리랜서',
   SELF_EMPLOYEED = '자영업자',
-  ETC = '기타'
+  ETC = '기타',
 }
-registerEnumType(JOB,{
-  name: 'JOB'
-})
+registerEnumType(JOB, {
+  name: 'JOB',
+});
 @Entity()
 @ObjectType()
 export class LectureRegistration {
@@ -34,16 +34,16 @@ export class LectureRegistration {
   id: string;
 
   @Column()
-  @Field(() => String, {nullable: true})
-  name: string
+  @Field(() => String, { nullable: true })
+  name: string;
 
   @Column()
   @Field(() => String)
-  phoneNumber: string
+  phoneNumber: string;
 
-  @Column({ type: 'enum', enum: JOB, default: JOB.DEFAULT})
+  @Column({ type: 'enum', enum: JOB, default: JOB.DEFAULT })
   @Field(() => JOB)
-  job: JOB
+  job: JOB;
 
   @Column()
   @Field(() => String)
@@ -55,7 +55,7 @@ export class LectureRegistration {
 
   @Column()
   @Field(() => Int)
-  age: number
+  age: number;
 
   @CreateDateColumn()
   @Field(() => Date)
@@ -69,22 +69,15 @@ export class LectureRegistration {
   @Field(() => Date)
   deletedAt?: Date;
 
-  @ManyToOne(
-    () => LectureProduct,
-    (product) => product.registration,
-  )
+  @ManyToOne(() => LectureProduct, (product) => product.registration)
   @Field(() => LectureProduct)
   product: LectureProduct;
 
-  @OneToMany(
-    () => LectureOrder,
-    (registration) => registration.order,
-  )
+  @OneToMany(() => LectureOrder, (registration) => registration.order)
   @Field(() => LectureOrder)
   registration: LectureOrder;
 
   @ManyToOne(() => User, (user) => user.registration)
   @Field(() => User)
-  user: User
-
+  user: User;
 }

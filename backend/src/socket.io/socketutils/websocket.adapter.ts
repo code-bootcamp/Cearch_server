@@ -7,7 +7,9 @@ export class RedisAdapter extends IoAdapter {
   private adapterConstructor: ReturnType<typeof createAdapter>;
 
   async connectToRedis(): Promise<void> {
-    const pubClient = createClient({ url: `redis://my-redis:6379` });
+    const pubClient = createClient({
+      url: `redis://redis-server-codesearch.wtmilw.ng.0001.apn2.cache.amazonaws.com:6379`,
+    });
     const subClient = pubClient.duplicate();
 
     await Promise.all([pubClient.connect(), subClient.connect()]);

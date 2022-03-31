@@ -53,6 +53,7 @@ export class UserResolver {
   async fetchMentorUser(@CurrentUser() currentUser: IcurrentUser) {
     return await this.userService.findMentoPage({ currentUser });
   }
+
   @Query(() => User)
   @UseGuards(GqlAccessGuard)
   async fetchUser(@CurrentUser() currentUser: IcurrentUser) {

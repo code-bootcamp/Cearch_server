@@ -19,7 +19,7 @@ export class AuthController {
       // const { password, ...rest } = req.user;
       // const userForm = { ...rest, password };
       // await this.userService.saveForm({ userForm });
-      return req.user
+      return req.user;
     }
     this.authService.setRefreshToken({ user, res });
     res.redirect('http://localhost:5501/backend/frontend/login/index.html');

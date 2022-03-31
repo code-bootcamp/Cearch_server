@@ -1,7 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { UseGuards } from '@nestjs/common';
 import { Args, Mutation, Resolver, Query } from '@nestjs/graphql';
-import { CurrentUser, ICurrentUser } from 'src/common/auth/decorate/currentuser.decorate';
+import {
+  CurrentUser,
+  ICurrentUser,
+} from 'src/common/auth/decorate/currentuser.decorate';
 import { Role } from 'src/common/auth/decorate/role.decorate';
 import { GqlAccessGuard } from 'src/common/auth/guard/gqlAuthGuard';
 import { RoleGuard } from 'src/common/auth/guard/roleGuard';
@@ -59,34 +62,30 @@ export class LectureProductResolver {
   @Query(() => [LectureProduct])
   async fetchSelectedTagLectures(
     @Args('lectureproductcategoryname') lectureproductcategoryname: string,
-  ){
+  ) {
     return await this.lectureProductService.fetchSelectedTagLectures({
-      lectureproduct: lectureproductcategoryname
-    })
+      lectureproduct: lectureproductcategoryname,
+    });
   }
 
   // FetchLectureWithMentor : 멘토가 본인이 개설한 수업 찾기
   @Query(() => [LectureProduct])
   @UseGuards(GqlAccessGuard, RoleGuard)
   @Role(USER_ROLE.MENTOR) // 테스트할땐 Mentee로
-  async fetchLectureWithMentor(
-    @CurrentUser() currentuser: IcurrentUser,
-  ){
+  async fetchLectureWithMentor(@CurrentUser() currentuser: IcurrentUser) {
     return await this.lectureProductService.findLectureWithMentor({
-      currentuser
-    })
+      currentuser,
+    });
   }
 
   // FetchLectureWithMentee : 수강중인 수업 찾기
   @Query(() => [LectureProduct])
   @UseGuards(GqlAccessGuard, RoleGuard)
   @Role(USER_ROLE.MENTEE) // 테스트할땐 Mentee로
-  async fetchLectureWithMentee(
-    @CurrentUser() currentuser: IcurrentUser,
-  ){
+  async fetchLectureWithMentee(@CurrentUser() currentuser: IcurrentUser) {
     return await this.lectureProductService.findLectureWithMentor({
-      currentuser
-    })
+      currentuser,
+    });
   }
 
   // Update Class

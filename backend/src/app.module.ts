@@ -22,7 +22,6 @@ import { FileUploadModule } from './apis/file/file.module';
 import { FollowModule } from './apis/follow/follow.module';
 import { LectureReviewModule } from './apis/lectureReview/lectureReview.module';
 import { WalletModule } from './apis/wallet/wallet.module';
-import { ConfigModule } from '@nestjs/config';
 import { SocketModule } from './socket.io/module.socket';
 
 @Module({
@@ -53,18 +52,18 @@ import { SocketModule } from './socket.io/module.socket';
     }),
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: 'my-db',
+      host: 'search-db.cwxg7py2ogvc.ap-northeast-2.rds.amazonaws.com',
       port: 3306,
-      database: 'test_db',
+      database: 'cearchdb',
       username: 'root',
-      password: '0000',
+      password: '00000000',
       entities: [__dirname + '/apis/**/*.entity.*'],
       logging: true,
       synchronize: true,
     }),
     CacheModule.register<RedisClientOptions>({
       store: redisStore,
-      url: 'redis://my-redis:6379',
+      url: 'redis://redis-server-codesearch.wtmilw.ng.0001.apn2.cache.amazonaws.com:6379',
       isGlobal: true,
     }),
     // ConfigModule.forRoot({
