@@ -1,9 +1,6 @@
 {
-  {
   "order": 0,
-  "index_patterns": [
-    "qtboard*"
-  ],
+  "index_patterns": ["qtboard*"],
   "template": "qtboard",
   "settings": {
     "analysis": {
@@ -34,83 +31,10 @@
       },
       "name": {
         "type": "text"
-      }
-    }
-  }
-},
-  {
-    "template": "mentor*",
-    "order": 0,
-    "index_patterns": [
-      "mentor*"
-    ],
-    "settings": {
-      "analysis": {
-        "analyzer": {
-          "my_ngram_analyzer": {
-            "tokenizer": "my_ngram_tokenizer"
-          }
-        },
-        "tokenizer": {
-          "my_ngram_tokenizer": {
-            "type": "nGram",
-            "min_gram": "1",
-            "max_gram": "10"
-          }
-        }
       },
-      "max_ngram_diff": "10"
-    },
-    "mappings": {
-      "properties": {
-        "user":  {
-          "type": "nested",
-          "properties": {
-            "name": {
-              "type": "text",
-              "analyzer": "my_ngram_analyzer",
-              "search_analyzer": "standard",
-            },
-            "role": {
-              "type": "keyword"
-            },
-          },
-        },
-        "work":  {
-          "type": "nested",
-          "properties": {
-            "category": {
-              "type": "nested",
-              "properties": {
-                "categoryname": {
-                  "type": "text",
-                },
-              },
-            },
-          },
-        },
-        "companyName": {
-          "type": "text",
-        },
-        "department": {
-          "type": "text",
-        },
-        "selfIntro" : {
-          "type": "text",
-        },
-        "mentoStatus" : {
-          "type": "text",
-        },
-        "createddate": {
-          "type": "date",
-          "format": "yyyy-MM-dd HH:mm:ss||yyyy/MM/dd||epoch_millis"
-        }
+      "createdat": {
+        "type": "date"
       }
     }
   }
 }
-
-
-
-
-

@@ -1,10 +1,13 @@
 import { ObjectType, Field, registerEnumType, Int } from '@nestjs/graphql';
 import { User } from 'src/apis/user/entities/user.entity';
+import { Wallet } from 'src/apis/wallet/entities/wallet.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -42,4 +45,9 @@ export class Point {
 
   @CreateDateColumn()
   createdAt: Date;
+
+  @JoinColumn()
+  @OneToOne(() => Wallet, (wallet) => wallet.payment)
+  @Field(() => Wallet)
+  wallet: Wallet;
 }

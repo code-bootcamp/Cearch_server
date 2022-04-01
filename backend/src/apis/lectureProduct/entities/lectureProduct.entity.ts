@@ -15,6 +15,7 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -44,10 +45,10 @@ export enum CLASS_CATEGORY {
   RESTAPI = 'RestAPI',
   SERVICE = 'AWS/GCP/AZURE',
 }
-
 registerEnumType(CLASS_CATEGORY, {
   name: 'CLASS_CATEGORY',
 });
+
 @Entity()
 @ObjectType()
 export class LectureProduct {
@@ -56,32 +57,41 @@ export class LectureProduct {
   id: string;
 
   @Column()
-  @Field(() => String)
+  @Field(() => String, { nullable: true })
   classTitle: string;
 
   @Column({
     type: 'enum',
     enum: CLASS_CATEGORY,
     default: CLASS_CATEGORY.DEFAULT,
+    nullable: true,
   })
-  @Field(() => CLASS_CATEGORY)
+  @Field(() => CLASS_CATEGORY, { nullable: true })
   classCategory!: CLASS_CATEGORY;
 
   @Column()
-  @Field(() => String)
+  @Field(() => String, { nullable: true })
   classDescription: string;
 
   @Column()
-  @Field(() => Int)
+  @Field(() => String, { nullable: true })
+  classCurriculum: string;
+
+  @Column()
+  @Field(() => Int, { nullable: true })
   classPrice: number;
 
   @Column()
-  @Field(() => Int)
+  @Field(() => Int, { nullable: true })
   classMaxUser: number;
 
   @Column()
-  @Field(() => Int)
-  classStartDate: number;
+  @Field(() => String, { nullable: true })
+  classStartDate: string;
+
+  @Column()
+  @Field(() => String, { nullable: true })
+  classStartTime: string;
 
   @Column({ default: 0, type: 'float' })
   @Field(() => Float, { nullable: true })
@@ -103,17 +113,19 @@ export class LectureProduct {
   @Field(() => [LectureImage])
   image: LectureImage[];
 
-  @OneToMany(() => LectureReview, (review) => review.user)
-  @Field(() => [LectureReview])
+  @OneToMany(() => LectureReview, (review) => review.user, { nullable: true })
+  @Field(() => [LectureReview], { nullable: true })
   reviews: LectureReview[];
 
   // Lecture Product Category와 중간 테이블과 1:N 연결
+  @JoinColumn()
   @OneToMany(
     () => JoinLectureAndProductCategory,
     (joinproductandproductcategory) =>
       joinproductandproductcategory.lectureproduct,
+    { nullable: true },
   )
-  @Field(() => [JoinLectureAndProductCategory])
+  @Field(() => [JoinLectureAndProductCategory], { nullable: true })
   joinproductandproductcategory: JoinLectureAndProductCategory[];
 
   // LectureRegistration과 1:N 연결

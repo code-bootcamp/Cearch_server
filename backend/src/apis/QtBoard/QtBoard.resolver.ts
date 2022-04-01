@@ -27,7 +27,7 @@ export class QtBoardResolver {
   ) {}
 
   @Query(() => [QtBoard]) // Query graphql에서 임포트 되는지 잘 보자
-  async fetchProducts(@Args('search') search: string) {
+  async searchQt(@Args('search') search: string) {
     const result = await this.elasticsearchService.search({
       index: 'qtboard', // 테이블명
       query: {
@@ -45,6 +45,7 @@ export class QtBoardResolver {
       contents: ele._source.contents,
       name: ele._source.name,
     }));
+    console.log(resultarray);
     if (!resultarray) throw '검색결과가 없습니다.';
     return resultarray;
   }
@@ -73,9 +74,15 @@ export class QtBoardResolver {
     return await this.qtBoardService.findOne({ postId });
   }
 
+  //공지사항 10개
   @Query(() => [Notice])
-  async fetchNotices() {
-    return await this.qtBoardService.findNoticeAll();
+  async fetchNotices(@Args('page') page: number) {
+    return await this.qtBoardService.findNoticeAll(page);
+  }
+
+  @Query(() => Int)
+  async fetchAllNoticeCount() {
+    return await this.qtBoardService.findAllNoticeCount();
   }
 
   @Query(() => Notice)
@@ -136,13 +143,13 @@ export class QtBoardResolver {
     @Args('nonMembersQtInput') nonMembersQtInput: NonMembersQtInput,
   ) {
     // 엘라스틱 서치 등록하기 연습 => 실제로는 MySQL에 저장할 예정!
-    // await this.elasticsearchService.create({
-    //   id: 'myid1', //nosql
-    //   index: 'qtboard', // 테이블이나 컬렉션을 의미
-    //   document: {
-    //     ...nonMembersQtInput,
-    //   },
-    // });
+    await this.elasticsearchService.create({
+      id: 'myid1', //nosql
+      index: 'qtboard', // 테이블이나 컬렉션을 의미
+      document: {
+        ...nonMembersQtInput,
+      },
+    });
 
     return await this.qtBoardService.nonMemberCreate({
       nonMembersQtInput,

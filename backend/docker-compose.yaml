@@ -46,6 +46,5 @@ services:
   #   volumes:
   #     - ./elk/logstash/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
   #     - ./elk/logstash/mysql-connector-java-8.0.28.jar:/usr/share/logstash/mysql-connector-java-8.0.28.jar
-  #     - ./elk/logstash/custom_template.json:/_templates/custom_template.json
-  #     # - ./elk/logstash/mentor_template.json:/_templates/mentor_template.json
-##
+  #     - ./elk/logstash/custom_template.json:/_templates/qtboard/custom_template.json
+  #     - ./elk/logstash/mentor_template.json:/_templates/mentor/mentor_template.json

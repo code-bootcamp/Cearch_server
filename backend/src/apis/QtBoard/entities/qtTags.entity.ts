@@ -23,7 +23,7 @@ export class JoinQtBoardAndProductCategory {
   @Field(() => QtBoard)
   qtBoard: QtBoard;
 
-  @DeleteDateColumn()
-  @Field(() => Date)
+  @DeleteDateColumn({ nullable: true })
+  @Field(() => Date, { nullable: true })
   deleteAt: Date;
 }

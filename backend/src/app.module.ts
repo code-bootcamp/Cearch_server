@@ -23,6 +23,7 @@ import { FollowModule } from './apis/follow/follow.module';
 import { LectureReviewModule } from './apis/lectureReview/lectureReview.module';
 import { WalletModule } from './apis/wallet/wallet.module';
 import { SocketModule } from './socket.io/module.socket';
+// import { SocketModule } from './socket.io/module.socket';
 
 @Module({
   imports: [

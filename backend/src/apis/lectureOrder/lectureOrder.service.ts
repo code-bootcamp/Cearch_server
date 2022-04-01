@@ -63,6 +63,13 @@ export class LectureOrderService {
           ...user,
           point: user.point - registration.product.classPrice,
         });
+        const pointHistory = this.walletRepository.create({
+          division: '환불',
+          description: '포인트를 환불하셨습니다.',
+          point: -registration.product.classPrice,
+          user: user,
+        })
+        await queryRunner.manager.save(pointHistory);
         const balance = await queryRunner.manager.save(updateNewuser);
         console.log('결제진행');
         const result = await queryRunner.manager.save(payment);

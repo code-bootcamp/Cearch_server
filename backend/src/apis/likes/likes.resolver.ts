@@ -20,4 +20,13 @@ export class LikesResolver {
   ) {
     return await this.likesService.likes({ currentuser, postId });
   }
+
+  @UseGuards(GqlAccessGuard)
+  @Mutation(() => Boolean)
+  async isLike(
+    @CurrentUser() currentuser: ICurrentUser,
+    @Args('postId') postId: string,
+  ) {
+    return await this.likesService.islike({ currentuser, postId });
+  }
 }

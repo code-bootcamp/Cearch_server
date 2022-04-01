@@ -40,6 +40,12 @@ export class UserService {
     private readonly connection: Connection,
   ) {} //
 
+  async findMentorCount() {
+    const myMentor = await this.mentoInfoRepository.count({
+      where: { mentoStatus: MENTOR_AUTH.AUTHROIZED },
+    });
+    return myMentor;
+  }
   async findMyPage({ currentUser }) {
     const myUser = await this.userRepository.findOne({
       where: { id: currentUser.id },
@@ -189,8 +195,9 @@ export class UserService {
 
   async fetchMentor({ page }) {
     const results = await this.mentoInfoRepository
-      .createQueryBuilder('mento')
-      .innerJoinAndSelect('mento.user', 'user')
+      .createQueryBuilder('mentor')
+      .innerJoinAndSelect('mentor.user', 'user')
+      .where('mentor.mentoStatus = :status', { status: MENTOR_AUTH.AUTHROIZED })
       .take(40)
       .skip(40 * (page - 1))
       .getMany();

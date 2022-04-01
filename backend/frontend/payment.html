@@ -45,7 +45,7 @@
                 {
                   query: `
                       mutation {
-                        chargePoint(impUid: "${rsp.imp_uid}", total_Price: ${rsp.paid_amount}) {
+                        chargePoint(impUid: "${rsp.imp_uid}", myamount: ${rsp.paid_amount}) {
                           id
                         }
                       }
@@ -54,7 +54,7 @@
                 {
                   headers: {
                     authorization:
-                      'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFhQGNvbSIsInN1YiI6ImMxZDMwYzI4LTExYTEtNGVjNy1hNDMxLTg1MzM0NDg5OTgyNiIsImlhdCI6MTY0NTEwMTQ4OSwiZXhwIjoxNjQ1MTA1MDg5fQ.GCfQIsQsgxFbroIQxgUgqHzKIAvN93xAmvhP4MDgNTs',
+                      'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NWYyYmIwMC0zNTQxLTQzNjktYTVjYS01MDUzZjZlNTkyYjIiLCJlbWFpbCI6IjU2NzhAY29tIiwicm9sZSI6Ik1FTlRFRSIsImlhdCI6MTY0ODcxMTY2NCwiZXhwIjoxNjQ4NzE1MjY0fQ.4xwxT5XvHvypNJkO7vaSLMHd-oaYmkBG7jtjf9v__a0',
                   },
                 },
               );

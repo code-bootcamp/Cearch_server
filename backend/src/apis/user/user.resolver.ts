@@ -1,5 +1,5 @@
 import { UnprocessableEntityException, UseGuards } from '@nestjs/common';
-import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Int, Query, Resolver } from '@nestjs/graphql';
 import { CurrentUser } from 'src/common/auth/decorate/currentuser.decorate';
 import { Role } from 'src/common/auth/decorate/role.decorate';
 import { GqlAccessGuard } from 'src/common/auth/guard/gqlAuthGuard';
@@ -12,6 +12,7 @@ import { MentoInfo } from './entities/mento.entity';
 import { User, USER_ROLE } from './entities/user.entity';
 import { UserService } from './user.service';
 import { ElasticsearchService } from '@nestjs/elasticsearch';
+import { SearchMento } from './entities/searchMento.entity';
 
 @Resolver()
 export class UserResolver {
@@ -21,10 +22,16 @@ export class UserResolver {
     private readonly elasticsearchService: ElasticsearchService,
   ) {}
 
-  @Query(() => [MentoInfo])
+  @Query(() => Int)
+  async fetchAllMentorCount() {
+    return await this.userService.findMentorCount();
+  }
+
+  @Query(() => [SearchMento])
   async fetchHomeSearch(@Args('search') search: string) {
     const result = await this.elasticsearchService.search({
       index: 'mentor', // 테이블명
+      sort: ['_score'],
       query: {
         bool: {
           should: [{ match: { name: search } }],
@@ -35,12 +42,12 @@ export class UserResolver {
         },
       },
     });
-    console.log(result.hits.hits);
     const resultarray = result.hits.hits.map((ele: any) => ({
       id: ele._source.id,
-      companyname: ele._source.companyname,
+      companyName: ele._source.companyname,
       department: ele._source.department,
       name: ele._source.name,
+      selfIntro: ele._source.selfintro,
     }));
     console.log(resultarray);
     if (!resultarray) throw '검색결과가 없습니다.';
@@ -95,7 +102,7 @@ export class UserResolver {
   async createUser(
     @Args('userForm') userForm: UserForm, //
   ) {
-    //   await this.elasticsearchService.create({
+    // await this.elasticsearchService.create({
     //   id: 'myid1', //nosql
     //   index: 'mentor', // 테이블이나 컬렉션을 의미
     //   document: {
@@ -208,6 +215,21 @@ export class UserResolver {
       user: currentUser,
       category,
       userForm,
+    });
+  }
+
+  @Mutation(() => Boolean)
+  @UseGuards(GqlAccessGuard)
+  @Role(USER_ROLE.ADMIN)
+  async authMentorLecture(
+    @CurrentUser() currentUser: IcurrentUser,
+    @Args('mentorId') mentorId: string,
+    @Args('lectureId') lectureId: string,
+  ) {
+    return await this.userService.permitLecture({
+      currentUser,
+      mentorId,
+      lectureId,
     });
   }
 

@@ -10,6 +10,7 @@ import { UpdateLectureReviewInput } from './dto/updateReview.input';
 import { LectureReview } from './entities/lectureReview.entity';
 import { LectureReviewService } from './lectureReview.service';
 
+
 @Resolver()
 export class LectureReviewResolver {
   constructor(private readonly lectureReviewService: LectureReviewService) {}
@@ -31,25 +32,11 @@ export class LectureReviewResolver {
   @Query(() => LectureReview)
   async fetchLectureReview(
     @CurrentUser() currentuser: ICurrentUser,
-    @Args('reviewId') reviewId: string,
+    @Args('lectureId') lectureId: string,
   ) {
     return await this.lectureReviewService.findOne({
       currentuser,
-      reviewId,
-    });
-  }
-
-  @UseGuards(GqlAccessGuard)
-  @Query(() => Boolean)
-  async fetchisReview(
-    @CurrentUser() currentuser: ICurrentUser,
-    @Args('lectureId') lectureId: string,
-    @Args('reviewId') reviewId: string,
-  ) {
-    return await this.lectureReviewService.findisReview({
-      currentuser,
       lectureId,
-      reviewId,
     });
   }
 
