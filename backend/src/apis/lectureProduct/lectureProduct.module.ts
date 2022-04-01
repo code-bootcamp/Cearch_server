@@ -11,6 +11,7 @@ import { User } from '../user/entities/user.entity';
 import { LectureProduct } from './entities/lectureProduct.entity';
 import { LectureProductResolver } from './lectureProduct.resolver';
 import { LectureProductService } from './lectureProduct.service';
+import { ElasticsearchModule } from '@nestjs/elasticsearch';
 
 @Module({
   imports: [
@@ -22,6 +23,9 @@ import { LectureProductService } from './lectureProduct.service';
       MentoInfo,
       // JoinLectureAndProductCategory
     ]),
+    ElasticsearchModule.register({
+      node: 'http://elasticsearch:9200',
+    }),
   ],
   providers: [
     LectureProductResolver,

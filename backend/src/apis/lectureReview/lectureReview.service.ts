@@ -37,27 +37,16 @@ export class LectureReviewService {
     return findAllReview;
   }
 
-  async findisReview({ currentuser, lectureId ,reviewId }) {
+  async findOne({ currentuser, lectureId }) {
     const findOneReview = await this.lectureReviewRepository
       .createQueryBuilder('review')
       .innerJoinAndSelect('review.user', 'user')
       .innerJoinAndSelect('review.lecture', 'lecture')
       .where('user.id = :userId', { userId: currentuser.id })
-      .andWhere('lecture.id = :id' ,{id: lectureId})
-      .andWhere('review.id = :reviewId', { reviewId: reviewId })
+      .andWhere('lecture.id = :id', { id: lectureId })
       .orderBy('review.createdAt', 'DESC')
       .getOne();
-      return findOneReview ? true : false
-  }
-
-  async findOne({ currentuser, reviewId }) {
-    const findOneReview = await this.lectureReviewRepository
-      .createQueryBuilder('review')
-      .innerJoinAndSelect('review.user', 'user')
-      .where('user.id = :userId', { userId: currentuser.id })
-      .andWhere('review.id = :reviewId', { reviewId: reviewId })
-      .orderBy('review.createdAt', 'DESC')
-      .getOne();
+    if (!findOneReview) return [];
     return findOneReview;
   }
 

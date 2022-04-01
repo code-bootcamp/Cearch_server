@@ -21,10 +21,10 @@ export class JwtGooglestrategy extends PassportStrategy(Strategy, 'google') {
     return {
       name: profile.displayName,
       email: profile.emails[0].value,
-      // password: profile.id,
+      password: profile.id,
       role: USER_ROLE.MENTEE,
-      // gender: '성별없음',
-      // phoneNumber: '01000000000',
+      gender: '성별없음',
+      phoneNumber: '01000000000',
     };
   }
 }

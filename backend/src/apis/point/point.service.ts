@@ -43,6 +43,7 @@ export class PointService {
         impUid: impUid,
       });
       if (myPoint) throw new ConflictException('이미 결제된 아이디입니다.');
+
       // 2. 거래기록 생성
       const pointPayment = await this.pointRepository.create({
         impUid: impUid,
@@ -64,6 +65,7 @@ export class PointService {
         point: +myamount,
         user: user,
       });
+
       await queryRunner.manager.save(pointHistory);
       await queryRunner.manager.save(pointPayment);
       await queryRunner.commitTransaction();
@@ -115,8 +117,8 @@ export class PointService {
       });
 
       const pointHistory = this.walletRepository.create({
-        division: '충전',
-        description: '포인트를 충전하셨습니다.',
+        division: '환불',
+        description: '포인트를 환불하셨습니다.',
         point: -amount,
         user: user,
       });

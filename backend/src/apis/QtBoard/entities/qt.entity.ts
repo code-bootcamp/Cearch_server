@@ -26,7 +26,7 @@ export class QtBoard {
   @Field(() => String)
   title!: string;
 
-  @Column()
+  @Column({ type: 'longtext' })
   @Field(() => String)
   contents!: string;
 
@@ -62,7 +62,7 @@ export class QtBoard {
   @Field(() => Date, { nullable: true })
   deletedAt?: Date;
 
-  @ManyToOne(() => User, (user) => user.qtBoard)
+  @ManyToOne(() => User, (user) => user.qtBoard, { nullable: true })
   @Field(() => User)
   user: User;
 
@@ -74,7 +74,9 @@ export class QtBoard {
   @Field(() => [Likes], { nullable: true })
   likes?: Likes[];
 
-  @OneToMany(() => PostImage, (postImage) => postImage.qtBoard)
+  @OneToMany(() => PostImage, (postImage) => postImage.qtBoard, {
+    nullable: true,
+  })
   @Field(() => [PostImage])
   image: PostImage[];
 

@@ -63,8 +63,9 @@ export class LectureProduct {
     type: 'enum',
     enum: CLASS_CATEGORY,
     default: CLASS_CATEGORY.DEFAULT,
+    nullable: true,
   })
-  @Field(() => CLASS_CATEGORY)
+  @Field(() => CLASS_CATEGORY, { nullable: true })
   classCategory!: CLASS_CATEGORY;
 
   @Column()
@@ -103,8 +104,8 @@ export class LectureProduct {
   @Field(() => [LectureImage])
   image: LectureImage[];
 
-  @OneToMany(() => LectureReview, (review) => review.user)
-  @Field(() => [LectureReview])
+  @OneToMany(() => LectureReview, (review) => review.user, { nullable: true })
+  @Field(() => [LectureReview], { nullable: true })
   reviews: LectureReview[];
 
   // Lecture Product Category와 중간 테이블과 1:N 연결

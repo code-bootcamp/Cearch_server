@@ -14,6 +14,7 @@ export class WalletService {
     const charging = await getConnection()
       .createQueryBuilder(Wallet, 'wallet')
       .innerJoinAndSelect('wallet.user', 'user')
+      .leftJoinAndSelect('wallet.payment', 'payment')
       .where('user.id = :id', { id: currentUser.id })
       .andWhere(
         new Brackets((qb) => {
@@ -32,11 +33,12 @@ export class WalletService {
     const minus = await getConnection()
       .createQueryBuilder(Wallet, 'wallet')
       .innerJoinAndSelect('wallet.user', 'user')
+      .leftJoinAndSelect('wallet.payment', 'payment')
       .where('user.id = :id', { id: currentUser.id })
       .andWhere(
         new Brackets((qb) => {
           qb.where('wallet.division = :division', {
-            division: '인출',
+            division: '결제',
           }).orWhere({ division: '환불' });
         }),
       )
@@ -44,5 +46,4 @@ export class WalletService {
       .getMany();
     return minus;
   }
-
 }
