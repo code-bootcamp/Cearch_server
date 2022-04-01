@@ -29,6 +29,7 @@ import { LectureOrderService } from './lectureOrder.service';
       Wallet,
       LectureProductCategory,
       JoinMentoAndProductCategory,
+      JoinLectureAndProductCategory
     ]),
     ElasticsearchModule.register({
       node: 'http://elasticsearch:9200',

@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { LectureProduct } from '../lectureProduct/entities/lectureProduct.entity';
 import { LectureProductService } from '../lectureProduct/lectureProduct.service';
+import { JoinLectureAndProductCategory } from '../lectureproductCategory/entities/lectureproductCagtegoryclassCategory.entity';
 import { LectureProductCategory } from '../lectureproductCategory/entities/lectureproductCategory.entity';
 import { LectureProductCategoryService } from '../lectureproductCategory/lectureproductCategory.service';
 import { MentoInfo } from '../user/entities/mento.entity';
@@ -21,6 +22,7 @@ import { LectureRegistrationService } from './lectureRegistration.service';
       MentoInfo,
       JoinMentoAndProductCategory,
       LectureProductCategory,
+      JoinLectureAndProductCategory
     ]),
   ],
   providers: [

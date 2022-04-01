@@ -1,6 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import { All, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CurrentUser } from 'src/common/auth/decorate/currentuser.decorate';
 import { Connection, getConnection, Repository } from 'typeorm';
 import { IcurrentUser } from '../auth/auth.resolver';
 import { JoinLectureAndProductCategory } from '../lectureproductCategory/entities/lectureproductCagtegoryclassCategory.entity';
@@ -8,10 +7,8 @@ import { LectureProductCategory } from '../lectureproductCategory/entities/lectu
 import { MentoInfo } from '../user/entities/mento.entity';
 import { User, USER_ROLE } from '../user/entities/user.entity';
 import { CreateLectureProductInput } from './dto/createLectureProduct.input';
-import { UpdateLectureProductInput } from './dto/updateLectureProduct.input';
 import {
   LectureProduct,
-  CLASS_CATEGORY,
 } from './entities/lectureProduct.entity';
 
 // Interface
@@ -22,11 +19,11 @@ interface ICreate {
 
 interface IFindOne {
   lectureproductId: string;
+  page: number
 }
 
 interface IUpdate {
   lectureproductId: string;
-  updateLectureProductInput: UpdateLectureProductInput;
 }
 
 @Injectable()
@@ -40,7 +37,9 @@ export class LectureProductService {
     private readonly lectureproductCategoryRepository: Repository<LectureProductCategory>,
     @InjectRepository(MentoInfo)
     private readonly mentoinfoRepository: Repository<MentoInfo>,
-
+    @InjectRepository(JoinLectureAndProductCategory)
+    private readonly joinlectureandproductRepository: Repository<JoinLectureAndProductCategory>,
+    
     private readonly connection: Connection,
   ) {}
 
@@ -63,25 +62,42 @@ export class LectureProductService {
     await queryRunner.connect();
     await queryRunner.startTransaction('REPEATABLE READ');
     try {
+      const { classCategories, ...rest } = createLectureProductInput
       const query = await this.userRepository
         .createQueryBuilder('user')
-        .innerJoinAndSelect('user.mentor', 'mentor')
+        .innerJoinAndSelect('user.mentor', 'mentor') 
         .where('user.id = :id', { id: user.id })
         .getOne();
-      // const mentor = await this.mentoinfoRepository
-      // .createQueryBuilder('mentor')
-      // .leftJoinAndSelect("mentor.user",'user')
-      // .where('user.id = :id' , {id : user.id})
-      // .getOne()
       const mentor = query.mentor;
       console.log('mentor : ', mentor);
-
-      const result = await queryRunner.manager.save(LectureProduct, {
-        ...createLectureProductInput,
-        mentor,
+    
+      const result = await this.lectureProductRepository.save({
+        ...rest,
+        mentor:mentor
       });
+      //
+      const categories = [];
+      for (let i = 0; i < classCategories.length; i++) {
+        const lecturecategories = classCategories[i].replace('#', '');
+        // 프로덕트카테고리레포에서 categoryname 찾기
+        const prevTag = await this.lectureproductCategoryRepository.findOne({
+          categoryname: lecturecategories,
+        })
+
+        const join = await this.joinlectureandproductRepository.save({
+          lectureproductcategory:prevTag,
+          lectureproduct:result
+        })
+          categories.push(join);
+      }
+      // 프로덕트레포에서 
+      const result2 = await this.lectureProductRepository.create({
+        ...result,
+        joinproductandproductcategory: categories,
+      });
+      await queryRunner.manager.save(result2) //LectureProduct
       await queryRunner.commitTransaction();
-      return result;
+      return result2
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;
@@ -92,12 +108,15 @@ export class LectureProductService {
 
   // Find All Class : ReadAll
   async findAll() {
+    const workctg = this.mentoinfoRepository.find()
     const result = await this.lectureProductRepository
+
       .createQueryBuilder('product')
       .leftJoinAndSelect('product.joinproductandproductcategory', 'jlpc')
       .leftJoinAndSelect('jlpc.lectureproductcategory', 'lpc')
       .leftJoinAndSelect('product.mentor', 'mentor')
       .leftJoinAndSelect('mentor.user', 'user')
+
       .getMany();
     console.log('result : ', result);
     return result;
@@ -130,22 +149,19 @@ export class LectureProductService {
   }
 
   // Find SelectedTag Classes
-  async fetchSelectedTagLectures({ lectureproduct }) {
-    const select = await getConnection()
-      .createQueryBuilder(LectureProduct, 'lectureproduct')
-      .innerJoinAndSelect(
-        'lectureproduct.joinproductandproductcategory',
-        'lecture',
-      )
-      .innerJoinAndSelect('lecture.lectureproductcategory', 'lpcategory')
-      // .innerJoinAndSelect('lpcategory.category', 'category')
-      .where('lpcategory.categoryname = :categoryname', {
-        categoryname: lectureproduct.classCategory,
+  async fetchSelectedTagLectures({ lectureproductcategoryId, page }) {
+    const selectedtag = await getConnection()
+      .createQueryBuilder(LectureProduct, 'product')
+      .innerJoinAndSelect('product.joinproductandproductcategory','jointable',)
+      .innerJoinAndSelect('jointable.lectureproductcategory','category',)
+      .where('category.id = :lectureproductId', {
+        lectureproductId: lectureproductcategoryId,
       })
-      .orderBy('lectureproduct.createdAt', 'DESC')
-      .limit(3)
+      // .orderBy('jointable.createdAt', 'DESC')
+      .limit(40)
+      .offset(15 * (page - 1))
       .getMany();
-    return select;
+    return selectedtag;
   }
 
   // Find Lectures with Mentor
@@ -169,13 +185,12 @@ export class LectureProductService {
   }
 
   // Update Class: only mentor has right to update class
-  async update({ lectureproductId, updateLectureProductInput }: IUpdate) {
+  async update({ lectureproductId }: IUpdate) {
     const currentlectureproduct = await this.lectureProductRepository.findOne({
       id: lectureproductId,
     });
     const newlectureproduct = {
       ...currentlectureproduct,
-      ...updateLectureProductInput,
     };
     return await this.lectureProductRepository.save(newlectureproduct);
   }

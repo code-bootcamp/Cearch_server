@@ -21,7 +21,7 @@ import { ElasticsearchModule } from '@nestjs/elasticsearch';
       User,
       LectureProductCategory,
       MentoInfo,
-      // JoinLectureAndProductCategory
+      JoinLectureAndProductCategory
     ]),
     ElasticsearchModule.register({
       node: 'http://elasticsearch:9200',
@@ -30,7 +30,6 @@ import { ElasticsearchModule } from '@nestjs/elasticsearch';
   providers: [
     LectureProductResolver,
     LectureProductService,
-    JoinLectureAndProductCategory,
     LectureRegistrationService,
     LectureProductCategoryService,
     LectureProductCategoryResolver,
