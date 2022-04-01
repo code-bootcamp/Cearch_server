@@ -1,23 +1,23 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { UseGuards } from '@nestjs/common';
-import { Args, Mutation, Resolver, Query } from '@nestjs/graphql';
+import { Args, Mutation, Resolver, Query, ID } from '@nestjs/graphql';
 import {
   CurrentUser,
-  ICurrentUser,
 } from 'src/common/auth/decorate/currentuser.decorate';
 import { Role } from 'src/common/auth/decorate/role.decorate';
 import { GqlAccessGuard } from 'src/common/auth/guard/gqlAuthGuard';
 import { RoleGuard } from 'src/common/auth/guard/roleGuard';
 import { IcurrentUser } from '../auth/auth.resolver';
+import { JoinLectureAndProductCategory } from '../lectureproductCategory/entities/lectureproductCagtegoryclassCategory.entity';
 import { USER_ROLE } from '../user/entities/user.entity';
 import { CreateLectureProductInput } from './dto/createLectureProduct.input';
-import { UpdateLectureProductInput } from './dto/updateLectureProduct.input';
 import { LectureProduct } from './entities/lectureProduct.entity';
 import { LectureProductService } from './lectureProduct.service';
 
 @Resolver()
 export class LectureProductResolver {
-  constructor(private readonly lectureProductService: LectureProductService) {}
+  constructor(
+    private readonly lectureProductService: LectureProductService
+  ) {}
 
   // Find Popular Classes
   @Query(() => [LectureProduct])
@@ -28,6 +28,7 @@ export class LectureProductResolver {
   // Create Class
   @Mutation(() => LectureProduct)
   @UseGuards(GqlAccessGuard)
+  @Role(USER_ROLE.MENTOR)
   async createLectureProduct(
     @Args('createLectureProductInput')
     createLectureProductInput: CreateLectureProductInput,
@@ -38,19 +39,24 @@ export class LectureProductResolver {
       createLectureProductInput,
     });
   }
+
   // Find All Class : ReadAll
   @Query(() => [LectureProduct])
-  async fetchlectureProducts() {
+  async fetchlectureProducts(
+    @Args('page') page: number,
+  ) {
     return await this.lectureProductService.findAll();
   }
+
   // Find One Class : ReadOne
   @Query(() => LectureProduct)
   @UseGuards(GqlAccessGuard, RoleGuard)
   @Role(USER_ROLE.MENTOR, USER_ROLE.MENTEE)
   async fetchLectureProduct(
     @Args('lectureproductId') lectureproductId: string, //
+    @Args('page') page: number,
   ) {
-    return await this.lectureProductService.findOne({ lectureproductId });
+    return await this.lectureProductService.findOne({ lectureproductId, page });
   }
   // Find NewClass : fetching new classes
   @Query(() => [LectureProduct])
@@ -61,11 +67,10 @@ export class LectureProductResolver {
   // Fetch Selected Tag Class
   @Query(() => [LectureProduct])
   async fetchSelectedTagLectures(
-    @Args('lectureproductcategoryname') lectureproductcategoryname: string,
+    @Args('lectureproductcategoryId') lectureproductcategoryId: string,
+    @Args('page') page: number,
   ) {
-    return await this.lectureProductService.fetchSelectedTagLectures({
-      lectureproduct: lectureproductcategoryname,
-    });
+    return await this.lectureProductService.fetchSelectedTagLectures({lectureproductcategoryId, page});
   }
 
   // FetchLectureWithMentor : 멘토가 본인이 개설한 수업 찾기
@@ -94,12 +99,9 @@ export class LectureProductResolver {
   @Role(USER_ROLE.MENTOR, USER_ROLE.MENTEE)
   async updateLectureProduct(
     @Args('lectureproductId') lectureproductId: string,
-    @Args('updateLectrueProductInput')
-    updateLectureProductInput: UpdateLectureProductInput,
   ) {
     return await this.lectureProductService.update({
       lectureproductId,
-      updateLectureProductInput,
     });
   }
 
