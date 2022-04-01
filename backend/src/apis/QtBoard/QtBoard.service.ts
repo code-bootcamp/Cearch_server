@@ -179,18 +179,12 @@ export class QtBoardService {
     const tags = [];
     for (let i = 0; i < qtTags.length; i++) {
       const tagname = qtTags[i].replace('#', '');
-      const prevTag = await this.qtTagsRepository.findOne({
-        tagname: tagname,
-      });
-      if (prevTag) {
-        tags.push(prevTag);
-        //존재하지 않는 태그라면
-      } else {
+
         const newTag = await this.qtTagsRepository.save({
           tagname: tagname,
         });
         tags.push(newTag);
-      }
+      
     }
     const hashedPassword = await bcrypt.hash(password, 10); // 해쉬로 비밀번호 바꿔서 저장
     nonMembersQtInput = {

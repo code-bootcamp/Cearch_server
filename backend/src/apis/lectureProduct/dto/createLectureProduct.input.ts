@@ -1,16 +1,17 @@
 import { Field, InputType, Int } from '@nestjs/graphql';
-import { CLASS_CATEGORY } from '../entities/lectureProduct.entity';
-
 @InputType()
 export class CreateLectureProductInput {
   @Field(() => String)
   classTitle!: string;
 
-  @Field(() => CLASS_CATEGORY)
-  classCategory!: CLASS_CATEGORY;
+  @Field(() => [String])
+  classCategories!: string[]
 
   @Field(() => String)
   classDescription!: string;
+
+  @Field(() => String)
+  classCurriculum: string
 
   @Field(() => Int)
   classPrice!: number;
@@ -18,6 +19,9 @@ export class CreateLectureProductInput {
   @Field(() => Int)
   classMaxUser!: number;
 
-  @Field(() => Int)
-  classStartDate!: number;
+  @Field(() => String)
+  classStartDate!: string;
+
+  @Field(() => String)
+  classStartTime!: string
 }

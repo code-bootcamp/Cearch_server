@@ -28,6 +28,7 @@ import { LectureOrderService } from './lectureOrder.service';
       Wallet,
       LectureProductCategory,
       JoinMentoAndProductCategory,
+      JoinLectureAndProductCategory
     ]),
   ],
   providers: [

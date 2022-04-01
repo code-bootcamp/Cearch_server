@@ -1,6 +1,6 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { LectureProduct } from 'src/apis/lectureProduct/entities/lectureProduct.entity';
-import { Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { LectureProductCategory } from './lectureproductCategory.entity';
 
 @Entity()
@@ -11,6 +11,7 @@ export class JoinLectureAndProductCategory {
   id: string;
 
   // LectureProduct와 N:1 연결
+  @JoinColumn()
   @ManyToOne(
     () => LectureProduct,
     (lectureproduct) => lectureproduct.joinproductandproductcategory,
@@ -19,6 +20,7 @@ export class JoinLectureAndProductCategory {
   lectureproduct: LectureProduct;
 
   // LectureProductCategory와 N:1 연결
+  @JoinColumn()
   @ManyToOne(
     () => LectureProductCategory,
     (lectureproductcategory) => lectureproductcategory.category,
@@ -26,5 +28,7 @@ export class JoinLectureAndProductCategory {
   @Field(() => LectureProductCategory)
   lectureproductcategory: LectureProductCategory;
 
-
+  @CreateDateColumn()
+  @Field(() => Date)
+  createdAt!: Date;
 }

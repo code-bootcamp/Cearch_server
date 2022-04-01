@@ -10,6 +10,7 @@ import { UpdateLectureReviewInput } from './dto/updateReview.input';
 import { LectureReview } from './entities/lectureReview.entity';
 import { LectureReviewService } from './lectureReview.service';
 
+
 @Resolver()
 export class LectureReviewResolver {
   constructor(private readonly lectureReviewService: LectureReviewService) {}

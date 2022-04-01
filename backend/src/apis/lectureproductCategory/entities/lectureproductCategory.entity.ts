@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Field, ObjectType } from '@nestjs/graphql';
-import { JoinQtBoardAndProductCategory } from 'src/apis/QtBoard/entities/qtTags.entity';
 import {
   Column,
   Entity,
+  JoinColumn,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -22,6 +22,7 @@ export class LectureProductCategory {
   categoryname: string;
 
   // JoinLectureAndProductCategory와 1:N 연결
+  @JoinColumn()
   @OneToMany(
     () => JoinLectureAndProductCategory,
     (category) => category.lectureproductcategory,
