@@ -10,6 +10,7 @@ import { JoinMentoAndProductCategory } from './entities/workMento.entity';
 import { UserResolver } from './user.resolver';
 import { UserService } from './user.service';
 import { ElasticsearchModule } from '@nestjs/elasticsearch';
+import { JoinUserAndProductCategory } from './entities/interestUser.entity';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { ElasticsearchModule } from '@nestjs/elasticsearch';
       MentoInfo,
       JoinMentoAndProductCategory,
       LectureProductCategory,
+      JoinUserAndProductCategory,
     ]),
     JwtModule.register({}),
     ElasticsearchModule.register({

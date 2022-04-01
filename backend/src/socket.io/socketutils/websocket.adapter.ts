@@ -8,7 +8,7 @@ export class RedisAdapter extends IoAdapter {
 
   async connectToRedis(): Promise<void> {
     const pubClient = createClient({
-      url: `redis://redis-server-codesearch.wtmilw.ng.0001.apn2.cache.amazonaws.com:6379`,
+      url: 'redis://my-redis:6379',
     });
     const subClient = pubClient.duplicate();
 

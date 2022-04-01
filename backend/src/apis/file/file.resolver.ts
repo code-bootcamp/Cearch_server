@@ -6,6 +6,7 @@ import { IcurrentUser } from '../auth/auth.resolver';
 import { CertificateImage } from '../certificateImage/entities/certificate.entity';
 import { LectureImage } from '../LectureImage/entities/lectureImage.entity';
 import { PostImage } from '../postImage/entities/postImage.entity';
+import { MentoInfo } from '../user/entities/mento.entity';
 import { User } from '../user/entities/user.entity';
 import { FileUploadService, URL_PURPOSE } from './file.service';
 

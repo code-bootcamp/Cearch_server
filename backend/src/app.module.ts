@@ -52,18 +52,18 @@ import { SocketModule } from './socket.io/module.socket';
     }),
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: 'search-db.cwxg7py2ogvc.ap-northeast-2.rds.amazonaws.com',
+      host: 'my-db',
       port: 3306,
-      database: 'cearchdb',
+      database: 'test_db',
       username: 'root',
-      password: '00000000',
+      password: '0000',
       entities: [__dirname + '/apis/**/*.entity.*'],
       logging: true,
       synchronize: true,
     }),
     CacheModule.register<RedisClientOptions>({
       store: redisStore,
-      url: 'redis://redis-server-codesearch.wtmilw.ng.0001.apn2.cache.amazonaws.com:6379',
+      url: 'redis://my-redis:6379',
       isGlobal: true,
     }),
     // ConfigModule.forRoot({

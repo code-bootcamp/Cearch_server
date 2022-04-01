@@ -50,7 +50,9 @@ export class CommentsService {
     await queryRunner.connect();
     await queryRunner.startTransaction('REPEATABLE READ');
     try {
-      const user = await queryRunner.manager.findOne(User, {id: currentuser.id});
+      const user = await queryRunner.manager.findOne(User, {
+        id: currentuser.id,
+      });
       const post = await queryRunner.manager.findOne(QtBoard, { id: postId });
       const createcomment = await this.commentsRepository.create({
         qtBoard: post,
@@ -186,6 +188,7 @@ export class CommentsService {
       const plusPoint = this.userRepository.create({
         ...commentUser,
         point: commentUser.point + 200,
+        answerCount: commentUser.answerCount + 1,
       });
 
       const pointHistory = this.walletRepository.create({

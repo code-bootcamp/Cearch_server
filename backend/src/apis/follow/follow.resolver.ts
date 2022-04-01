@@ -1,8 +1,9 @@
 import { UseGuards } from '@nestjs/common';
-import { Args, Mutation, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { CurrentUser } from 'src/common/auth/decorate/currentuser.decorate';
 import { GqlAccessGuard } from 'src/common/auth/guard/gqlAuthGuard';
 import { IcurrentUser } from '../auth/auth.resolver';
+import { MentoInfo } from '../user/entities/mento.entity';
 import { Follow } from './entities/follow.entity';
 import { FollowService } from './follow.service';
 
@@ -21,5 +22,15 @@ export class FollowResolver {
       user: currentUser,
     });
     return result;
+  }
+
+  @Query(() => [MentoInfo])
+  async fetchMostRecommendMentor() {
+    return await this.followService.fetchMostRecommendMentor();
+  }
+
+  @Query(() => [MentoInfo])
+  async fetchMostAnswerMentor() {
+    return await this.followService.fetchMostRecommendMentor();
   }
 }
