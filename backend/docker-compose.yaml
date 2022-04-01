@@ -34,6 +34,7 @@ services:
     ports:
       - '6000:6379'
 
+
   # elasticsearch:
   #   image: elasticsearch:7.17.0
   #   environment:

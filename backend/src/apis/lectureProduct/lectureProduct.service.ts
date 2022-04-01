@@ -110,11 +110,13 @@ export class LectureProductService {
   async findAll() {
     const workctg = this.mentoinfoRepository.find()
     const result = await this.lectureProductRepository
-    .createQueryBuilder('product')
-    .leftJoinAndSelect('product.mentor', 'mentor')
-    .leftJoinAndSelect('mentor.user', 'user')
-    .leftJoinAndSelect('mentor.work', 'work')
-    .leftJoinAndSelect('work.category', 'category')
+
+      .createQueryBuilder('product')
+      .leftJoinAndSelect('product.joinproductandproductcategory', 'jlpc')
+      .leftJoinAndSelect('jlpc.lectureproductcategory', 'lpc')
+      .leftJoinAndSelect('product.mentor', 'mentor')
+      .leftJoinAndSelect('mentor.user', 'user')
+
       .getMany();
     console.log('result : ', result);
     return result;
@@ -122,14 +124,18 @@ export class LectureProductService {
 
   // Find One Class : ReadOne
   async findOne({ lectureproductId }: IFindOne) {
-    return await this.lectureProductRepository
+    const lecture = await this.lectureProductRepository
       .createQueryBuilder('product')
+      .leftJoinAndSelect('product.joinproductandproductcategory', 'jlpc')
+      .leftJoinAndSelect('jlpc.lectureproductcategory', 'lpc')
       .leftJoinAndSelect('product.mentor', 'mentor')
       .leftJoinAndSelect('mentor.user', 'user')
       .leftJoinAndSelect('mentor.work', 'work')
       .leftJoinAndSelect('work.category', 'category')
       .where('product.id = :id', { id: lectureproductId })
       .getOne();
+    console.log(lecture);
+    return lecture;
   }
 
   // Find New Classes
