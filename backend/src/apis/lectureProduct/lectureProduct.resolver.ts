@@ -1,8 +1,6 @@
 import { UseGuards } from '@nestjs/common';
 import { Args, Mutation, Resolver, Query, ID } from '@nestjs/graphql';
-import {
-  CurrentUser,
-} from 'src/common/auth/decorate/currentuser.decorate';
+import { CurrentUser } from 'src/common/auth/decorate/currentuser.decorate';
 import { Role } from 'src/common/auth/decorate/role.decorate';
 import { GqlAccessGuard } from 'src/common/auth/guard/gqlAuthGuard';
 import { RoleGuard } from 'src/common/auth/guard/roleGuard';
@@ -20,7 +18,6 @@ export class LectureProductResolver {
   constructor(
     private readonly lectureProductService: LectureProductService,
     private readonly elasticsearchService: ElasticsearchService,
-
   ) {}
 
   // Find Popular Classes
@@ -83,9 +80,7 @@ export class LectureProductResolver {
 
   // Find All Class : ReadAll
   @Query(() => [LectureProduct])
-  async fetchlectureProducts(
-    @Args('page') page: number,
-  ) {
+  async fetchlectureProducts(@Args('page') page: number) {
     return await this.lectureProductService.findAll();
   }
 
@@ -111,7 +106,10 @@ export class LectureProductResolver {
     @Args('lectureproductcategoryId') lectureproductcategoryId: string,
     @Args('page') page: number,
   ) {
-    return await this.lectureProductService.fetchSelectedTagLectures({lectureproductcategoryId, page});
+    return await this.lectureProductService.fetchSelectedTagLectures({
+      lectureproductcategoryId,
+      page,
+    });
   }
 
   // FetchLectureWithMentor : 멘토가 본인이 개설한 수업 찾기
