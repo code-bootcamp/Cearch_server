@@ -1,7 +1,5 @@
-
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
-
 
 export interface ICurrentUser {
   //jwt access storagy 파일의 validate 값들의 타입 지정
@@ -16,4 +14,3 @@ export const CurrentUser = createParamDecorator(
     return user;
   },
 );
-

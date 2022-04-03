@@ -1,4 +1,4 @@
-import { UnprocessableEntityException, UseGuards } from '@nestjs/common';
+import { UseGuards, CACHE_MANAGER, Inject } from '@nestjs/common';
 import { Args, Mutation, Int, Query, Resolver } from '@nestjs/graphql';
 import { CurrentUser } from 'src/common/auth/decorate/currentuser.decorate';
 import { Role } from 'src/common/auth/decorate/role.decorate';
@@ -8,11 +8,14 @@ import { AuthService } from '../auth/auth.service';
 import { AUTH_KIND } from '../auth/entities/auth.entity';
 import { MentorForm } from './dto/mentoForm.input';
 import { UserForm } from './dto/user.input';
+import { Cache } from 'cache-manager';
 import { MentoInfo } from './entities/mento.entity';
 import { User, USER_ROLE } from './entities/user.entity';
 import { UserService } from './user.service';
 import { ElasticsearchService } from '@nestjs/elasticsearch';
 import { SearchMento } from './entities/searchMento.entity';
+import { UpdateUserForm } from './dto/updateUser.input';
+import { LectureProductCategory } from '../lectureproductCategory/entities/lectureproductCategory.entity';
 
 @Resolver()
 export class UserResolver {
@@ -20,6 +23,9 @@ export class UserResolver {
     private readonly userService: UserService, //
     private readonly authService: AuthService,
     private readonly elasticsearchService: ElasticsearchService,
+
+    @Inject(CACHE_MANAGER)
+    private readonly cacheManager: Cache,
   ) {}
 
   @Query(() => Int)
@@ -29,13 +35,18 @@ export class UserResolver {
 
   @Query(() => [SearchMento])
   async fetchHomeSearch(@Args('search') search: string) {
+    // const searchCache = await this.cacheManager.get(`mentor:${search}`);
+    // if (searchCache) return searchCache;
+    // else {
     const result = await this.elasticsearchService.search({
       index: 'mentor', // 테이블명
       sort: ['_score'],
+      from: 0,
+      size: 100,
       query: {
         bool: {
-          should: [{ match: { name: search } }],
           must: [
+            { match: { name: search } },
             { match: { role: 'MENTOR' } },
             { match: { mentostatus: 'AUTHORIZED' } },
           ],
@@ -50,9 +61,25 @@ export class UserResolver {
       selfIntro: ele._source.selfintro,
     }));
     console.log(resultarray);
+    // await this.cacheManager.set(`mentor:${search}`, resultarray, {
+    //   ttl: 60,
+    // });
     if (!resultarray) throw '검색결과가 없습니다.';
     return resultarray;
+    // }
   }
+
+  // @Query(() => LectureProductCategory)
+  // @UseGuards(GqlAccessGuard)
+  // async fetchUserInterest(
+  //   @Args({ name: 'interestIds', type: () => [String] }) interestIds: string[],
+  //   @CurrentUser() currentUser: IcurrentUser,
+  // ) {
+  //   return await this.userService.findUserInterest({
+  //     currentUser,
+  //     interestIds,
+  //   });
+  // }
 
   @Query(() => User)
   @UseGuards(GqlAccessGuard)
@@ -207,14 +234,14 @@ export class UserResolver {
   @Mutation(() => User)
   @UseGuards(GqlAccessGuard)
   async updateUserInfo(
-    @Args('userForm') userForm: UserForm,
+    @Args('updateUserForm') updateUserForm: UpdateUserForm,
     @Args({ name: 'category', type: () => [String] }) category: string[],
     @CurrentUser() currentUser: IcurrentUser,
   ) {
     return await this.userService.updateUserForm({
       user: currentUser,
       category,
-      userForm,
+      updateUserForm,
     });
   }
 

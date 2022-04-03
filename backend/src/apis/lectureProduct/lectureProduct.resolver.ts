@@ -1,13 +1,11 @@
-import { UseGuards } from '@nestjs/common';
+import { UseGuards, CACHE_MANAGER, Inject } from '@nestjs/common';
 import { Args, Mutation, Resolver, Query, ID } from '@nestjs/graphql';
-import {
-  CurrentUser,
-} from 'src/common/auth/decorate/currentuser.decorate';
+import { CurrentUser } from 'src/common/auth/decorate/currentuser.decorate';
 import { Role } from 'src/common/auth/decorate/role.decorate';
 import { GqlAccessGuard } from 'src/common/auth/guard/gqlAuthGuard';
 import { RoleGuard } from 'src/common/auth/guard/roleGuard';
 import { IcurrentUser } from '../auth/auth.resolver';
-import { JoinLectureAndProductCategory } from '../lectureproductCategory/entities/lectureproductCagtegoryclassCategory.entity';
+import { Cache } from 'cache-manager';
 import { USER_ROLE } from '../user/entities/user.entity';
 import { CreateLectureProductInput } from './dto/createLectureProduct.input';
 import { LectureProduct } from './entities/lectureProduct.entity';
@@ -20,6 +18,8 @@ export class LectureProductResolver {
   constructor(
     private readonly lectureProductService: LectureProductService,
     private readonly elasticsearchService: ElasticsearchService,
+    @Inject(CACHE_MANAGER)
+    private readonly cacheManager: Cache,
 
   ) {}
 
@@ -31,32 +31,39 @@ export class LectureProductResolver {
 
   @Query(() => [SearchLecture])
   async fetchLectureSearch(@Args('search') search: string) {
+    // const searchCache = await this.cacheManager.get(`Lecture:${search}`);
+    // if (searchCache) return searchCache;
+    // else {
     const result = await this.elasticsearchService.search({
       index: 'lecture', // 테이블명
+      from: 0,
+      size: 100,
       query: {
         bool: {
           should: [
-            { match: { classTitle: search } },
-            { match: { classDescription: search } },
+            { match: { classtitle: search } },
+            { match: { classdescription: search } },
             { match: { name: search } },
           ],
         },
       },
     });
-    console.log(result);
+    // console.log(result.hits.hits);
     const resultarray = result.hits.hits.map((ele: any) => ({
       id: ele._source.id,
-      companyName: ele._source.companyName,
+      companyName: ele._source.companyname,
       department: ele._source.department,
       name: ele._source.name,
-      selfIntro: ele._source.selfIntro,
-      classTitle: ele._source.classTitle,
-      classDescription: ele._source.classDescription,
+      classTitle: ele._source.classtitle,
+      classDescription: ele._source.classdescription,
       rating: ele._source.rating,
     }));
     console.log(resultarray);
-    if (!resultarray) throw '검색결과가 없습니다.';
+    // await this.cacheManager.set(`Lecture:${search}`, resultarray, {
+    //   ttl: 60,
+    // });
     return resultarray;
+    // }
   }
 
   // Create Class
@@ -83,9 +90,7 @@ export class LectureProductResolver {
 
   // Find All Class : ReadAll
   @Query(() => [LectureProduct])
-  async fetchlectureProducts(
-    @Args('page') page: number,
-  ) {
+  async fetchlectureProducts(@Args('page') page: number) {
     return await this.lectureProductService.findAll();
   }
 
@@ -111,7 +116,12 @@ export class LectureProductResolver {
     @Args('lectureproductcategoryname') lectureproductcategoryname: string,
     @Args('page') page: number,
   ) {
-    return await this.lectureProductService.fetchSelectedTagLectures({lectureproductcategoryname, page});
+
+    return await this.lectureProductService.fetchSelectedTagLectures({
+      lectureproductcategoryId,
+      page,
+    });
+
   }
 
   // FetchLectureWithMentor : 멘토가 본인이 개설한 수업 찾기
