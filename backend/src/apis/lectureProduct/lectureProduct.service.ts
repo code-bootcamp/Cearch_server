@@ -7,9 +7,7 @@ import { LectureProductCategory } from '../lectureproductCategory/entities/lectu
 import { MentoInfo } from '../user/entities/mento.entity';
 import { User, USER_ROLE } from '../user/entities/user.entity';
 import { CreateLectureProductInput } from './dto/createLectureProduct.input';
-import {
-  LectureProduct,
-} from './entities/lectureProduct.entity';
+import { LectureProduct } from './entities/lectureProduct.entity';
 
 // Interface
 interface ICreate {
@@ -19,7 +17,7 @@ interface ICreate {
 
 interface IFindOne {
   lectureproductId: string;
-  page: number
+  page: number;
 }
 
 interface IUpdate {
@@ -39,7 +37,7 @@ export class LectureProductService {
     private readonly mentoinfoRepository: Repository<MentoInfo>,
     @InjectRepository(JoinLectureAndProductCategory)
     private readonly joinlectureandproductRepository: Repository<JoinLectureAndProductCategory>,
-    
+
     private readonly connection: Connection,
   ) {}
 
@@ -62,18 +60,18 @@ export class LectureProductService {
     await queryRunner.connect();
     await queryRunner.startTransaction('REPEATABLE READ');
     try {
-      const { classCategories, ...rest } = createLectureProductInput
+      const { classCategories, ...rest } = createLectureProductInput;
       const query = await this.userRepository
         .createQueryBuilder('user')
-        .innerJoinAndSelect('user.mentor', 'mentor') 
+        .innerJoinAndSelect('user.mentor', 'mentor')
         .where('user.id = :id', { id: user.id })
         .getOne();
       const mentor = query.mentor;
       console.log('mentor : ', mentor);
-    
+
       const result = await this.lectureProductRepository.save({
         ...rest,
-        mentor:mentor
+        mentor: mentor,
       });
       //
       const categories = [];
@@ -82,22 +80,22 @@ export class LectureProductService {
         // 프로덕트카테고리레포에서 categoryname 찾기
         const prevTag = await this.lectureproductCategoryRepository.findOne({
           categoryname: lecturecategories,
-        })
+        });
 
         const join = await this.joinlectureandproductRepository.save({
-          lectureproductcategory:prevTag,
-          lectureproduct:result
-        })
-          categories.push(join);
+          lectureproductcategory: prevTag,
+          lectureproduct: result,
+        });
+        categories.push(join);
       }
-      // 프로덕트레포에서 
+      // 프로덕트레포에서
       const result2 = await this.lectureProductRepository.create({
         ...result,
         joinproductandproductcategory: categories,
       });
-      await queryRunner.manager.save(result2) //LectureProduct
+      await queryRunner.manager.save(result2); //LectureProduct
       await queryRunner.commitTransaction();
-      return result2
+      return result2;
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;
@@ -108,7 +106,7 @@ export class LectureProductService {
 
   // Find All Class : ReadAll
   async findAll() {
-    const workctg = this.mentoinfoRepository.find()
+    const workctg = this.mentoinfoRepository.find();
     const result = await this.lectureProductRepository
 
       .createQueryBuilder('product')
@@ -152,8 +150,10 @@ export class LectureProductService {
   async fetchSelectedTagLectures({ lectureproductcategoryId, page }) {
     const selectedtag = await getConnection()
       .createQueryBuilder(LectureProduct, 'product')
-      .innerJoinAndSelect('product.joinproductandproductcategory','jointable',)
-      .innerJoinAndSelect('jointable.lectureproductcategory','category',)
+      .innerJoinAndSelect('product.joinproductandproductcategory', 'jointable')
+      .innerJoinAndSelect('jointable.lectureproductcategory', 'category')
+      .leftJoinAndSelect('product.mentor', 'mentor')
+      .leftJoinAndSelect('mentor.user', 'user')
       .where('category.id = :lectureproductId', {
         lectureproductId: lectureproductcategoryId,
       })
