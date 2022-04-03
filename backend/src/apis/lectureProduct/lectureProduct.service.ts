@@ -113,7 +113,7 @@ export class LectureProductService {
       .getMany();
     return registeredlecturefinder;
   }
-  
+
   // Find All Class : ReadAll
   async findAll() {
     const workctg = this.mentoinfoRepository.find();
@@ -181,8 +181,8 @@ export class LectureProductService {
   async fetchSelectedTagLectures({ lectureproductcategoryname, page }) {
     const selectedtag = await getConnection()
       .createQueryBuilder(LectureProduct, 'product')
-      .innerJoinAndSelect('product.joinproductandproductcategory','jointable',)
-      .innerJoinAndSelect('jointable.lectureproductcategory','category',)
+      .innerJoinAndSelect('product.joinproductandproductcategory', 'jointable')
+      .innerJoinAndSelect('jointable.lectureproductcategory', 'category')
       .where('category.categoryname = :categoryname', {
         categoryname: lectureproductcategoryname,
       })
@@ -206,14 +206,13 @@ export class LectureProductService {
 
   // Delete Class: only mentor has right to delete class
   async delete({ lectureproductId }) {
-
     const deletelecture = await this.lectureProductRepository.softDelete({
       id: lectureproductId,
     });
-    // const deletecategory = await this.joinlectureandproductRepository.softDelete({ 
+    // const deletecategory = await this.joinlectureandproductRepository.softDelete({
     //   id: lectureproductcategoryId
     // })
-    console.log('삭제완료')
+    console.log('삭제완료');
     return deletelecture.affected ? true : false;
   }
 

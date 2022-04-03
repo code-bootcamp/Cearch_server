@@ -66,6 +66,11 @@ export class UserService {
     const myUser = getConnection()
       .createQueryBuilder(User, 'user')
       .innerJoinAndSelect('user.mentor', 'mentor')
+      .leftJoinAndSelect('user.interest', 'interest')
+      .leftJoinAndSelect(
+        'interest.linkedToLectureProductCategory',
+        'joinCategory',
+      )
       .where('user.id = :id', { id: currentUser.id });
     return myUser;
   }

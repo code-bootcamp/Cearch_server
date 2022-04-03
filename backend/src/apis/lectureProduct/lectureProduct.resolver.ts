@@ -20,7 +20,6 @@ export class LectureProductResolver {
     private readonly elasticsearchService: ElasticsearchService,
     @Inject(CACHE_MANAGER)
     private readonly cacheManager: Cache,
-
   ) {}
 
   // Find Popular Classes
@@ -116,12 +115,10 @@ export class LectureProductResolver {
     @Args('lectureproductcategoryname') lectureproductcategoryname: string,
     @Args('page') page: number,
   ) {
-
     return await this.lectureProductService.fetchSelectedTagLectures({
-      lectureproductcategoryId,
+      lectureproductcategoryname,
       page,
     });
-
   }
 
   // FetchLectureWithMentor : 멘토가 본인이 개설한 수업 찾기
@@ -164,7 +161,7 @@ export class LectureProductResolver {
     @Args('lectureproductId') lectureproductId: string,
     // @Args('lectureproductcategoryId') lectureproductcategoryId: string
   ) {
-    return await this.lectureProductService.delete({ lectureproductId});
+    return await this.lectureProductService.delete({ lectureproductId });
   }
 
   @Query(() => LectureProduct)
