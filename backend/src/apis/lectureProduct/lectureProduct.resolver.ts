@@ -18,9 +18,9 @@ export class LectureProductResolver {
   constructor(
     private readonly lectureProductService: LectureProductService,
     private readonly elasticsearchService: ElasticsearchService,
-
     @Inject(CACHE_MANAGER)
     private readonly cacheManager: Cache,
+
   ) {}
 
   // Find Popular Classes

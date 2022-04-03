@@ -69,7 +69,8 @@ export class FollowService {
 
   async fetchMostRecommendMentor() {
     const result = await getManager().query(`
-    select followeeId  ,(SELECT COUNT(*) FROM follow f2 )as cnt
+    select f.followeeId ,(SELECT COUNT(*) FROM follow f2 where f2.followeeId = f.followeeId 
+    and f2.following = 1)as cnt
     FROM  follow f
     GROUP BY f.followeeId
     ORDER BY cnt DESC

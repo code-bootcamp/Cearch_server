@@ -34,12 +34,18 @@ services:
     ports:
       - '6000:6379'
 
-  elasticsearch:
-    image: elasticsearch:7.17.0
-    environment:
-      discovery.type: single-node
+
+#   elasticsearch:
+#     image: elasticsearch:7.17.0
+#     environment:
+#       discovery.type: single-node
+#     ports:
+#       - 9200:9200
+
+  my-mongo:
+    image: 'mongo:latest'
     ports:
-      - 9200:9200
+      - '27017:27017'
 
   logstash:
     image: logstash:7.17.0
