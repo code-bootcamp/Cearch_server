@@ -3,7 +3,6 @@ import {
   Float,
   Int,
   ObjectType,
-  registerEnumType,
 } from '@nestjs/graphql';
 import { LectureImage } from 'src/apis/LectureImage/entities/lectureImage.entity';
 import { JoinLectureAndProductCategory } from 'src/apis/lectureproductCategory/entities/lectureproductCagtegoryclassCategory.entity';
@@ -22,33 +21,6 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-export enum CLASS_CATEGORY {
-  DEFAULT = '카테고리 선택',
-  HTML = 'HTML',
-  CSS = 'CSS',
-  JS = 'JS',
-  TS = 'TS',
-  REACT = 'REACT',
-  PYTHON = 'PYTHON',
-  C = 'C',
-  CSHARP = 'C#',
-  PHP = 'PHP',
-  NODEJS = 'NODE.JS',
-  MYSQL = 'MySQL',
-  DOCKER = 'DOCKER',
-  LIB = 'LIBRARY',
-  REACTNATIVE = 'REACT-NATIVE',
-  RUBY = 'RUBY',
-  MONGODB = 'MONGODB',
-  VUEJS = 'VUE.JS',
-  GRAPHQL = 'GraphQL',
-  RESTAPI = 'RestAPI',
-  SERVICE = 'AWS/GCP/AZURE',
-}
-registerEnumType(CLASS_CATEGORY, {
-  name: 'CLASS_CATEGORY',
-});
-
 @Entity()
 @ObjectType()
 export class LectureProduct {
@@ -59,15 +31,6 @@ export class LectureProduct {
   @Column()
   @Field(() => String, { nullable: true })
   classTitle: string;
-
-  @Column({
-    type: 'enum',
-    enum: CLASS_CATEGORY,
-    default: CLASS_CATEGORY.DEFAULT,
-    nullable: true,
-  })
-  @Field(() => CLASS_CATEGORY, { nullable: true })
-  classCategory!: CLASS_CATEGORY;
 
   @Column()
   @Field(() => String, { nullable: true })

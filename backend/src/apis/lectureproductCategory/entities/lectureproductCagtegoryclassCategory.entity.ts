@@ -1,6 +1,6 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { LectureProduct } from 'src/apis/lectureProduct/entities/lectureProduct.entity';
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { LectureProductCategory } from './lectureproductCategory.entity';
 
 @Entity()
@@ -31,4 +31,8 @@ export class JoinLectureAndProductCategory {
   @CreateDateColumn()
   @Field(() => Date)
   createdAt!: Date;
+
+  @DeleteDateColumn()
+  @Field(() => Date)
+  deletedAt?: Date;
 }
