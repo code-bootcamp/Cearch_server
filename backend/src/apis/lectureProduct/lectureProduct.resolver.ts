@@ -113,13 +113,15 @@ export class LectureProductResolver {
   // Fetch Selected Tag Class
   @Query(() => [LectureProduct])
   async fetchSelectedTagLectures(
-    @Args('lectureproductcategoryId') lectureproductcategoryId: string,
+    @Args('lectureproductcategoryname') lectureproductcategoryname: string,
     @Args('page') page: number,
   ) {
+
     return await this.lectureProductService.fetchSelectedTagLectures({
       lectureproductcategoryId,
       page,
     });
+
   }
 
   // FetchLectureWithMentor : 멘토가 본인이 개설한 수업 찾기
@@ -160,8 +162,9 @@ export class LectureProductResolver {
   @Role(USER_ROLE.MENTOR)
   async deleteLectureProduct(
     @Args('lectureproductId') lectureproductId: string,
+    // @Args('lectureproductcategoryId') lectureproductcategoryId: string
   ) {
-    return await this.lectureProductService.delete({ lectureproductId });
+    return await this.lectureProductService.delete({ lectureproductId});
   }
 
   @Query(() => LectureProduct)

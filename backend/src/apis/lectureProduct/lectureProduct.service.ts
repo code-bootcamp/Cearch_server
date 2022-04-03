@@ -1,6 +1,6 @@
 import { All, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Connection, getConnection, Repository } from 'typeorm';
+import { Connection, getConnection, IsNull, Not, Repository } from 'typeorm';
 import { IcurrentUser } from '../auth/auth.resolver';
 import { JoinLectureAndProductCategory } from '../lectureproductCategory/entities/lectureproductCagtegoryclassCategory.entity';
 import { LectureProductCategory } from '../lectureproductCategory/entities/lectureproductCategory.entity';
@@ -41,20 +41,7 @@ export class LectureProductService {
     private readonly connection: Connection,
   ) {}
 
-  async findPopular() {
-    const popular = await this.lectureProductRepository
-      .createQueryBuilder('lecture')
-      .leftJoinAndSelect('lecture.mentor', 'mentor')
-      .leftJoinAndSelect('mentor.user', 'user')
-      .orderBy('lecture.rating', 'DESC')
-      .take(10)
-      .getMany();
-
-    console.log('popular : ', popular);
-    return popular;
-  }
-
-  // Create Class : only mentor has right to create class
+  // Create Class : only mentor has right to create class : 완료
   async create({ createLectureProductInput, user }: ICreate) {
     const queryRunner = this.connection.createQueryRunner();
     await queryRunner.connect();
@@ -88,7 +75,7 @@ export class LectureProductService {
         });
         categories.push(join);
       }
-      // 프로덕트레포에서
+
       const result2 = await this.lectureProductRepository.create({
         ...result,
         joinproductandproductcategory: categories,
@@ -104,17 +91,39 @@ export class LectureProductService {
     }
   }
 
+  // Find Lectures with Mentor
+  async findLectureWithMentor({ currentuser }) {
+    // const finder = await this.lectureProductRepository.find({mentor: mentorId})
+    // console.log(finder)
+    const mylecturefinder = await this.lectureProductRepository
+      .createQueryBuilder('lecture')
+      .innerJoinAndSelect('lecture.mentor', 'mentor')
+      .innerJoinAndSelect('mentor.user', 'mentormyself')
+      .where('mentormyself.id = :Id', { Id: currentuser.id })
+      .getMany();
+    return mylecturefinder;
+  }
+
+  // Find registered Lectures
+  async findLectureWithMentee({ currentuser }) {
+    const registeredlecturefinder = await this.lectureProductRepository
+      .createQueryBuilder('lecture')
+      .innerJoinAndSelect('lecture.user', 'user')
+      .where('user.id = :id', { id: currentuser.id })
+      .getMany();
+    return registeredlecturefinder;
+  }
+  
   // Find All Class : ReadAll
   async findAll() {
     const workctg = this.mentoinfoRepository.find();
     const result = await this.lectureProductRepository
-
       .createQueryBuilder('product')
       .leftJoinAndSelect('product.joinproductandproductcategory', 'jlpc')
       .leftJoinAndSelect('jlpc.lectureproductcategory', 'lpc')
       .leftJoinAndSelect('product.mentor', 'mentor')
       .leftJoinAndSelect('mentor.user', 'user')
-
+      .orderBy('product.createdAt', 'DESC')
       .getMany();
     console.log('result : ', result);
     return result;
@@ -136,52 +145,52 @@ export class LectureProductService {
     return lecture;
   }
 
-  // Find New Classes
+  // 인기 클래스: 완료
+  async findPopular() {
+    const popular = await this.lectureProductRepository
+      .createQueryBuilder('lecture')
+      .leftJoinAndSelect('lecture.mentor', 'mentor')
+      .leftJoinAndSelect('mentor.user', 'user')
+      .orderBy('lecture.rating', 'DESC')
+      .take(8)
+      .getMany();
+
+    console.log('popular : ', popular);
+    return popular;
+  }
+
+  // Find New Classes : 완료
   async findNewClasses() {
-    const findNewClasses = await this.lectureProductRepository.find({
-      take: 10, // 5개
-      order: { createdAt: 'DESC' },
-      where: { deletedAt: null },
-    });
+    const findNewClasses = await this.lectureProductRepository
+      .createQueryBuilder('product')
+      .leftJoinAndSelect('product.joinproductandproductcategory', 'jlpc')
+      .leftJoinAndSelect('jlpc.lectureproductcategory', 'lpc')
+      .leftJoinAndSelect('product.mentor', 'mentor')
+      .leftJoinAndSelect('mentor.user', 'user')
+      .take(8)
+      .getMany();
+
+    // const findNewClasses = await this.lectureProductRepository.find({
+    //   take: 10, // 5개
+    //   order: { createdAt: 'DESC' },
+    // });
     return findNewClasses;
   }
 
   // Find SelectedTag Classes
-  async fetchSelectedTagLectures({ lectureproductcategoryId, page }) {
+  async fetchSelectedTagLectures({ lectureproductcategoryname, page }) {
     const selectedtag = await getConnection()
       .createQueryBuilder(LectureProduct, 'product')
-      .innerJoinAndSelect('product.joinproductandproductcategory', 'jointable')
-      .innerJoinAndSelect('jointable.lectureproductcategory', 'category')
-      .leftJoinAndSelect('product.mentor', 'mentor')
-      .leftJoinAndSelect('mentor.user', 'user')
-      .where('category.id = :lectureproductId', {
-        lectureproductId: lectureproductcategoryId,
+      .innerJoinAndSelect('product.joinproductandproductcategory','jointable',)
+      .innerJoinAndSelect('jointable.lectureproductcategory','category',)
+      .where('category.categoryname = :categoryname', {
+        categoryname: lectureproductcategoryname,
       })
-      // .orderBy('jointable.createdAt', 'DESC')
+      .orderBy('jointable.createdAt', 'DESC')
       .limit(40)
       .offset(15 * (page - 1))
       .getMany();
     return selectedtag;
-  }
-
-  // Find Lectures with Mentor
-  async findLectureWithMentor({ currentuser }) {
-    const mylecturefinder = await this.lectureProductRepository
-      .createQueryBuilder('lecture')
-      .innerJoinAndSelect('lecture.mentor', 'mentor')
-      .where('mentor.id = :id', { id: currentuser.id })
-      .getMany();
-    return mylecturefinder;
-  }
-
-  // Find registered Lectures
-  async findLectureWithMentee({ currentuser }) {
-    const registeredlecturefinder = await this.lectureProductRepository
-      .createQueryBuilder('lecture')
-      .innerJoinAndSelect('lecture.user', 'user')
-      .where('user.id = :id', { id: currentuser.id })
-      .getMany();
-    return registeredlecturefinder;
   }
 
   // Update Class: only mentor has right to update class
@@ -197,10 +206,15 @@ export class LectureProductService {
 
   // Delete Class: only mentor has right to delete class
   async delete({ lectureproductId }) {
-    const result = await this.lectureProductRepository.softDelete({
+
+    const deletelecture = await this.lectureProductRepository.softDelete({
       id: lectureproductId,
     });
-    return result.affected ? true : false;
+    // const deletecategory = await this.joinlectureandproductRepository.softDelete({ 
+    //   id: lectureproductcategoryId
+    // })
+    console.log('삭제완료')
+    return deletelecture.affected ? true : false;
   }
 
   // Fetch Lecture Detail
