@@ -34,6 +34,10 @@ services:
     ports:
       - '6000:6379'
 
+  my-mongo:
+    image: 'mongo:latest'
+    ports:
+      - '27017:27017'
   # elasticsearch:
   #   image: elasticsearch:7.17.0
   #   environment:
