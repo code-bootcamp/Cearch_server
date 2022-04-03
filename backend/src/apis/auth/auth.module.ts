@@ -11,6 +11,7 @@ import { JwtGooglestrategy } from 'src/common/auth/strategy/social-google.strate
 import { UserService } from '../user/user.service';
 import { MentoInfo } from '../user/entities/mento.entity';
 import { JoinMentoAndProductCategory } from '../user/entities/workMento.entity';
+import { JoinUserAndProductCategory } from '../user/entities/interestUser.entity';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { JoinMentoAndProductCategory } from '../user/entities/workMento.entity';
       User,
       MentoInfo,
       JoinMentoAndProductCategory,
+      JoinUserAndProductCategory
     ]), //
     JwtModule.register({}),
   ],

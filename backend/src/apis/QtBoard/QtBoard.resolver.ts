@@ -28,26 +28,35 @@ export class QtBoardResolver {
 
   @Query(() => [QtBoard]) // Query graphql에서 임포트 되는지 잘 보자
   async searchQt(@Args('search') search: string) {
-    const result = await this.elasticsearchService.search({
-      index: 'qtboard', // 테이블명
-      query: {
-        bool: {
-          should: [
-            { match: { title: search } },
-            { match: { contents: search } },
-          ],
+    const searchCache = await this.cacheManager.get(`qtBoard:${search}`);
+    if (searchCache) return searchCache;
+    else {
+      const result = await this.elasticsearchService.search({
+        index: 'qtboard', // 테이블명
+        from: 0,
+        size: 100,
+        query: {
+          bool: {
+            should: [
+              { match: { title: search } },
+              { match: { contents: search } },
+            ],
+          },
         },
-      },
-    });
-    const resultarray = result.hits.hits.map((ele: any) => ({
-      id: ele._source.id,
-      title: ele._source.title,
-      contents: ele._source.contents,
-      name: ele._source.name,
-    }));
-    console.log(resultarray);
-    if (!resultarray) throw '검색결과가 없습니다.';
-    return resultarray;
+      });
+      const resultarray = result.hits.hits.map((ele: any) => ({
+        id: ele._source.id,
+        title: ele._source.title,
+        contents: ele._source.contents,
+        name: ele._source.name,
+      }));
+      console.log(resultarray);
+      await this.cacheManager.set(`qtBoard:${search}`, resultarray, {
+        ttl: 60,
+      });
+      if (!resultarray) throw '검색결과가 없습니다.';
+      return resultarray;
+    }
   }
 
   //총 게시글 수
@@ -143,13 +152,13 @@ export class QtBoardResolver {
     @Args('nonMembersQtInput') nonMembersQtInput: NonMembersQtInput,
   ) {
     // 엘라스틱 서치 등록하기 연습 => 실제로는 MySQL에 저장할 예정!
-    await this.elasticsearchService.create({
-      id: 'myid1', //nosql
-      index: 'qtboard', // 테이블이나 컬렉션을 의미
-      document: {
-        ...nonMembersQtInput,
-      },
-    });
+    // await this.elasticsearchService.create({
+    //   id: 'myid1', //nosql
+    //   index: 'qtboard', // 테이블이나 컬렉션을 의미
+    //   document: {
+    //     ...nonMembersQtInput,
+    //   },
+    // });
 
     return await this.qtBoardService.nonMemberCreate({
       nonMembersQtInput,

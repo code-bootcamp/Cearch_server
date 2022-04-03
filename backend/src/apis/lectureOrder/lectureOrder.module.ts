@@ -17,6 +17,7 @@ import { Wallet } from '../wallet/entities/wallet.entity';
 import { LectureOrder } from './entities/lectureOrder.entity';
 import { LectureOrderResolver } from './lectureOrder.resolver';
 import { LectureOrderService } from './lectureOrder.service';
+import { JoinUserAndProductCategory } from '../user/entities/interestUser.entity';
 
 @Module({
   imports: [
@@ -29,7 +30,8 @@ import { LectureOrderService } from './lectureOrder.service';
       Wallet,
       LectureProductCategory,
       JoinMentoAndProductCategory,
-      JoinLectureAndProductCategory
+      JoinLectureAndProductCategory,
+      JoinUserAndProductCategory
     ]),
     ElasticsearchModule.register({
       node: 'http://elasticsearch:9200',

@@ -21,39 +21,26 @@
   },
   "mappings": {
     "properties": {
-      "user": {
-        "type": "nested",
-        "properties": {
-          "name": {
-            "type": "text",
-            "analyzer": "my_ngram_analyzer",
-            "search_analyzer": "standard"
-          }
-        }
+      "name": {
+        "type": "text",
+        "analyzer": "my_ngram_analyzer"
       },
-      "info": {
-        "type": "nested",
-        "properties": {
-          "companyname": {
-            "type": "text"
-          },
-          "department": {
-            "type": "text"
-          }
-        }
+      "classtitle": {
+        "type": "text",
+        "analyzer": "my_ngram_analyzer"
+      },
+      "classdescription": {
+        "type": "text",
+        "analyzer": "my_ngram_analyzer"
+      },
+      "companyName": {
+        "type": "text"
+      },
+      "department": {
+        "type": "text"
       },
       "rating": {
         "type": "float"
-      },
-      "classTitle": {
-        "type": "text",
-        "analyzer": "my_ngram_analyzer",
-        "search_analyzer": "standard"
-      },
-      "classDescription": {
-        "type": "text",
-        "analyzer": "my_ngram_analyzer",
-        "search_analyzer": "standard"
       }
     }
   }

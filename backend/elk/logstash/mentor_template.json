@@ -21,31 +21,13 @@
   },
   "mappings": {
     "properties": {
-      "user": {
-        "type": "nested",
-        "properties": {
-          "name": {
-            "type": "text",
-            "analyzer": "my_ngram_analyzer",
-            "search_analyzer": "standard"
-          },
-          "role": {
-            "type": "text"
-          }
-        }
+     "name": {
+        "type": "text",
+        "analyzer": "my_ngram_analyzer",
+        "search_analyzer": "standard"
       },
-      "work": {
-        "type": "nested",
-        "properties": {
-          "category": {
-            "type": "nested",
-            "properties": {
-              "categoryname": {
-                "type": "text"
-              }
-            }
-          }
-        }
+      "role": {
+        "type": "text"
       },
       "companyname": {
         "type": "text"
@@ -56,12 +38,8 @@
       "selfintro": {
         "type": "text"
       },
-      "mentoStatus": {
+      "mentostatus": {
         "type": "text"
-      },
-      "createdat": {
-        "type": "date",
-        "format": "yyyy-MM-dd HH:mm:ss||yyyy/MM/dd||epoch_millis"
       }
     }
   }

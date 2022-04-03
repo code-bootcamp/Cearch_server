@@ -152,6 +152,8 @@ export class LectureProductService {
       .createQueryBuilder(LectureProduct, 'product')
       .innerJoinAndSelect('product.joinproductandproductcategory', 'jointable')
       .innerJoinAndSelect('jointable.lectureproductcategory', 'category')
+      .leftJoinAndSelect('product.mentor', 'mentor')
+      .leftJoinAndSelect('mentor.user', 'user')
       .where('category.id = :lectureproductId', {
         lectureproductId: lectureproductcategoryId,
       })
