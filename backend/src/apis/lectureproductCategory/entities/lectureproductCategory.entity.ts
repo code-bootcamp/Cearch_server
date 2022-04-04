@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Field, ObjectType } from '@nestjs/graphql';
-import { JoinUserAndProductCategory } from 'src/apis/user/entities/interestUser.entity';
 import {
   Column,
   Entity,
@@ -27,17 +26,7 @@ export class LectureProductCategory {
   @OneToMany(
     () => JoinLectureAndProductCategory,
     (category) => category.lectureproductcategory,
-    { nullable: true },
   )
-  @Field(() => [JoinLectureAndProductCategory], { nullable: true })
+  @Field(() => [JoinLectureAndProductCategory])
   category: JoinLectureAndProductCategory[];
-
-  @JoinColumn()
-  @OneToMany(
-    () => JoinUserAndProductCategory,
-    (category) => category.linkedToLectureProductCategory,
-    { nullable: true },
-  )
-  @Field(() => [JoinUserAndProductCategory], { nullable: true })
-  interest: JoinUserAndProductCategory[];
 }

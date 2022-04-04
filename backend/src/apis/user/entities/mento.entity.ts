@@ -1,4 +1,4 @@
-import { Field, Int, ObjectType, registerEnumType } from '@nestjs/graphql';
+import { Field, ObjectType, registerEnumType } from '@nestjs/graphql';
 import { CertificateImage } from 'src/apis/certificateImage/entities/certificate.entity';
 import { LectureProduct } from 'src/apis/lectureProduct/entities/lectureProduct.entity';
 import {
@@ -73,8 +73,4 @@ export class MentoInfo {
   @OneToMany(() => LectureProduct, (lecutre) => lecutre.mentor)
   @Field(() => [LectureProduct])
   lecture: LectureProduct[];
-
-  @Column({ default: 0 })
-  @Field(() => Int)
-  follower: number;
 }
