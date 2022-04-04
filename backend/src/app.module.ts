@@ -67,10 +67,10 @@ import { MongooseModule } from '@nestjs/mongoose';
     }),
     CacheModule.register<RedisClientOptions>({
       store: redisStore,
-      url: 'redis://my-redis:6379',
+      url: process.env.REDIS_URL,
       isGlobal: true,
     }),
-    MongooseModule.forRoot(`mongodb://my-mongo:27017`),
+    MongooseModule.forRoot(process.env.MONGODB_URL),
     ConfigModule.forRoot({
       isGlobal: true,
     }),

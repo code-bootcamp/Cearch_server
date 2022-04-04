@@ -64,7 +64,6 @@ export class LectureOrderService {
           point: user.point - order.product.classPrice,
         });
         const pointHistory = this.walletRepository.create({
-
           division: '구매',
           description: '클래스를 구매하셨습니다.',
           point: -order.product.classPrice,
@@ -87,16 +86,16 @@ export class LectureOrderService {
   }
   // finding all orders
   async findAll() {
-      const findAllOrders = await this.lectureOrderRepository.find({
-        take: 10,
-        order: { createdAt: 'DESC'},
-      })
+    const findAllOrders = await this.lectureOrderRepository.find({
+      take: 10,
+      order: { createdAt: 'DESC' },
+    });
     return findAllOrders;
   }
   // finding one order
   async findOne({ lectureorderId }: IFindOne) {
     return await this.lectureOrderRepository.findOne({
-      where: {id: lectureorderId},
+      where: { id: lectureorderId },
     });
   }
   // Update lectureOrder
