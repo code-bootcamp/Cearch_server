@@ -52,9 +52,7 @@ export class LectureRegistrationService {
 
   // Find All Registration Forms: ReadAll
   async findAll() {
-    const result = await this.lectureRegistrationRepository.find({
-      relations: ['lectureRegistration'],
-    });
+    const result = await this.lectureRegistrationRepository.find({});
     return await result;
   }
 

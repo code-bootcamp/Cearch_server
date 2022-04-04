@@ -11,6 +11,7 @@ export interface IcurrentUser {
   id: string;
   email: string;
   role: USER_ROLE;
+  name: string;
 }
 
 @Resolver()

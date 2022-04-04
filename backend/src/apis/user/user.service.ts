@@ -63,7 +63,7 @@ export class UserService {
     return myUser;
   }
   async findMentoPage({ currentUser }) {
-    const myUser = getConnection()
+    const myUser = await getConnection()
       .createQueryBuilder(User, 'user')
       .innerJoinAndSelect('user.mentor', 'mentor')
       .leftJoinAndSelect('user.interest', 'interest')
@@ -71,7 +71,10 @@ export class UserService {
         'interest.linkedToLectureProductCategory',
         'joinCategory',
       )
-      .where('user.id = :id', { id: currentUser.id });
+      .leftJoinAndSelect('mentor.work', 'work')
+      .leftJoinAndSelect('work.category', 'category')
+      .where('user.id = :id', { id: currentUser.id })
+      .getOne();
     return myUser;
   }
 

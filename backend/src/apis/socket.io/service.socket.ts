@@ -43,7 +43,6 @@ export class SocketService {
 
   async fetchRoomLog({ roomId, userId }) {
     const user = await this.chatRoomModel.findOne({ roomId });
-    console.log('뭘까 이거 : ', user);
     if (user === null) {
       return null;
     }
@@ -78,7 +77,7 @@ export class SocketService {
       roomName,
       created: new Date(),
     });
-
+    console.log(result);
     return result;
   }
 
@@ -101,5 +100,10 @@ export class SocketService {
       created: new Date(),
     });
     return result;
+  }
+
+  async deleteRoom({ roomId }) {
+    await this.chatRoomModel.deleteMany({ roomId });
+    await this.chatLogModel.deleteMany({ roomId });
   }
 }

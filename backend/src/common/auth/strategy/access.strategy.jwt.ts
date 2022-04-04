@@ -38,6 +38,7 @@ export class JwtAccessStrategy extends PassportStrategy(
         id: payload.sub,
         email: payload.email,
         role: payload.role,
+        name: payload.name,
         exp: payload.exp,
       };
     } catch (error) {

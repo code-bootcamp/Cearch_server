@@ -20,7 +20,7 @@ import { JoinUserAndProductCategory } from '../user/entities/interestUser.entity
       User,
       MentoInfo,
       JoinMentoAndProductCategory,
-      JoinUserAndProductCategory
+      JoinUserAndProductCategory,
     ]), //
     JwtModule.register({}),
   ],

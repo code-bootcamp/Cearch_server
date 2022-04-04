@@ -31,6 +31,14 @@ export class FollowResolver {
 
   @Query(() => [MentoInfo])
   async fetchMostAnswerMentor() {
-    return await this.followService.fetchMostRecommendMentor();
+    return await this.followService.fetchMostAnswerMentor();
+  }
+
+  @Query(() => [Follow])
+  @UseGuards(GqlAccessGuard)
+  async fetchMyFollower(
+    @CurrentUser() currentUser: IcurrentUser, //
+  ) {
+    return await this.followService.fetchMyFollower({ userId: currentUser.id });
   }
 }

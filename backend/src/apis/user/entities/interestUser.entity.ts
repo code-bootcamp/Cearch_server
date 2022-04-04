@@ -1,6 +1,11 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { LectureProductCategory } from 'src/apis/lectureproductCategory/entities/lectureproductCategory.entity';
-import { Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  DeleteDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { User } from './user.entity';
 
 @Entity()
@@ -23,4 +28,7 @@ export class JoinUserAndProductCategory {
   @ManyToOne(() => User, (user) => user.interest, { nullable: true })
   @Field(() => User, { nullable: true })
   user: User;
+
+  @DeleteDateColumn()
+  deletedAt: Date;
 }

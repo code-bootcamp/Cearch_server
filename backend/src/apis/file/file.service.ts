@@ -45,8 +45,8 @@ interface IfileToDbMento {
 }
 
 const s3 = new AWS.S3({
-  accessKeyId: 'AKIAXWQK6LR2PAYBMZYM',
-  secretAccessKey: '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',
+  accessKeyId: 'AKIATYG7SRXVOBZJZ2DD',
+  secretAccessKey: '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',
   region: 'ap-northeast-2',
   signatureVersion: 'v4',
 });
@@ -99,19 +99,19 @@ export class FileUploadService {
   }
 
   async getSignedUrlUser({ user }) {
-    const userFinds = await this.userRepository.find({
+    const userFind = await this.userRepository.findOne({
       where: { id: user.id },
     });
-    const fileNamesList = userFinds.map((user) =>
-      s3.getSignedUrlPromise('getObject', {
-        Bucket: 'cearchtest',
+    if (userFind.imageUrl) {
+      const url = await s3.getSignedUrlPromise('getObject', {
+        Bucket: 'cearchstorage',
         Expires: 120,
-        Key: user.imageUrl, //img url 추후 문자열처리를 해주어야한다. 우선적으로 진행
-      }),
-    );
-    const urls = await Promise.all(fileNamesList);
-    console.log('urls : ', urls);
-    return urls;
+        Key: userFind.imageUrl, //img url 추후 문자열처리를 해주어야한다. 우선적으로 진행
+      });
+      console.log('urls : ', url);
+      return url;
+    }
+    return 'null';
   }
   ////////////////////////
   async getSignedUrlLecture({ lectureId }) {

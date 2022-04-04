@@ -24,7 +24,7 @@ import { LectureRegistrationService } from './lectureRegistration.service';
       JoinMentoAndProductCategory,
       LectureProductCategory,
       JoinLectureAndProductCategory,
-      JoinUserAndProductCategory
+      JoinUserAndProductCategory,
     ]),
   ],
   providers: [
