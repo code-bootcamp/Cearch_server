@@ -8,10 +8,11 @@ import { getConnection, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { Comments } from '../comments/entities/comments.entity';
 import { User, USER_ROLE } from '../user/entities/user.entity';
-import { MembersQtInput } from './dto/membersQtBoard.input';
+
 import { QtBoard } from './entities/qt.entity';
 import { Notice } from './entities/notice.entity';
 import { JoinQtBoardAndProductCategory } from './entities/qtTags.entity';
+import { MembersQtInput } from './dto/membersQtBoard.input';
 
 interface IFindOne {
   postId: string;
@@ -195,7 +196,7 @@ export class QtBoardService {
       tags.push(newTag);
 
     }
-    const hashedPassword = await bcrypt.hash(String(password), 1); // 해쉬로 비밀번호 바꿔서 저장
+    const hashedPassword = await bcrypt.hash(password, 10); // 해쉬로 비밀번호 바꿔서 저장
     nonMembersQtInput = {
       ...userInfo,
       qtTags: tags,
@@ -254,7 +255,7 @@ export class QtBoardService {
   async nonMembersUpdate({ postId, nonMembersQtInput }) {
     const { password, qtTags, ...userInfo } = nonMembersQtInput;
     const post = await this.qtBoardRepository.findOne({ id: postId });
-    const hashedPassword = await bcrypt.hash(String(password), 1);
+    const hashedPassword = await bcrypt.hash(password, 10);
     console.log(post);
     const passwordCheck = await bcrypt.compare(password, post.password);
     console.log('passwordCheck : ', passwordCheck);

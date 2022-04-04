@@ -67,13 +67,15 @@
           polling: {
             extraHeaders: {
               Authorization:
-                "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyNjU1OTdiYS03ZTdmLTQxMmQtYmNhYy01NzE3Mjc5M2JjMTgiLCJuYW1lIjoi7ZiE7IiY7LChIiwiZW1haWwiOiJ0bWRndXN0bjA2QG5hdmVyLmNvbSIsInJvbGUiOiJNRU5URUUiLCJpYXQiOjE2NDg5NDI4MDYsImV4cCI6MTY0ODk0NjQwNn0.8txoOEn-1oziWxdtWIpRHlzC1Qwv0wh7y1WpSr1KsE8", //'Bearer h93t4293t49jt34j9rferek...'
+                "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyNjU1OTdiYS03ZTdmLTQxMmQtYmNhYy01NzE3Mjc5M2JjMTgiLCJuYW1lIjoi7ZiE7IiY7LChIiwiZW1haWwiOiJ0bWRndXN0bjA2QG5hdmVyLmNvbSIsInJvbGUiOiJNRU5URUUiLCJpYXQiOjE2NDkwMDc2MDEsImV4cCI6MTY0OTAxMTIwMX0.ha9cwIyHsZa7yyrbW9f9JIbtCNk7gDHkGPlL3YbObYo", //'Bearer h93t4293t49jt34j9rferek...'
             },
           },
         },
       };
       var socket = io("http://localhost:5000", socketOptions);
-
+      socket.on("login expired", function (data) {
+        alert("login expired");
+      });
       socket.on("server message", function (data) {
         console.log("data : ", data);
         $("#chatLog").append("<li> " + data.username + " : " + data + " </li>");

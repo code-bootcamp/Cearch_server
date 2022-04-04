@@ -67,7 +67,11 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
       name: client.data.name,
       chat: message.message,
     });
-    this.server.to(message.roomNum).emit('server message', message.message);
+    const clientMessage = JSON.stringify({
+      message: message.message,
+      userName: client.data.name,
+    });
+    this.server.to(message.roomNum).emit('server message', clientMessage);
   }
 
   @SubscribeMessage('join room')
@@ -102,7 +106,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
       userId: client.data.id,
     });
     console.log('wls : ', logs);
-    this.server.to(client.id).emit('room logs', logs);
+    this.server.to(client.id).emit('room logs', JSON.stringify(logs));
   }
 
   @SubscribeMessage('leave room')

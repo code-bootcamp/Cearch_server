@@ -1,6 +1,10 @@
 import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+<<<<<<< HEAD
 import { Connection, Repository } from 'typeorm';
+=======
+import { Connection, getConnection, getManager, Repository } from 'typeorm';
+>>>>>>> upstream/dev
 import { IcurrentUser } from '../auth/auth.resolver';
 import { MentoInfo } from '../user/entities/mento.entity';
 import { User } from '../user/entities/user.entity';
@@ -39,13 +43,15 @@ export class FollowService {
         const mentoFind = await queryRunner.manager.findOne(MentoInfo, {
           id: mentoId,
         });
+
         const savedMento = await queryRunner.manager.save(MentoInfo, {
           ...mentoFind,
-          follower: mentoFind.follower + 1,
+          follower: mentoFind. + 1,
         });
+
         const result = await queryRunner.manager.save(Follow, {
           follower: userFind,
-          followee: savedMento,
+          followee: mentoFind,
           following: true,
         });
         console.log(result);
@@ -55,26 +61,10 @@ export class FollowService {
       const followFind = await queryRunner.manager.findOne(Follow, {
         id: followInfo.id,
       });
-      let mentorFind = await queryRunner.manager.findOne(MentoInfo, {
-        id: mentoId,
-      });
-
-      if (followFind.following) {
-        mentorFind = await queryRunner.manager.save(MentoInfo, {
-          ...mentorFind,
-          follower: mentorFind.follower - 1,
-        });
-      } else {
-        mentorFind = await queryRunner.manager.save(MentoInfo, {
-          ...mentorFind,
-          follower: mentorFind.follower + 1,
-        });
-      }
-
+      console.log('hellllooooo : ', followFind);
       const result = await queryRunner.manager.save(Follow, {
         ...followFind,
         following: !followFind.following,
-        followee: mentorFind,
       });
       await queryRunner.commitTransaction();
       return result;
@@ -99,6 +89,7 @@ export class FollowService {
 
     console.log('result list : ', result);
     return result;
+
   }
 
   async fetchMostAnswerMentor() {

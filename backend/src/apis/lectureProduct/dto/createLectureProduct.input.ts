@@ -24,4 +24,7 @@ export class CreateLectureProductInput {
 
   @Field(() => String)
   classStartTime!: string
+
+  @Field(() => String)
+  imageURL: string 
 }
