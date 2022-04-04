@@ -34,67 +34,13 @@ export class LectureProductResolver {
     return await this.lectureProductService.findPopular();
   }
 
-  // @Query(() => [SearchLecture])
-  // async fetchLectureSearch(@Args('search') search: string) {
-  //   if (search.length < 2)
-  //     throw new UnprocessableEntityException('두 글자 이상 입력해주세요');
-  //     const result = await this.elasticsearchService.search({
-  //       index: 'lecture', // 테이블명
-  //       from: 0,
-  //       size: 100,
-  //       query: {
-  //         bool: {
-  //           should: [
-  //             {
-  //               match: {
-  //                 classtitle: {
-  //                   query: search,
-  //                   fuzziness: '3',
-  //                 },
-  //               },
-  //             },
-  //             {
-  //               match: {
-  //                 classdescription: {
-  //                   query: search,
-  //                   fuzziness: '3',
-  //                 },
-  //               },
-  //             },
-  //             {
-  //               match: {
-  //                 name: {
-  //                   query: search,
-  //                   fuzziness: '3',
-  //                 },
-  //               },
-  //             },
-  //           ],
-  //         },
-  //       },
-  //     });
-  //     // console.log(result.hits.hits);
-  //     const resultarray = result.hits.hits.map((ele: any) => ({
-  //       id: ele._source.id,
-  //       companyName: ele._source.companyname,
-  //       department: ele._source.department,
-  //       name: ele._source.name,
-  //       classTitle: ele._source.classtitle,
-  //       classDescription: ele._source.classdescription,
-  //       rating: ele._source.rating,
-  //     }));
-  //     console.log(resultarray); 
-     
-  //     return resultarray;
-  // }
-
   @Query(() => [SearchLecture])
   async fetchSearchAuto(@Args('search') search: string) {
     const searchCache = await this.cacheManager.get(`lecture:${search}`);
     if (searchCache) return searchCache;
     else {
       const result = await this.elasticsearchService.search({
-        index: 'lecture', // 테이블명
+        index: 'lecture',
         from: 0,
         size: 100,
         query: {
@@ -120,8 +66,9 @@ export class LectureProductResolver {
       await this.cacheManager.set(`lecture:${search}`, resultarray, { ttl: 600 });
       return resultarray;
   }
+
   }
-  // Create Class
+
   @Mutation(() => LectureProduct)
   @UseGuards(GqlAccessGuard)
   @Role(USER_ROLE.MENTOR)
@@ -136,7 +83,6 @@ export class LectureProductResolver {
     });
   }
 
-  // Find All Class : ReadAll
   @Query(() => [LectureProduct])
   async fetchlectureProducts(
     @Args('page') page: number,
@@ -144,7 +90,6 @@ export class LectureProductResolver {
     return await this.lectureProductService.findAll();
   }
 
-  // Find One Class : ReadOne
   @Query(() => LectureProduct)
   async fetchLectureProduct(
     @Args('lectureproductId') lectureproductId: string, //
@@ -152,13 +97,12 @@ export class LectureProductResolver {
   ) {
     return await this.lectureProductService.findOne({ lectureproductId, page });
   }
-  // Find NewClass : fetching new classes
+
   @Query(() => [LectureProduct])
   async fetchNewClasses() {
     return await this.lectureProductService.findNewClasses();
   }
 
-  // Fetch Selected Tag Class
   @Query(() => [LectureProduct])
   async fetchSelectedTagLectures(
     @Args('lectureproductcategoryname') lectureproductcategoryname: string,
@@ -167,17 +111,15 @@ export class LectureProductResolver {
     return await this.lectureProductService.fetchSelectedTagLectures({lectureproductcategoryname, page});
   }
 
-  // FetchLectureWithMentor : 멘토가 본인이 개설한 수업 찾기
   @Query(() => [LectureProduct])
   @UseGuards(GqlAccessGuard, RoleGuard)
-  @Role(USER_ROLE.MENTOR) // 테스트할땐 Mentee로
+  @Role(USER_ROLE.MENTOR)
   async fetchLectureWithMentor(@CurrentUser() currentuser: IcurrentUser) {
     return await this.lectureProductService.findLectureWithMentor({
       currentuser,
     });
   }
 
-  // FetchLectureWithMentee : 수강중인 수업 찾기
   @Query(() => [LectureProduct])
   @UseGuards(GqlAccessGuard)
   async fetchLectureWithMentee(@CurrentUser() currentuser: IcurrentUser) {
@@ -186,7 +128,6 @@ export class LectureProductResolver {
     });
   }
 
-  // Update Class
   @Mutation(() => LectureProduct)
   @UseGuards(GqlAccessGuard)
   async updateLectureProduct(
@@ -199,20 +140,18 @@ export class LectureProductResolver {
     });
   }
 
-  // Delete Class
   @Mutation(() => Boolean)
   @UseGuards(GqlAccessGuard, RoleGuard)
   @Role(USER_ROLE.MENTOR)
   async deleteLectureProduct(
     @Args('lectureproductId') lectureproductId: string,
-    // @Args('lectureproductcategoryId') lectureproductcategoryId: string
   ) {
     return await this.lectureProductService.delete({ lectureproductId});
   }
 
   @Query(() => LectureProduct)
   async fetchLectureDetail(
-    @Args('lectureId') lectureId: string, //
+    @Args('lectureId') lectureId: string,
   ) {
     return await this.lectureProductService.fetchLectureDetail({ lectureId });
   }

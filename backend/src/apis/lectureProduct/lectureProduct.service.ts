@@ -57,7 +57,6 @@ export class LectureProductService {
         ...rest,
         mentor:mentor
       });
-      //
       const categories = [];
       for (let i = 0; i < classCategories.length; i++) {
         const lecturecategories = classCategories[i].replace('#', '');
@@ -89,8 +88,8 @@ export class LectureProductService {
   async findLectureWithMentor({ currentuser }) {
     const mylecturefinder = await this.lectureProductRepository
       .createQueryBuilder('product')
-      .leftJoinAndSelect('product.joinproductandproductcategory', 'jlpc')
-      .leftJoinAndSelect('jlpc.lectureproductcategory', 'lpc')
+      .innerJoinAndSelect('product.joinproductandproductcategory', 'jlpc')
+      .innerJoinAndSelect('jlpc.lectureproductcategory', 'lpc')
       .leftJoinAndSelect('product.mentor', 'mentor')
       .leftJoinAndSelect('mentor.user', 'user')
       .leftJoinAndSelect('product.registration', 'registration')
@@ -104,8 +103,8 @@ export class LectureProductService {
   async findLectureWithMentee({ currentuser }) {
     const registeredlecturefinder = await this.lectureProductRepository
       .createQueryBuilder('product')
-      .leftJoinAndSelect('product.joinproductandproductcategory', 'jlpc')
-      .leftJoinAndSelect('jlpc.lectureproductcategory', 'lpc')
+      .innerJoinAndSelect('product.joinproductandproductcategory', 'jlpc')
+      .innerJoinAndSelect('jlpc.lectureproductcategory', 'lpc')
       .leftJoinAndSelect('product.mentor', 'mentor')
       .leftJoinAndSelect('mentor.user', 'mentoruser')
       .leftJoinAndSelect('product.registration', 'registration')
@@ -117,13 +116,14 @@ export class LectureProductService {
   }
   
   async findAll() {
-    const workctg = this.mentoinfoRepository.find()
     const result = await this.lectureProductRepository
       .createQueryBuilder('product')
-      .leftJoinAndSelect('product.joinproductandproductcategory', 'jlpc')
-      .leftJoinAndSelect('jlpc.lectureproductcategory', 'lpc')
+      .innerJoinAndSelect('product.joinproductandproductcategory', 'jlpc')
+      .innerJoinAndSelect('jlpc.lectureproductcategory', 'lpc')
       .leftJoinAndSelect('product.mentor', 'mentor')
       .leftJoinAndSelect('mentor.user', 'user')
+      .leftJoinAndSelect('mentor.work', 'work')
+      .leftJoinAndSelect('work.category', 'category')
       .orderBy('product.createdAt', 'DESC')
       .getMany();
     return result;
@@ -132,8 +132,8 @@ export class LectureProductService {
   async findOne({ lectureproductId }: IFindOne) {
     const lecture = await this.lectureProductRepository
       .createQueryBuilder('product')
-      .leftJoinAndSelect('product.joinproductandproductcategory', 'jlpc')
-      .leftJoinAndSelect('jlpc.lectureproductcategory', 'lpc')
+      .innerJoinAndSelect('product.joinproductandproductcategory', 'jlpc')
+      .innerJoinAndSelect('jlpc.lectureproductcategory', 'lpc')
       .leftJoinAndSelect('product.mentor', 'mentor')
       .leftJoinAndSelect('mentor.user', 'user')
       .leftJoinAndSelect('mentor.work', 'work')
@@ -157,8 +157,8 @@ export class LectureProductService {
   async findNewClasses() {
     const findNewClasses = await this.lectureProductRepository
       .createQueryBuilder('product')
-      .leftJoinAndSelect('product.joinproductandproductcategory', 'jlpc')
-      .leftJoinAndSelect('jlpc.lectureproductcategory', 'lpc')
+      .innerJoinAndSelect('product.joinproductandproductcategory', 'jlpc')
+      .innerJoinAndSelect('jlpc.lectureproductcategory', 'lpc')
       .leftJoinAndSelect('product.mentor', 'mentor')
       .leftJoinAndSelect('mentor.user', 'user')
       .take(8)
@@ -195,15 +195,13 @@ export class LectureProductService {
   }
 
   async delete({ lectureproductId }) {
-
     const deletelecture = await this.lectureProductRepository.softDelete({
       id: lectureproductId,
     });
     console.log('삭제완료')
     return deletelecture.affected ? true : false;
   }
-
-  // Fetch Lecture Detail
+  
   async fetchLectureDetail({ lectureId }) {
     const lectureDetail = await this.lectureProductRepository
       .createQueryBuilder('lecture')
