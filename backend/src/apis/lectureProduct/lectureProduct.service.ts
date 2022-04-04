@@ -52,7 +52,6 @@ export class LectureProductService {
         .where('user.id = :id', { id: user.id })
         .getOne();
       const mentor = query.mentor;
-      // console.log('mentor : ', mentor);
     
       const result = await this.lectureProductRepository.save({
         ...rest,
@@ -127,7 +126,6 @@ export class LectureProductService {
       .leftJoinAndSelect('mentor.user', 'user')
       .orderBy('product.createdAt', 'DESC')
       .getMany();
-    // console.log('result : ', result);
     return result;
   }
 
@@ -142,7 +140,6 @@ export class LectureProductService {
       .leftJoinAndSelect('work.category', 'category')
       .where('product.id = :id', { id: lectureproductId })
       .getOne();
-    // console.log(lecture);
     return lecture;
   }
 
@@ -154,8 +151,6 @@ export class LectureProductService {
       .orderBy('lecture.rating', 'DESC')
       .take(8)
       .getMany();
-
-    // console.log('popular : ', popular);
     return popular;
   }
 

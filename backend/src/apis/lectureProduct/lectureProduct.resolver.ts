@@ -20,7 +20,6 @@ export class LectureProductResolver {
   constructor(
     private readonly lectureProductService: LectureProductService,
     private readonly elasticsearchService: ElasticsearchService,
-
   ) {}
 
   // Find Popular Classes
