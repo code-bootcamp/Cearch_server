@@ -172,7 +172,6 @@ export class AuthService {
     const refreshToken = this.jwtService.sign(
       {
         sub: user.id,
-        name: user.name,
         email: user.email,
         role: user.role,
       },
@@ -190,7 +189,6 @@ export class AuthService {
     const accessToken = this.jwtService.sign(
       {
         sub: user.id,
-        name: user.name,
         email: user.email,
         role: user.role,
       },

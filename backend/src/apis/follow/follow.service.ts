@@ -1,6 +1,5 @@
 import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { query } from 'express';
 import { Connection, getConnection, getManager, Repository } from 'typeorm';
 import { IcurrentUser } from '../auth/auth.resolver';
 import { MentoInfo } from '../user/entities/mento.entity';
@@ -40,13 +39,9 @@ export class FollowService {
         const mentoFind = await queryRunner.manager.findOne(MentoInfo, {
           id: mentoId,
         });
-        const savedMento = await queryRunner.manager.save({
-          ...mentoFind,
-          follower: mentoFind.follower + 1,
-        });
         const result = await queryRunner.manager.save(Follow, {
           follower: userFind,
-          followee: savedMento,
+          followee: mentoFind,
           following: true,
         });
         console.log(result);
@@ -56,26 +51,10 @@ export class FollowService {
       const followFind = await queryRunner.manager.findOne(Follow, {
         id: followInfo.id,
       });
-      let mentorFind = await queryRunner.manager.findOne(MentoInfo, {
-        id: mentoId,
-      });
-
-      if (followFind.following) {
-        mentorFind = await queryRunner.manager.save(MentoInfo, {
-          ...mentorFind,
-          follower: mentorFind.follower - 1,
-        });
-      } else {
-        mentorFind = await queryRunner.manager.save(MentoInfo, {
-          ...mentorFind,
-          follower: mentorFind.follower + 1,
-        });
-      }
-
+      console.log('hellllooooo : ', followFind);
       const result = await queryRunner.manager.save(Follow, {
         ...followFind,
         following: !followFind.following,
-        followee: mentorFind,
       });
       await queryRunner.commitTransaction();
       return result;
@@ -89,17 +68,27 @@ export class FollowService {
   }
 
   async fetchMostRecommendMentor() {
-    const result = await this.mentoInfoRepostiory
-      .createQueryBuilder('mento')
-      .innerJoinAndSelect('mento.user', 'user')
-      .innerJoinAndSelect('mento.work', 'work')
-      .innerJoinAndSelect('work.category', 'ctg')
-      .orderBy('mento.follow', 'DESC')
-      .limit(10)
-      .getMany();
-
-    console.log('result list : ', result);
-    return result;
+    const result = await getManager().query(`
+    select followeeId  ,(SELECT COUNT(*) FROM follow f2 )as cnt
+    FROM  follow f
+    GROUP BY f.followeeId
+    ORDER BY cnt DESC
+    LIMIT 10`);
+    console.log(result);
+    const result_list = [];
+    for (const ele of result) {
+      const mentoInfo = await this.mentoInfoRepostiory
+        .createQueryBuilder('mento')
+        .innerJoinAndSelect('mento.user', 'user')
+        .innerJoinAndSelect('mento.work', 'work')
+        .innerJoinAndSelect('work.category', 'ctg')
+        .where('mento.id = :id', { id: ele.followeeId })
+        .getOne();
+      console.log('mentoinfo : ', mentoInfo);
+      result_list.push(mentoInfo);
+    }
+    console.log('result list : ', result_list);
+    return result_list;
   }
 
   async fetchMostAnswerMentor() {
