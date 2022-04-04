@@ -102,7 +102,7 @@ export class FileUploadService {
     const userFind = await this.userRepository.findOne({
       where: { id: user.id },
     });
-    if (userFind == undefined) {
+    if (!userFind.imageUrl) {
       const url = await s3.getSignedUrlPromise('getObject', {
         Bucket: process.env.AWC_S3_BUCKET,
 
