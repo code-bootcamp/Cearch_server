@@ -30,8 +30,7 @@ import { JoinUserAndProductCategory } from '../user/entities/interestUser.entity
       Wallet,
       LectureProductCategory,
       JoinMentoAndProductCategory,
-      JoinLectureAndProductCategory,
-      JoinUserAndProductCategory
+      JoinLectureAndProductCategory
     ]),
     ElasticsearchModule.register({
       node: 'http://elasticsearch:9200',

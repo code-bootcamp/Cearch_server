@@ -1,7 +1,6 @@
 import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { query } from 'express';
-import { Connection, getConnection, getManager, Repository } from 'typeorm';
+import { Connection, Repository } from 'typeorm';
 import { IcurrentUser } from '../auth/auth.resolver';
 import { MentoInfo } from '../user/entities/mento.entity';
 import { User } from '../user/entities/user.entity';
@@ -40,7 +39,7 @@ export class FollowService {
         const mentoFind = await queryRunner.manager.findOne(MentoInfo, {
           id: mentoId,
         });
-        const savedMento = await queryRunner.manager.save({
+        const savedMento = await queryRunner.manager.save(MentoInfo, {
           ...mentoFind,
           follower: mentoFind.follower + 1,
         });
@@ -94,7 +93,7 @@ export class FollowService {
       .innerJoinAndSelect('mento.user', 'user')
       .innerJoinAndSelect('mento.work', 'work')
       .innerJoinAndSelect('work.category', 'ctg')
-      .orderBy('mento.follow', 'DESC')
+      .orderBy('mento.follower', 'DESC')
       .limit(10)
       .getMany();
 
@@ -113,5 +112,16 @@ export class FollowService {
       .getMany();
     console.log(mentorInfo);
     return mentorInfo;
+  }
+
+  async fetchMyFollower({ userId }) {
+    const user = await this.followRepostiory
+      .createQueryBuilder('follow')
+      .innerJoinAndSelect('follow.followee', 'mento')
+      .innerJoinAndSelect('mento.user', 'user')
+      .where('follow.follower = :id', { id: userId })
+      .getMany();
+    console.log('follower : ', user);
+    return user;
   }
 }

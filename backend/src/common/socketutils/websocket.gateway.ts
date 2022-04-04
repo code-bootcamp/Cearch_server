@@ -39,6 +39,8 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
       );
       client.data.id = result.sub;
       client.data.name = result.name;
+
+      console.log('testing : ', result.name);
       await this.socketService.updateSocketId({
         socketId: client.id,
         id: result.sub,
@@ -47,6 +49,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
       console.log(`${client.id} Hi~~`);
     } catch (error) {
+      this.server.to(client.id).emit('login expired', 'expired');
       throw new ConflictException('token validate not fine');
     }
   }
@@ -66,7 +69,11 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
       name: client.data.name,
       chat: message.message,
     });
-    this.server.to(message.roomNum).emit('server message', message.message);
+    const clientMessage = JSON.stringify({
+      message: message.message,
+      userName: client.data.name,
+    });
+    this.server.to(message.roomNum).emit('server message', clientMessage);
   }
 
   @SubscribeMessage('join room')
@@ -101,7 +108,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
       userId: client.data.id,
     });
     console.log('wls : ', logs);
-    this.server.to(client.id).emit('room logs', logs);
+    this.server.to(client.id).emit('room logs', JSON.stringify(logs));
   }
 
   @SubscribeMessage('leave room')

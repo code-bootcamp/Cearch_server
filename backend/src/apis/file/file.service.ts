@@ -49,6 +49,7 @@ const s3 = new AWS.S3({
   secretAccessKey: process.env.AWS_S3_SECRETACCESS_KEY,
   region: process.env.AWS_S3_REGION,
   signatureVersion: process.env.AWS_S3_SIGNATUREVERSION,
+
 });
 
 @Injectable()
@@ -99,19 +100,21 @@ export class FileUploadService {
   }
 
   async getSignedUrlUser({ user }) {
-    const userFinds = await this.userRepository.find({
+    const userFind = await this.userRepository.findOne({
       where: { id: user.id },
     });
+
     const fileNamesList = userFinds.map((user) =>
       s3.getSignedUrlPromise('getObject', {
         Bucket: process.env.AWC_S3_BUCKET,
+
         Expires: 120,
-        Key: user.imageUrl, //img url 추후 문자열처리를 해주어야한다. 우선적으로 진행
-      }),
-    );
-    const urls = await Promise.all(fileNamesList);
-    console.log('urls : ', urls);
-    return urls;
+        Key: userFind.imageUrl, //img url 추후 문자열처리를 해주어야한다. 우선적으로 진행
+      });
+      console.log('urls : ', url);
+      return url;
+    }
+    return 'null';
   }
   ////////////////////////
   async getSignedUrlLecture({ lectureId }) {

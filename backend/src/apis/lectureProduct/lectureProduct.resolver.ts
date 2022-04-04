@@ -1,16 +1,15 @@
+
+import { UseGuards } from '@nestjs/common';
+import { Args, Mutation, Resolver, Query} from '@nestjs/graphql';
 import {
-  UseGuards,
-  CACHE_MANAGER,
-  Inject,
-  UnprocessableEntityException,
-} from '@nestjs/common';
-import { Args, Mutation, Resolver, Query, ID } from '@nestjs/graphql';
-import { CurrentUser } from 'src/common/auth/decorate/currentuser.decorate';
+  CurrentUser,
+} from 'src/common/auth/decorate/currentuser.decorate';
+
 import { Role } from 'src/common/auth/decorate/role.decorate';
 import { GqlAccessGuard } from 'src/common/auth/guard/gqlAuthGuard';
 import { RoleGuard } from 'src/common/auth/guard/roleGuard';
 import { IcurrentUser } from '../auth/auth.resolver';
-import { Cache } from 'cache-manager';
+import { JoinLectureAndProductCategory } from '../lectureproductCategory/entities/lectureproductCagtegoryclassCategory.entity';
 import { USER_ROLE } from '../user/entities/user.entity';
 import { CreateLectureProductInput } from './dto/createLectureProduct.input';
 import { LectureProduct } from './entities/lectureProduct.entity';
@@ -23,8 +22,6 @@ export class LectureProductResolver {
   constructor(
     private readonly lectureProductService: LectureProductService,
     private readonly elasticsearchService: ElasticsearchService,
-    @Inject(CACHE_MANAGER)
-    private readonly cacheManager: Cache,
   ) {}
 
   // Find Popular Classes
@@ -88,6 +85,7 @@ export class LectureProductResolver {
   // }
 
   @Query(() => [SearchLecture])
+
   async fetchSearchAuto(@Args('search') search: string) {
       const result = await this.elasticsearchService.search({
         index: 'lecture', // 테이블명
@@ -116,6 +114,7 @@ export class LectureProductResolver {
       console.log(resultarray);
       return resultarray;
     
+
   }
 
   // Create Class
@@ -135,7 +134,9 @@ export class LectureProductResolver {
 
   // Find All Class : ReadAll
   @Query(() => [LectureProduct])
-  async fetchlectureProducts(@Args('page') page: number) {
+  async fetchlectureProducts(
+    @Args('page') page: number,
+  ) {
     return await this.lectureProductService.findAll();
   }
 
@@ -161,10 +162,7 @@ export class LectureProductResolver {
     @Args('lectureproductcategoryname') lectureproductcategoryname: string,
     @Args('page') page: number,
   ) {
-    return await this.lectureProductService.fetchSelectedTagLectures({
-      lectureproductcategoryname,
-      page,
-    });
+    return await this.lectureProductService.fetchSelectedTagLectures({lectureproductcategoryname, page});
   }
 
   // FetchLectureWithMentor : 멘토가 본인이 개설한 수업 찾기
@@ -179,23 +177,23 @@ export class LectureProductResolver {
 
   // FetchLectureWithMentee : 수강중인 수업 찾기
   @Query(() => [LectureProduct])
-  @UseGuards(GqlAccessGuard, RoleGuard)
-  @Role(USER_ROLE.MENTEE) // 테스트할땐 Mentee로
+  @UseGuards(GqlAccessGuard)
   async fetchLectureWithMentee(@CurrentUser() currentuser: IcurrentUser) {
-    return await this.lectureProductService.findLectureWithMentor({
+    return await this.lectureProductService.findLectureWithMentee({
       currentuser,
     });
   }
 
   // Update Class
   @Mutation(() => LectureProduct)
-  @UseGuards(GqlAccessGuard, RoleGuard)
-  @Role(USER_ROLE.MENTOR, USER_ROLE.MENTEE)
+  @UseGuards(GqlAccessGuard)
   async updateLectureProduct(
     @Args('lectureproductId') lectureproductId: string,
+    createLectureProductInput
   ) {
     return await this.lectureProductService.update({
       lectureproductId,
+      createLectureProductInput
     });
   }
 
@@ -207,7 +205,7 @@ export class LectureProductResolver {
     @Args('lectureproductId') lectureproductId: string,
     // @Args('lectureproductcategoryId') lectureproductcategoryId: string
   ) {
-    return await this.lectureProductService.delete({ lectureproductId });
+    return await this.lectureProductService.delete({ lectureproductId});
   }
 
   @Query(() => LectureProduct)
