@@ -25,7 +25,7 @@ export class Follow {
   followee: MentoInfo;
 
   @Field(() => Boolean)
-  @Column()
+  @Column({ nullable: true })
   following: boolean;
 
   @Field(() => Date)
