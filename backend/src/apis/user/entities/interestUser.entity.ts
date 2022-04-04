@@ -18,14 +18,15 @@ export class JoinUserAndProductCategory {
   // LectureProductCategory와 N:1 연결
   @ManyToOne(
     () => LectureProductCategory,
-    (linkedToLectureProductCategory) => linkedToLectureProductCategory.category,
+    (linkedToLectureProductCategory) => linkedToLectureProductCategory.interest,
+    { nullable: true },
   )
-  @Field(() => LectureProductCategory)
+  @Field(() => LectureProductCategory, { nullable: true })
   linkedToLectureProductCategory: LectureProductCategory;
 
   // LectureProduct와 N:1 연결
-  @ManyToOne(() => User, (user) => user.interest)
-  @Field(() => User)
+  @ManyToOne(() => User, (user) => user.interest, { nullable: true })
+  @Field(() => User, { nullable: true })
   user: User;
 
   @DeleteDateColumn()

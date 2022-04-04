@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { Connection, getConnection, Repository } from 'typeorm';
 import { IcurrentUser } from '../auth/auth.resolver';
+import { CommentsModule } from '../comments/comments.module';
 import { LectureProduct } from '../lectureProduct/entities/lectureProduct.entity';
 import { LectureProductCategory } from '../lectureproductCategory/entities/lectureproductCategory.entity';
 import { MentorForm } from './dto/mentoForm.input';
@@ -37,6 +38,8 @@ export class UserService {
     private readonly mentoInfoRepository: Repository<MentoInfo>,
     @InjectRepository(JoinMentoAndProductCategory)
     private readonly joinMentoAndProductCtgRepository: Repository<JoinMentoAndProductCategory>,
+    @InjectRepository(JoinUserAndProductCategory)
+    private readonly joinUserAndProductCtgRepository: Repository<JoinMentoAndProductCategory>,
     private readonly connection: Connection,
   ) {} //
 
@@ -47,16 +50,22 @@ export class UserService {
     return myMentor;
   }
   async findMyPage({ currentUser }) {
-    const myUser = await this.userRepository.findOne({
-      where: { id: currentUser.id },
-    });
+    const myUser = await getConnection()
+      .createQueryBuilder(User, 'user')
+      .leftJoinAndSelect('user.interest', 'interest')
+      .leftJoinAndSelect(
+        'interest.linkedToLectureProductCategory',
+        'joinCategory',
+      )
+      .where('user.id = :id', { id: currentUser.id })
+      .getOne();
+
     return myUser;
   }
   async findMentoPage({ currentUser }) {
     const myUser = await getConnection()
       .createQueryBuilder(User, 'user')
       .innerJoinAndSelect('user.mentor', 'mentor')
-<<<<<<< HEAD
       .leftJoinAndSelect('user.interest', 'interest')
       .leftJoinAndSelect(
         'interest.linkedToLectureProductCategory',
@@ -66,9 +75,6 @@ export class UserService {
       .leftJoinAndSelect('work.category', 'category')
       .where('user.id = :id', { id: currentUser.id })
       .getOne();
-=======
-      .where('user.id = :id', { id: currentUser.id });
->>>>>>> upstream/dev
     return myUser;
   }
 
@@ -310,15 +316,30 @@ export class UserService {
       await queryRunner.release();
     }
   }
-  async updateUserForm({ user, userForm, category }) {
+  async updateUserForm({ user, updateUserForm, category }) {
     const queryRunner = this.connection.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction('REPEATABLE READ');
     try {
       const userFind = await queryRunner.manager.findOne(User, { id: user.id });
+      const userinterestList = await this.joinUserAndProductCtgRepository
+        .createQueryBuilder('interest')
+        .leftJoinAndSelect(
+          'interest.linkedToLectureProductCategory',
+          'category',
+        )
+        .where('interest.user = :id', { id: userFind.id })
+        .getMany();
+      console.log('userWorkList : ', userinterestList);
+      const workList = userinterestList.map((interest) => {
+        return queryRunner.manager.softDelete(JoinUserAndProductCategory, {
+          id: interest.id,
+        });
+      });
+      await Promise.all(workList);
       const userUpdate = await queryRunner.manager.save(User, {
         ...userFind,
-        ...userForm,
+        ...updateUserForm,
       });
       const joinedCtg = category.map(async (ctg) => {
         const ctgFind = await queryRunner.manager.findOne(
@@ -330,27 +351,83 @@ export class UserService {
         const joinProductCtg = await queryRunner.manager.save(
           JoinUserAndProductCategory,
           {
-            category: ctgFind,
+            linkedToLectureProductCategory: ctgFind,
             user: userUpdate,
           },
         );
+        console.log(joinProductCtg);
         return joinProductCtg;
       });
+
       const joinedCtgPromise = await Promise.all(joinedCtg);
       const saveUserInfo = await queryRunner.manager.save(MentoInfo, {
         ...userUpdate,
         interest: joinedCtgPromise,
       });
+      console.log(saveUserInfo);
       await queryRunner.commitTransaction();
       return saveUserInfo;
     } catch (error) {
       console.log(error);
       await queryRunner.rollbackTransaction();
-      throw new UnprocessableEntityException("can't update MentoInfo");
+      throw new UnprocessableEntityException("can't update UserInfo");
     } finally {
       await queryRunner.release();
     }
   }
+  // async findUserInterest({ currentUser, interestIds }) {
+  //   const queryRunner = this.connection.createQueryRunner();
+  //   await queryRunner.connect();
+  //   await queryRunner.startTransaction('REPEATABLE READ');
+  //   try {
+  //     const userFind = await queryRunner.manager.findOne(User, {
+  //       id: currentUser.id,
+  //     });
+  //     // const userinterestList = await this.joinUserAndProductCtgRepository
+  //     //   .createQueryBuilder('interest')
+  //     //   .leftJoinAndSelect(
+  //     //     'interest.linkedToLectureProductCategory',
+  //     //     'category',
+  //     //   )
+  //     //   .where('interest.user = :id', { id: userFind.id })
+  //     //   .getMany();
+
+  //     // console.log(userinterestList);
+  //     const joinedCtg = interestIds.map(async (interestId) => {
+  //       const userinterestList = await this.joinUserAndProductCtgRepository
+  //         .createQueryBuilder('interest')
+  //         .leftJoinAndSelect(
+  //           'interest.linkedToLectureProductCategory',
+  //           'category',
+  //         )
+  //         .where('interest.user = :id', { id: userFind.id })
+  //         .where('category.id = :cateId', { cateId: interestId })
+  //         .getOne();
+
+  //       console.log(userinterestList);
+  //       return userinterestList;
+  //       // const joinProductCtg = await queryRunner.manager.findOne(
+  //       //   JoinUserAndProductCategory,
+  //       //   {
+  //       //     id: interestId,
+  //       //     user: { id: currentUser.id },
+  //       //   },
+  //       // );
+
+  //       // return joinProductCtg;
+  //     });
+  //     const joinedCtgPromise = await Promise.all(joinedCtg);
+  //     console.log(joinedCtgPromise);
+
+  //     return joinedCtgPromise;
+  //   } catch (error) {
+  //     console.log(error);
+  //     await queryRunner.rollbackTransaction();
+  //     throw new UnprocessableEntityException('관심분야를 찾을 수 없습니다.');
+  //   } finally {
+  //     await queryRunner.release();
+  //   }
+  // }
   async permitLecture({ currentUser, mentorId, lectureId }) {
     const querryRunner = this.connection.createQueryRunner();
     await querryRunner.connect();

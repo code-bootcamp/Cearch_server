@@ -60,10 +60,6 @@ export class LectureProduct {
   @Field(() => Float, { nullable: true })
   rating: number;
 
-  @Column()
-  @Field(() => String, { nullable: true })
-  imageURL: string
-
   @CreateDateColumn()
   @Field(() => Date)
   createdAt!: Date;

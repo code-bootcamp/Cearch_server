@@ -5,6 +5,7 @@ import { LectureProductService } from '../lectureProduct/lectureProduct.service'
 import { JoinLectureAndProductCategory } from '../lectureproductCategory/entities/lectureproductCagtegoryclassCategory.entity';
 import { LectureProductCategory } from '../lectureproductCategory/entities/lectureproductCategory.entity';
 import { LectureProductCategoryService } from '../lectureproductCategory/lectureproductCategory.service';
+import { JoinUserAndProductCategory } from '../user/entities/interestUser.entity';
 import { MentoInfo } from '../user/entities/mento.entity';
 import { User } from '../user/entities/user.entity';
 import { JoinMentoAndProductCategory } from '../user/entities/workMento.entity';
@@ -22,12 +23,8 @@ import { LectureRegistrationService } from './lectureRegistration.service';
       MentoInfo,
       JoinMentoAndProductCategory,
       LectureProductCategory,
-<<<<<<< HEAD
       JoinLectureAndProductCategory,
       JoinUserAndProductCategory,
-=======
-      JoinLectureAndProductCategory
->>>>>>> upstream/dev
     ]),
   ],
   providers: [

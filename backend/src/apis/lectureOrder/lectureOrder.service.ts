@@ -9,12 +9,12 @@ import {
   LectureOrder,
   REGISTRATION_STATUS_ENUM,
 } from './entities/lectureOrder.entity';
-import { IcurrentUser } from '../auth/auth.resolver';
 
 // Interface
 interface IFindOne {
   lectureorderId: string;
-  currentUser: IcurrentUser;
+  lectureRegistrationId;
+  currentuser;
 }
 interface IUpdate {
   lectureOrderId: string;
@@ -37,36 +37,36 @@ export class LectureOrderService {
   ) {}
 
   // Placing order
-  async create({ lectureRegistrationId, currentUser }) {
+  async create({ lectureRegistrationId, currentuser }) {
     // 멘티가 신청서ID 중 하나를 찾아 맞으면 결제
     const queryRunner = this.connection.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction('REPEATABLE READ');
     try {
       // Find currentuser
-      console.log(currentUser);
+      console.log(currentuser);
       const user = await queryRunner.manager.findOne(User, {
-        id: currentUser.id,
+        id: currentuser.id,
       });
       // Find registrationId
-      const order = await getRepository(LectureRegistration)
+      const registration = await getRepository(LectureRegistration)
         .createQueryBuilder('lectureregistration')
-        .leftJoinAndSelect('lectureregistration.product', 'lecproduct')
+        .leftJoinAndSelect('lectureregistration.lecproduct', 'lecproduct')
         .getOne();
       console.log(user);
-      if (user.point >= order.product.classPrice) {
+      if (user.point >= registration.product.classPrice) {
         const payment = await this.lectureOrderRepository.create({
           registrationStatus: REGISTRATION_STATUS_ENUM.PAID,
-          registration: order,
+          order: registration,
         });
         const updateNewuser = await this.userRepository.create({
           ...user,
-          point: user.point - order.product.classPrice,
+          point: user.point - registration.product.classPrice,
         });
         const pointHistory = this.walletRepository.create({
           division: '환불',
           description: '포인트를 환불하셨습니다.',
-          point: -order.product.classPrice,
+          point: -registration.product.classPrice,
           user: user,
         })
         await queryRunner.manager.save(pointHistory);
@@ -85,16 +85,15 @@ export class LectureOrderService {
   }
   // finding all orders
   async findAll() {
-      const findAllOrders = await this.lectureOrderRepository.find({
-        take: 10,
-        order: { createdAt: 'DESC'},
-      })
-    return findAllOrders;
+    const result = await this.lectureOrderRepository.find({
+      relations: ['lectureOrder'],
+    });
+    return await result;
   }
   // finding one order
   async findOne({ lectureorderId }: IFindOne) {
     return await this.lectureOrderRepository.findOne({
-      where: {id: lectureorderId},
+      id: lectureorderId,
     });
   }
   // Update lectureOrder

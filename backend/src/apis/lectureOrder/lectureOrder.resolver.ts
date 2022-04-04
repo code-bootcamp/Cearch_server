@@ -1,9 +1,9 @@
 import { UseGuards } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import {
-  CurrentUser
+  CurrentUser,
+  ICurrentUser,
 } from 'src/common/auth/decorate/currentuser.decorate';
-import { IcurrentUser } from '../auth/auth.resolver';
 import { Role } from 'src/common/auth/decorate/role.decorate';
 import { GqlAccessGuard } from 'src/common/auth/guard/gqlAuthGuard';
 import { RoleGuard } from 'src/common/auth/guard/roleGuard';
@@ -13,41 +13,43 @@ import { LectureOrderService } from './lectureOrder.service';
 
 @Resolver()
 export class LectureOrderResolver {
-  constructor(
-    private readonly lectureOrderService: LectureOrderService
-    
-  ) {}
+  constructor(private readonly lectureOrderService: LectureOrderService) {}
 
   // Placing Order
   @Mutation(() => LectureOrder)
-  @UseGuards(GqlAccessGuard)
+  @UseGuards(GqlAccessGuard, RoleGuard)
+  @Role(USER_ROLE.MENTEE)
   async createlecturePayment(
     @Args('lectureRegistrationId') lectureRegistrationId: string,
-    @CurrentUser() currentUser: IcurrentUser,
+    @CurrentUser() currentuser: ICurrentUser,
   ) {
     return await this.lectureOrderService.create({
-      currentUser,
       lectureRegistrationId,
+      currentuser,
     });
   }
 
   // Fetch Order
   @Query(() => [LectureOrder])
-  @UseGuards(GqlAccessGuard)
+  @UseGuards(GqlAccessGuard, RoleGuard)
+  @Role(USER_ROLE.MENTEE)
   async fetchlectureOrders() {
     return await this.lectureOrderService.findAll();
   }
 
   // Fetch Orders
   @Query(() => LectureOrder)
-  @UseGuards(GqlAccessGuard)
+  @UseGuards(GqlAccessGuard, RoleGuard)
+  @Role(USER_ROLE.MENTEE)
   async fetchlectureOrder(
     @Args('lectureorderId') lectureorderId: string,
-    @CurrentUser() currentUser: IcurrentUser
+    @Args('lectureRegistrationId') lectureRegistrationId: string,
+    @CurrentUser() currentuser: ICurrentUser,
   ) {
     return await this.lectureOrderService.findOne({
       lectureorderId,
-      currentUser,
+      lectureRegistrationId,
+      currentuser,
     });
   }
 

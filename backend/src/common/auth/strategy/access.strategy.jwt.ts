@@ -26,27 +26,23 @@ export class JwtAccessStrategy extends PassportStrategy(
   }
   async validate(req, payload) {
     console.log(req.headers.cookie);
-    const accessToken = req.headers.authorization.replace('Bearer ', '');
+    const refreshToken = req.headers.cookie.replace('refreshToken=', '');
+    console.log('strategy refresh : ', refreshToken);
     try {
-      const isAccess = await this.cacheManager.get(
-        `accessToken:${accessToken}`,
-      ); // refresh가 없는경우 access 와 상관없이 false
-      console.log(isAccess);
-      if (isAccess) {
-        console.log('여기로 들어가면 안되는데');
+      const isRefresh = await this.cacheManager.get(`refresh:${refreshToken}`); // refresh가 없는경우 access 와 상관없이 false
+      console.log(isRefresh);
+      if (isRefresh) {
         return false;
       }
       return {
         id: payload.sub,
         email: payload.email,
         role: payload.role,
-<<<<<<< HEAD
         name: payload.name,
         exp: payload.exp,
-=======
->>>>>>> upstream/dev
       };
     } catch (error) {
+      console.log(error);
       throw new UnprocessableEntityException('REDIS cant get or push info');
     }
   }

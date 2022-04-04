@@ -73,9 +73,9 @@ export class LectureRegistration {
   @Field(() => LectureProduct)
   product: LectureProduct;
 
-  @OneToMany(() => LectureOrder, (order) => order.registration)
-  @Field(() => LectureOrder, {nullable: true})
-  order: LectureOrder;
+  @OneToMany(() => LectureOrder, (registration) => registration.order)
+  @Field(() => LectureOrder)
+  registration: LectureOrder;
 
   @ManyToOne(() => User, (user) => user.registration)
   @Field(() => User)
