@@ -30,6 +30,8 @@ export class AuthController {
     @Req() req: Request, //
     @Res() res: Response,
   ) {
-    await this.login(req, res);
+    // const user = await this.userService.findOne({ email: req.user.email })
+    // if(!user) return req.user
+    return await this.login(req, res);
   }
 }

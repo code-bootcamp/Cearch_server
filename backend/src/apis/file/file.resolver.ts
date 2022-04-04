@@ -3,6 +3,7 @@ import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { CurrentUser } from 'src/common/auth/decorate/currentuser.decorate';
 import { GqlAccessGuard } from 'src/common/auth/guard/gqlAuthGuard';
 import { IcurrentUser } from '../auth/auth.resolver';
+import { CertificateImage } from '../certificateImage/entities/certificate.entity';
 import { LectureImage } from '../LectureImage/entities/lectureImage.entity';
 import { PostImage } from '../postImage/entities/postImage.entity';
 import { User } from '../user/entities/user.entity';
@@ -27,7 +28,8 @@ export class FileUploadResolver {
     });
   }
 
-  @Query(() => [String])
+  @Query(() => String)
+  @UseGuards(GqlAccessGuard)
   async getSignedUrlUser(
     @CurrentUser() currentUser: IcurrentUser, //
   ) {
@@ -80,7 +82,7 @@ export class FileUploadResolver {
       lectureId,
     });
   }
-  ////////////
+  ////////////////
   @Query(() => [String])
   @UseGuards(GqlAccessGuard)
   async putSignedUrlQt(
@@ -111,6 +113,40 @@ export class FileUploadResolver {
     return await this.fileUploadService.urlToDbQt({
       filePaths,
       qTId,
+    });
+  }
+  /////////////////
+  @Query(() => [String])
+  @UseGuards(GqlAccessGuard)
+  async putSignedUrlCertificate(
+    @Args({ name: 'fileNames', type: () => [String] }) fileNames: string[], //
+    @CurrentUser() currentUser: IcurrentUser,
+  ) {
+    return await this.fileUploadService.putSignedUrl({
+      fileNames,
+      id: currentUser.id,
+      purpose: URL_PURPOSE.CERTIFICATE,
+    });
+  }
+
+  @Query(() => [String])
+  async getSignedUrlCertificate(
+    @Args('mentoId') mentoId: string, //
+  ) {
+    return await this.fileUploadService.getSignedUrlCertification({
+      mentoId,
+    });
+  }
+
+  @Mutation(() => [CertificateImage])
+  @UseGuards(GqlAccessGuard)
+  async urlToDbCertificate(
+    @Args({ name: 'filePaths', type: () => [String] }) filePaths: string[],
+    @CurrentUser() currentUser: IcurrentUser, //
+  ) {
+    return await this.fileUploadService.urlToDbCertificate({
+      filePaths,
+      user: currentUser,
     });
   }
 }

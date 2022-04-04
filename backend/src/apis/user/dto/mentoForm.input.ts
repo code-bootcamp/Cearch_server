@@ -4,6 +4,6 @@ import { MentoInfo } from '../entities/mento.entity';
 @InputType()
 export class MentorForm extends PickType(
   MentoInfo,
-  ['companyName', 'department', 'selfIntro'],
+  ['companyName', 'department', 'selfIntro', 'onlineTime'],
   InputType,
 ) {}

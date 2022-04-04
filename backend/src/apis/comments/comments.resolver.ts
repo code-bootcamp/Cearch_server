@@ -22,8 +22,19 @@ export class CommentsResolver {
   }
 
   @Query(() => [Comments])
-  async fetchReComments(@Args('commentId') commentId: string) {
-    return await this.commentsService.findAllReComment({ commentId });
+  async fetchComments(
+    @Args('postId') postId: string,
+    @Args('page') page: number,
+  ) {
+    return await this.commentsService.findOne({ postId, page });
+  }
+
+  @Query(() => [Comments])
+  async fetchReComments(
+    @Args('commentId') commentId: string,
+    @Args('page') page: number,
+  ) {
+    return await this.commentsService.findAllReComment({ commentId, page });
   }
 
   @UseGuards(GqlAccessGuard)
@@ -35,6 +46,7 @@ export class CommentsResolver {
   ) {
     return await this.commentsService.create({ currentuser, postId, contents });
   }
+
   @Mutation(() => Comments)
   @UseGuards(GqlAccessGuard)
   async updateComments(

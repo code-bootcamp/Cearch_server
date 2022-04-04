@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Connection, Repository } from 'typeorm';
 import { LectureProduct } from '../lectureProduct/entities/lectureProduct.entity';
 import { User } from '../user/entities/user.entity';
+import { IcurrentUser } from '../auth/auth.resolver';
 import { CreateLectureRegistrationInput } from './dto/createLectureRegistration.input';
 import { UpdateLectureRegistrationInput } from './dto/updateLectureRegistration.input';
 import { LectureRegistration } from './entitites/lectureRegistration.entity';
@@ -10,49 +11,71 @@ import { LectureRegistration } from './entitites/lectureRegistration.entity';
 // Interface
 interface ICreate {
   createLectureRegistrationInput: CreateLectureRegistrationInput;
-  lectureproductId: string
-  currentuser: any;
+  productId: string,
+  user: IcurrentUser;
 }
 interface IFindOne {
   lectureRegistrationId: string;
-  // currentuser
 }
 interface IUpdate {
   lectureRegistrationId: string;
   updatelectureRegistrationInput: UpdateLectureRegistrationInput;
-  // currentuser,
 }
 @Injectable()
 export class LectureRegistrationService {
   constructor(
     @InjectRepository(LectureRegistration)
     private readonly lectureRegistrationRepository: Repository<LectureRegistration>,
-  
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-
     @InjectRepository(LectureProduct)
-    private readonly lectureproductRepository: Repository<LectureProduct>
-    ){}
+    private readonly lectureproductRepository: Repository<LectureProduct>,
+
+    private readonly connection: Connection,
+  ) {}
 
   // Create Registration Form
-  async create({createLectureRegistrationInput, currentuser, lectureproductId}: ICreate) {
-    const user = await this.userRepository.findOne({ id: currentuser.id });
-    const lecture = await this.lectureproductRepository.findOne({ id:lectureproductId })
-    return await this.lectureRegistrationRepository.save({...createLectureRegistrationInput, lecproduct:lecture, user});
+  async create({user, createLectureRegistrationInput, productId}: ICreate) {
+    const queryRunner = this.connection.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction('REPEATABLE READ');
+    try{
+      const currentuser = await this.userRepository
+        .createQueryBuilder('user')
+        .where('user.id = :id', { id: user.id })
+        .getOne()
+      console.log('currentuser : ', currentuser)
+
+      const product = await this.lectureproductRepository.findOne({id: productId})
+      const result = await this.lectureRegistrationRepository.create({
+        ...createLectureRegistrationInput,
+        user: currentuser,
+        product: product
+      })
+      await queryRunner.manager.save(result)
+      await queryRunner.commitTransaction()
+      console.log('신청완료되었습니다')
+      return result
+    } catch(error){
+      await queryRunner.rollbackTransaction()
+      throw error
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   // Find All Registration Forms: ReadAll
   async findAll() {
     const result = await this.lectureRegistrationRepository.find({
-      relations: ['lectureRegistration'],
+      take: 10,
+      order: { createdAt: 'DESC'},
     });
     return await result;
   }
 
   async findOne({ lectureRegistrationId }: IFindOne) {
     return await this.lectureRegistrationRepository.findOne({
-      id: lectureRegistrationId,
+      where: {id: lectureRegistrationId},
     });
   }
 

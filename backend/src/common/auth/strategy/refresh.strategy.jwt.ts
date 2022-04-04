@@ -24,7 +24,6 @@ export class JwtRefreshStrategy extends PassportStrategy(
     });
   }
   async validate(req, payload) {
-    console.log('refressh req header : ', payload);
     const refreshToken = req.headers.cookie.replace('refreshToken=', '');
     console.log('strategy refresh : ', refreshToken);
     try {
@@ -40,6 +39,7 @@ export class JwtRefreshStrategy extends PassportStrategy(
         exp: payload.exp,
       };
     } catch (error) {
+      console.log(error);
       throw new UnprocessableEntityException('REDIS cant get or push info');
     }
   }

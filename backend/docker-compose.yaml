@@ -9,11 +9,12 @@ services:
       - ./src:/backend/src
     ports:
       - '3000:3000'
-    volumes:
-      - ./src:/backend/src
-      - ./.env:/backend/.env
+      - '5000:5000'
+  # volumes:
+  #   - ./src:/backend/src
+  #   - ./.env:/backend/.env
 
-  my_db:
+  my-db:
     platform: linux/amd64
     image: 'mysql:latest'
     environment:
@@ -28,7 +29,28 @@ services:
     ports:
       - '3307:3306'
 
-  my_redis:
+  my-redis:
     image: 'redis:latest'
     ports:
       - '6000:6379'
+
+  #   elasticsearch:
+  #     image: elasticsearch:7.17.0
+  #     environment:
+  #       discovery.type: single-node
+  #     ports:
+  #       - 9200:9200
+
+  my-mongo:
+    image: 'mongo:latest'
+    ports:
+      - '27017:27017'
+
+  # logstash:
+  #   image: logstash:7.17.0
+  #   volumes:
+  #     - ./elk/logstash/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+  #     - ./elk/logstash/mysql-connector-java-8.0.28.jar:/usr/share/logstash/mysql-connector-java-8.0.28.jar
+  #     - ./elk/logstash/custom_template.json:/_templates/qtboard/custom_template.json
+  #     - ./elk/logstash/mentor_template.json:/_templates/mentor/mentor_template.json
+  #     - ./elk/logstash/lecture_template.json:/_templates/lecture/lecture_template.json

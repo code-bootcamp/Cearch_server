@@ -1,6 +1,6 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { LectureProduct } from 'src/apis/lectureProduct/entities/lectureProduct.entity';
-import { Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { LectureProductCategory } from './lectureproductCategory.entity';
 
 @Entity()
@@ -10,19 +10,29 @@ export class JoinLectureAndProductCategory {
   @Field(() => String)
   id: string;
 
-  // LectureProductCategory와 N:1 연결
-  @ManyToOne(
-    () => LectureProductCategory,
-    (linkedToLectureProductCategory) => linkedToLectureProductCategory.category,
-  )
-  @Field(() => LectureProductCategory)
-  linkedToLectureProductCategory: LectureProductCategory;
-
   // LectureProduct와 N:1 연결
+  @JoinColumn()
   @ManyToOne(
     () => LectureProduct,
-    (linkedToLectureProduct) => linkedToLectureProduct.lecproduct,
+    (lectureproduct) => lectureproduct.joinproductandproductcategory,
   )
   @Field(() => LectureProduct)
-  linkedToLectureProduct: LectureProduct;
+  lectureproduct: LectureProduct;
+
+  // LectureProductCategory와 N:1 연결
+  @JoinColumn()
+  @ManyToOne(
+    () => LectureProductCategory,
+    (lectureproductcategory) => lectureproductcategory.category,
+  )
+  @Field(() => LectureProductCategory)
+  lectureproductcategory: LectureProductCategory;
+
+  @CreateDateColumn()
+  @Field(() => Date)
+  createdAt!: Date;
+
+  @DeleteDateColumn()
+  @Field(() => Date)
+  deletedAt?: Date;
 }

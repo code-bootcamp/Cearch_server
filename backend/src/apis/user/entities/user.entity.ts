@@ -15,6 +15,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { JoinUserAndProductCategory } from './interestUser.entity';
 import { MentoInfo } from './mento.entity';
 
 export enum USER_ROLE {
@@ -85,9 +86,7 @@ export class User {
   @Field(() => Date)
   deleteDate: Date;
 
-  @OneToMany(() => QtBoard, (qt) => qt.user, {
-    cascade: true,
-  })
+  @OneToMany(() => QtBoard, (qt) => qt.user, {})
   @Field(() => [QtBoard])
   qtBoard: QtBoard[];
 
@@ -96,7 +95,8 @@ export class User {
   comments: Comments[];
 
   @JoinColumn()
-  @OneToOne(() => MentoInfo)
+  @OneToOne(() => MentoInfo, (mentoInfo) => mentoInfo.user)
+  @Field(() => MentoInfo)
   mentor: MentoInfo;
 
   @OneToMany(() => Likes, (like) => like.user)
@@ -107,8 +107,15 @@ export class User {
   @Field(() => [LectureReview])
   reviews: LectureReview[];
 
-  @OneToMany(() => LectureRegistration, (registration) => registration.user)
-  @Field(() =>[LectureRegistration])
-  registration: LectureRegistration[];
+  @OneToMany(
+    () => JoinUserAndProductCategory,
+    (joinUserAndProductCategory) => joinUserAndProductCategory.user,
+    { nullable: true },
+  )
+  @Field(() => [JoinUserAndProductCategory], { nullable: true })
+  interest: JoinUserAndProductCategory[];
 
+  @OneToMany(() => LectureRegistration, (registration) => registration.user)
+  @Field(() => [LectureRegistration])
+  registration: LectureRegistration[];
 }

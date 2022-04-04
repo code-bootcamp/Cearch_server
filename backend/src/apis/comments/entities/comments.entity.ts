@@ -18,7 +18,7 @@ export class Comments {
   @Field(() => String)
   id!: string;
 
-  @Column()
+  @Column({ type: 'longtext' })
   @Field(() => String)
   contents!: string;
 
@@ -28,11 +28,11 @@ export class Comments {
   @Field(() => Int, { nullable: true })
   isPick!: number;
 
-  @Column({ default: 0 })
-  @Field(() => Int)
+  @Column({ default: 0, nullable: true })
+  @Field(() => Int, { nullable: true })
   depth!: number;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, default: '1' })
   @Field(() => String, { nullable: true })
   parent: string;
 
@@ -53,8 +53,7 @@ export class Comments {
   deletedAt?: Date;
 
   @ManyToOne(() => QtBoard, (qtBoard) => qtBoard.comments, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
+    nullable: true,
   })
   @Field(() => QtBoard)
   qtBoard: QtBoard;

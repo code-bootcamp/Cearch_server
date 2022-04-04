@@ -25,11 +25,13 @@ export class PointResolver {
   @Mutation(() => Point)
   async chargePoint(
     @Args('impUid') impUid: string,
-    @Args('amount') myamount: number,
+    @Args('myamount') myamount: number,
     @CurrentUser() currentuser: ICurrentUser,
   ) {
     const token = await this.iamportService.getIamportToken();
-    await this.iamportService.checkPaid({ impUid, myamount, token });
+    console.log(token)
+    const aa =await this.iamportService.checkPaid({ impUid, myamount, token });
+    console.log("💕",aa)
     return await this.pointService.create({ impUid, myamount, currentuser });
   }
 

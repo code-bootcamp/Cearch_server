@@ -7,6 +7,7 @@ import {
   UnprocessableEntityException,
 } from '@nestjs/common';
 import { User } from '../user/entities/user.entity';
+import { Wallet } from '../wallet/entities/wallet.entity';
 
 @Injectable()
 export class PointService {
@@ -15,6 +16,8 @@ export class PointService {
     private readonly pointRepository: Repository<Point>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(Wallet)
+    private readonly walletRepository: Repository<Wallet>,
 
     private readonly connection: Connection,
   ) {}
@@ -40,6 +43,7 @@ export class PointService {
         impUid: impUid,
       });
       if (myPoint) throw new ConflictException('이미 결제된 아이디입니다.');
+
       // 2. 거래기록 생성
       const pointPayment = await this.pointRepository.create({
         impUid: impUid,
@@ -55,8 +59,14 @@ export class PointService {
         ...user,
         point: user.point + myamount,
       });
+      const pointHistory = this.walletRepository.create({
+        division: '충전',
+        description: '포인트를 충전하셨습니다.',
+        point: +myamount,
+        user: user,
+      });
 
-      // await queryRunner.manager.save(updatePoint);
+      await queryRunner.manager.save(pointHistory);
       await queryRunner.manager.save(pointPayment);
       await queryRunner.commitTransaction();
       return pointPayment;
@@ -81,7 +91,6 @@ export class PointService {
       if (myPoint) throw new ConflictException('이미 취소된 결제아이디입니다.');
 
       //취소하기에 내 포인트 잔액이 충분한지
-      console.log('😂', currentuser);
 
       const currentPoint = await queryRunner.manager.findOne(Point, {
         impUid: impUid,
@@ -104,8 +113,16 @@ export class PointService {
       });
       await this.userRepository.save({
         ...user,
-        point: user.point + amount,
+        point: user.point - amount,
       });
+
+      const pointHistory = this.walletRepository.create({
+        division: '환불',
+        description: '포인트를 환불하셨습니다.',
+        point: -amount,
+        user: user,
+      });
+      await queryRunner.manager.save(pointHistory);
       await queryRunner.manager.save(pointCancel);
       await queryRunner.commitTransaction();
       return pointCancel;

@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: codecearch
+  labels:
+    app: k8s-configmap
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: k8s-configmap
+  template:
+    metadata:
+      labels:
+        app: k8s-configmap
+    spec:
+      containers:
+        - name: k8s-configmap
+          image: 192.168.123.141:5000/middleware/springboot/configmap:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          env:
+            - name: LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  name: loglevel-configmap
+                  key: loglevel

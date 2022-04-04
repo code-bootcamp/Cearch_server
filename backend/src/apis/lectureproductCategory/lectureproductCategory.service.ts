@@ -1,13 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { CreateLectureProductCategoryInput } from './dto/createLectureProductCategory.input';
+
 import { LectureProductCategory } from './entities/lectureproductCategory.entity';
 
 // Interface
-interface ICreate {
-  createLectureProductCategoryInput: CreateLectureProductCategoryInput;
-}
 interface IFindOne {
   lectureproductCategoryId: string;
 }

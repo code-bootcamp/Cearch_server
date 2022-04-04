@@ -16,6 +16,41 @@ export class LikesService {
     private readonly connection: Connection,
   ) {}
 
+  async islike({ currentuser, postId }) {
+    const queryRunner = this.connection.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction('REPEATABLE READ');
+
+    try {
+      const post = await queryRunner.manager.findOne(QtBoard, {
+        id: postId,
+      });
+      console.log(post);
+      const user = await queryRunner.manager.findOne(User, {
+        id: currentuser.id,
+      });
+      console.log(user);
+      const userLike = await queryRunner.manager.findOne(Likes, {
+        qtBoard: post,
+        user: user,
+      });
+      console.log(userLike);
+      if (!userLike) return false;
+      if (userLike.isLike === true) {
+        await queryRunner.commitTransaction();
+        return true;
+      } else if (userLike.isLike === false) {
+        await queryRunner.commitTransaction();
+        return false;
+      }
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
   async likes({ currentuser, postId }) {
     const queryRunner = this.connection.createQueryRunner();
     await queryRunner.connect();

@@ -19,28 +19,44 @@ import { PointModule } from './apis/point/point.module';
 import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { FileUploadModule } from './apis/file/file.module';
+import { FollowModule } from './apis/follow/follow.module';
+import { LectureReviewModule } from './apis/lectureReview/lectureReview.module';
+import { WalletModule } from './apis/wallet/wallet.module';
+import { SocketModule } from './apis/socket.io/module.socket';
+import { SocketGateway } from './common/socketutils/websocket.gateway';
+import { MongooseModule } from '@nestjs/mongoose';
+// import { SocketModule } from './socket.io/module.socket';
 
 @Module({
   imports: [
+    WalletModule,
     LikesModule,
     AuthModule,
     UserModule,
     QtBoardModule,
     CommentsModule,
     PointModule,
+    LectureReviewModule,
     LectureProductModule,
     LectureProductCategoryModule,
     LectureRegistrationModule,
     LectureOrderModule,
     FileUploadModule,
+    FollowModule,
+    SocketModule,
     GraphQLModule.forRoot<ApolloDriverConfig>({
       autoSchemaFile: '/src/grapqhql/schema.gql',
       context: ({ req, res }) => ({ req, res }),
       driver: ApolloDriver,
+      cors: {
+        credential: true,
+        origin: true,
+      },
     }),
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: 'my_db',
+      host: 'my-db',
+      port: 3306,
       database: 'test_db',
       username: 'root',
       password: '0000',
@@ -50,9 +66,13 @@ import { FileUploadModule } from './apis/file/file.module';
     }),
     CacheModule.register<RedisClientOptions>({
       store: redisStore,
-      url: 'redis://my_redis:6379',
+      url: 'redis://my-redis:6379',
       isGlobal: true,
     }),
+    MongooseModule.forRoot(`mongodb://my-mongo:27017`),
+    // ConfigModule.forRoot({
+    //   isGlobal: true,
+    // }),
   ],
   controllers: [AppController],
   providers: [AppService, JwtAccessStrategy, JwtRefreshStrategy],
