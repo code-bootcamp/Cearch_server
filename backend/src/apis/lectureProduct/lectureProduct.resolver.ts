@@ -1,8 +1,10 @@
+
 import { UseGuards } from '@nestjs/common';
 import { Args, Mutation, Resolver, Query} from '@nestjs/graphql';
 import {
   CurrentUser,
 } from 'src/common/auth/decorate/currentuser.decorate';
+
 import { Role } from 'src/common/auth/decorate/role.decorate';
 import { GqlAccessGuard } from 'src/common/auth/guard/gqlAuthGuard';
 import { RoleGuard } from 'src/common/auth/guard/roleGuard';
@@ -28,35 +30,91 @@ export class LectureProductResolver {
     return await this.lectureProductService.findPopular();
   }
 
+  // @Query(() => [SearchLecture])
+  // async fetchLectureSearch(@Args('search') search: string) {
+  //   if (search.length < 2)
+  //     throw new UnprocessableEntityException('두 글자 이상 입력해주세요');
+  //     const result = await this.elasticsearchService.search({
+  //       index: 'lecture', // 테이블명
+  //       from: 0,
+  //       size: 100,
+  //       query: {
+  //         bool: {
+  //           should: [
+  //             {
+  //               match: {
+  //                 classtitle: {
+  //                   query: search,
+  //                   fuzziness: '3',
+  //                 },
+  //               },
+  //             },
+  //             {
+  //               match: {
+  //                 classdescription: {
+  //                   query: search,
+  //                   fuzziness: '3',
+  //                 },
+  //               },
+  //             },
+  //             {
+  //               match: {
+  //                 name: {
+  //                   query: search,
+  //                   fuzziness: '3',
+  //                 },
+  //               },
+  //             },
+  //           ],
+  //         },
+  //       },
+  //     });
+  //     // console.log(result.hits.hits);
+  //     const resultarray = result.hits.hits.map((ele: any) => ({
+  //       id: ele._source.id,
+  //       companyName: ele._source.companyname,
+  //       department: ele._source.department,
+  //       name: ele._source.name,
+  //       classTitle: ele._source.classtitle,
+  //       classDescription: ele._source.classdescription,
+  //       rating: ele._source.rating,
+  //     }));
+  //     console.log(resultarray); 
+     
+  //     return resultarray;
+  // }
+
   @Query(() => [SearchLecture])
-  async fetchLectureSearch(
-    @Args('search') search: string) {
-    const result = await this.elasticsearchService.search({
-      index: 'lecture', // 테이블명
-      query: {
-        bool: {
-          should: [
-            { match: { classTitle: search } },
-            { match: { classDescription: search } },
-            { match: { name: search } },
-          ],
+
+  async fetchSearchAuto(@Args('search') search: string) {
+      const result = await this.elasticsearchService.search({
+        index: 'lecture', // 테이블명
+        from: 0,
+        size: 100,
+        query: {
+          bool: {
+            should: [
+              { prefix: { classtitle: search } },
+              { prefix: { classdescription: search } },
+              { prefix: { name: search } },
+            ],
+          },
         },
-      },
-    });
-    console.log(result);
-    const resultarray = result.hits.hits.map((ele: any) => ({
-      id: ele._source.id,
-      companyName: ele._source.companyName,
-      department: ele._source.department,
-      name: ele._source.name,
-      selfIntro: ele._source.selfIntro,
-      classTitle: ele._source.classTitle,
-      classDescription: ele._source.classDescription,
-      rating: ele._source.rating,
-    }));
-    console.log(resultarray);
-    if (!resultarray) throw '검색결과가 없습니다.';
-    return resultarray;
+      });
+      // console.log(result.hits.hits);
+      const resultarray = result.hits.hits.map((ele: any) => ({
+        id: ele._source.id,
+        companyName: ele._source.companyname,
+        department: ele._source.department,
+        name: ele._source.name,
+        classTitle: ele._source.classtitle,
+        classDescription: ele._source.classdescription,
+        rating: ele._source.rating,
+      }));
+      console.log(resultarray);
+      return resultarray;
+    
+
   }
 
   // Create Class
@@ -68,13 +126,6 @@ export class LectureProductResolver {
     createLectureProductInput: CreateLectureProductInput,
     @CurrentUser() currentUser: IcurrentUser,
   ) {
-    // await this.elasticsearchService.create({
-    //   id: 'myid1', //nosql
-    //   index: 'lecture', // 테이블이나 컬렉션을 의미
-    //   document: {
-    //     ...createLectureProductInput,
-    //   },
-    // });
     return await this.lectureProductService.create({
       user: currentUser,
       createLectureProductInput,

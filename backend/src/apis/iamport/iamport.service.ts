@@ -14,9 +14,8 @@ export class IamportService {
       const getToken = await axios.post(
         'https://api.iamport.kr/users/getToken',
         {
-          imp_key: '2237209758798240', // REST API키
-          imp_secret:
-            '763a75859d56d8d32fad04ad7ff1b75fb6368ac9f1f93fb3de6b1f39c3773c04e08e7186f870d7d3', // REST API Secret
+          imp_key: process.env.IAMPORT_API_KEY, // REST API키
+          imp_secret: process.env.IAMPORT_SECRET,
         },
       );
       const { access_token } = getToken.data.response;

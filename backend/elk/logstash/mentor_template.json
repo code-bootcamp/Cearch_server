@@ -12,7 +12,7 @@
       "tokenizer": {
         "my_ngram_tokenizer": {
           "type": "nGram",
-          "min_gram": "1",
+          "min_gram": "2",
           "max_gram": "10"
         }
       }
@@ -21,7 +21,7 @@
   },
   "mappings": {
     "properties": {
-     "name": {
+      "name": {
         "type": "text",
         "analyzer": "my_ngram_analyzer",
         "search_analyzer": "standard"

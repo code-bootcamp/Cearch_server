@@ -1,4 +1,9 @@
-import { UseGuards, CACHE_MANAGER, Inject } from '@nestjs/common';
+import {
+  UseGuards,
+  CACHE_MANAGER,
+  Inject,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { Args, Mutation, Int, Query, Resolver } from '@nestjs/graphql';
 import { CurrentUser } from 'src/common/auth/decorate/currentuser.decorate';
 import { Role } from 'src/common/auth/decorate/role.decorate';
@@ -29,57 +34,53 @@ export class UserResolver {
   ) {}
 
   @Query(() => Int)
+  async fetchNewUserCount(@Args('date') date: string) {
+    return await this.userService.findSignInCount({ date });
+  }
+
+  @Query(() => Int)
   async fetchAllMentorCount() {
     return await this.userService.findMentorCount();
   }
 
   @Query(() => [SearchMento])
   async fetchHomeSearch(@Args('search') search: string) {
-    // const searchCache = await this.cacheManager.get(`mentor:${search}`);
-    // if (searchCache) return searchCache;
-    // else {
-    const result = await this.elasticsearchService.search({
-      index: 'mentor', // 테이블명
-      sort: ['_score'],
-      from: 0,
-      size: 100,
-      query: {
-        bool: {
-          must: [
-            { match: { name: search } },
-            { match: { role: 'MENTOR' } },
-            { match: { mentostatus: 'AUTHORIZED' } },
-          ],
-        },
-      },
-    });
-    const resultarray = result.hits.hits.map((ele: any) => ({
-      id: ele._source.id,
-      companyName: ele._source.companyname,
-      department: ele._source.department,
-      name: ele._source.name,
-      selfIntro: ele._source.selfintro,
-    }));
-    console.log(resultarray);
-    // await this.cacheManager.set(`mentor:${search}`, resultarray, {
-    //   ttl: 60,
-    // });
-    if (!resultarray) throw '검색결과가 없습니다.';
-    return resultarray;
-    // }
-  }
+    if (search.length < 2)
+      throw new UnprocessableEntityException('두 글자 이상 입력해주세요');
 
-  // @Query(() => LectureProductCategory)
-  // @UseGuards(GqlAccessGuard)
-  // async fetchUserInterest(
-  //   @Args({ name: 'interestIds', type: () => [String] }) interestIds: string[],
-  //   @CurrentUser() currentUser: IcurrentUser,
-  // ) {
-  //   return await this.userService.findUserInterest({
-  //     currentUser,
-  //     interestIds,
-  //   });
-  // }
+    const searchCache = await this.cacheManager.get(`mentor:${search}`);
+    if (searchCache) return searchCache;
+    else {
+      const result = await this.elasticsearchService.search({
+        index: 'mentor', // 테이블명
+        sort: ['_score'],
+        from: 0,
+        size: 100,
+        query: {
+          bool: {
+            must: [
+              { match: { name: search } },
+              { match: { role: 'MENTOR' } },
+              { match: { mentostatus: 'AUTHORIZED' } },
+            ],
+          },
+        },
+      });
+      const resultarray = result.hits.hits.map((ele: any) => ({
+        id: ele._source.id,
+        companyName: ele._source.companyname,
+        department: ele._source.department,
+        name: ele._source.name,
+        selfIntro: ele._source.selfintro,
+      }));
+      console.log(resultarray);
+      await this.cacheManager.set(`mentor:${search}`, resultarray, {
+        ttl: 10,
+      });
+      if (!resultarray) throw '검색결과가 없습니다.';
+      return resultarray;
+    }
+  }
 
   @Query(() => User)
   @UseGuards(GqlAccessGuard)

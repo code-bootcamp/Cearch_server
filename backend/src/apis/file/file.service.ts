@@ -45,10 +45,11 @@ interface IfileToDbMento {
 }
 
 const s3 = new AWS.S3({
-  accessKeyId: 'AKIATYG7SRXVOBZJZ2DD',
-  secretAccessKey: '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',
-  region: 'ap-northeast-2',
-  signatureVersion: 'v4',
+  accessKeyId: process.env.AWS_S3_ACCESSKEY_ID,
+  secretAccessKey: process.env.AWS_S3_SECRETACCESS_KEY,
+  region: process.env.AWS_S3_REGION,
+  signatureVersion: process.env.AWS_S3_SIGNATUREVERSION,
+
 });
 
 @Injectable()
@@ -73,7 +74,7 @@ export class FileUploadService {
   async putSignedUrl({ fileNames, id, purpose }: IfileInfo) {
     const fileNamesList = fileNames.map((ele) =>
       s3.getSignedUrlPromise('putObject', {
-        Bucket: 'cearchtest',
+        Bucket: process.env.AWC_S3_BUCKET,
         Expires: 120,
         Key: `${purpose}/${id}/${ele}`,
       }),
@@ -102,9 +103,11 @@ export class FileUploadService {
     const userFind = await this.userRepository.findOne({
       where: { id: user.id },
     });
-    if (userFind.imageUrl) {
-      const url = await s3.getSignedUrlPromise('getObject', {
-        Bucket: 'cearchstorage',
+
+    const fileNamesList = userFinds.map((user) =>
+      s3.getSignedUrlPromise('getObject', {
+        Bucket: process.env.AWC_S3_BUCKET,
+
         Expires: 120,
         Key: userFind.imageUrl, //img url 추후 문자열처리를 해주어야한다. 우선적으로 진행
       });
@@ -126,7 +129,7 @@ export class FileUploadService {
 
     const fileNamesList = urlList.map((lecture) =>
       s3.getSignedUrlPromise('getObject', {
-        Bucket: 'cearchtest',
+        Bucket: process.env.AWC_S3_BUCKET,
         Expires: 120,
         Key: lecture.url, //img url 추후 문자열처리를 해주어야한다. 우선적으로 진행
       }),
@@ -168,7 +171,7 @@ export class FileUploadService {
 
     const fileNamesList = urlList.map((qT) =>
       s3.getSignedUrlPromise('getObject', {
-        Bucket: 'cearchtest',
+        Bucket: 'process.env.AWC_S3_BUCKET',
         Expires: 120,
         Key: qT.url, //img url 추후 문자열처리를 해주어야한다. 우선적으로 진행
       }),
@@ -261,7 +264,7 @@ export class FileUploadService {
 
     const fileNamesList = urlList.map((certification) =>
       s3.getSignedUrlPromise('getObject', {
-        Bucket: 'cearchtest',
+        Bucket: process.env.AWC_S3_BUCKET,
         Expires: 120,
         Key: certification.url, //img url 추후 문자열처리를 해주어야한다. 우선적으로 진행
       }),

@@ -51,7 +51,7 @@ export class PointService {
         user: currentuser,
         status: POINT_STATUS_ENUM.PAYMENT,
       });
-
+      await queryRunner.manager.save(pointPayment);
       const user = await queryRunner.manager.findOne(User, {
         where: { id: currentuser.id },
       });
@@ -64,10 +64,10 @@ export class PointService {
         description: '포인트를 충전하셨습니다.',
         point: +myamount,
         user: user,
+        payment: pointPayment,
       });
 
       await queryRunner.manager.save(pointHistory);
-      await queryRunner.manager.save(pointPayment);
       await queryRunner.commitTransaction();
       return pointPayment;
     } catch (error) {

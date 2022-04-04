@@ -38,8 +38,10 @@ export class WalletService {
       .andWhere(
         new Brackets((qb) => {
           qb.where('wallet.division = :division', {
-            division: '결제',
-          }).orWhere({ division: '환불' });
+            division: '구매',
+          })
+            .orWhere({ division: '환불' })
+            .orWhere({ division: '취소' });
         }),
       )
       .orderBy('wallet.createdAt', 'DESC')

@@ -18,6 +18,7 @@ import { LikesModule } from './apis/likes/likes.module';
 import { PointModule } from './apis/point/point.module';
 import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule } from '@nestjs/config';
 import { FileUploadModule } from './apis/file/file.module';
 import { FollowModule } from './apis/follow/follow.module';
 import { LectureReviewModule } from './apis/lectureReview/lectureReview.module';
@@ -70,9 +71,10 @@ import { MongooseModule } from '@nestjs/mongoose';
       isGlobal: true,
     }),
     MongooseModule.forRoot(`mongodb://my-mongo:27017`),
-    // ConfigModule.forRoot({
-    //   isGlobal: true,
-    // }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env/.env',
+    }),
   ],
   controllers: [AppController],
   providers: [AppService, JwtAccessStrategy, JwtRefreshStrategy],

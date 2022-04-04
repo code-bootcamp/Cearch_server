@@ -7,8 +7,7 @@ export class WsGuard implements CanActivate {
     const bearerToken =
       context.args[0].handshake.headers.authorization.split(' ')[1];
     try {
-      const decode = Jwt.verify(bearerToken, 'myAccessKey');
-      console.log('haha');
+      const decode = Jwt.verify(bearerToken, process.env.ACCESS_KEY_TOKEN);
       return true;
     } catch (error) {
       console.log('token expired');

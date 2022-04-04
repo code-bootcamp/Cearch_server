@@ -6,12 +6,12 @@ import { USER_ROLE } from 'src/apis/user/entities/user.entity';
 export class JwtGooglestrategy extends PassportStrategy(Strategy, 'google') {
   constructor() {
     super({
-      clientID: `237557568181-nfsv7jfi69gkhspo3q0clor066h4pm0l.apps.googleusercontent.com`,
-      clientSecret: `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`,
-      callbackURL: `http://localhost:3000/login/google/callback`,
-      //   clientID: process.env.GOOGLE_CLIENT_ID,
-      //   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      //   callbackURL: process.env.GOOGLE_CALLBACK_URL,
+      // clientID: `237557568181-nfsv7jfi69gkhspo3q0clor066h4pm0l.apps.googleusercontent.com`,
+      // clientSecret: `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`,
+      // callbackURL: `http://localhost:3000/login/google/callback`,
+      clientID: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      callbackURL: process.env.GOOGLE_CALLBACK_URL,
       scope: ['email', 'profile'],
     });
   }
