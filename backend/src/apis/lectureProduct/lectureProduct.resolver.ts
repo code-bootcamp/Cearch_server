@@ -33,71 +33,62 @@ export class LectureProductResolver {
     return await this.lectureProductService.findPopular();
   }
 
-  @Query(() => [SearchLecture])
-  async fetchLectureSearch(@Args('search') search: string) {
-    if (search.length < 2)
-      throw new UnprocessableEntityException('두 글자 이상 입력해주세요');
-    const searchCache = await this.cacheManager.get(`Lecture:${search}`);
-    if (searchCache) return searchCache;
-    else {
-      const result = await this.elasticsearchService.search({
-        index: 'lecture', // 테이블명
-        from: 0,
-        size: 100,
-        query: {
-          bool: {
-            should: [
-              {
-                match: {
-                  classtitle: {
-                    query: search,
-                    fuzziness: 'AUTO',
-                  },
-                },
-              },
-              {
-                match: {
-                  classdescription: {
-                    query: search,
-                    fuzziness: 'AUTO',
-                  },
-                },
-              },
-              {
-                match: {
-                  name: {
-                    query: search,
-                    fuzziness: 'AUTO',
-                  },
-                },
-              },
-            ],
-          },
-        },
-      });
-      // console.log(result.hits.hits);
-      const resultarray = result.hits.hits.map((ele: any) => ({
-        id: ele._source.id,
-        companyName: ele._source.companyname,
-        department: ele._source.department,
-        name: ele._source.name,
-        classTitle: ele._source.classtitle,
-        classDescription: ele._source.classdescription,
-        rating: ele._source.rating,
-      }));
-      console.log(resultarray);
-      await this.cacheManager.set(`Lecture:${search}`, resultarray, {
-        ttl: 10,
-      });
-      return resultarray;
-    }
-  }
+  // @Query(() => [SearchLecture])
+  // async fetchLectureSearch(@Args('search') search: string) {
+  //   if (search.length < 2)
+  //     throw new UnprocessableEntityException('두 글자 이상 입력해주세요');
+  //     const result = await this.elasticsearchService.search({
+  //       index: 'lecture', // 테이블명
+  //       from: 0,
+  //       size: 100,
+  //       query: {
+  //         bool: {
+  //           should: [
+  //             {
+  //               match: {
+  //                 classtitle: {
+  //                   query: search,
+  //                   fuzziness: '3',
+  //                 },
+  //               },
+  //             },
+  //             {
+  //               match: {
+  //                 classdescription: {
+  //                   query: search,
+  //                   fuzziness: '3',
+  //                 },
+  //               },
+  //             },
+  //             {
+  //               match: {
+  //                 name: {
+  //                   query: search,
+  //                   fuzziness: '3',
+  //                 },
+  //               },
+  //             },
+  //           ],
+  //         },
+  //       },
+  //     });
+  //     // console.log(result.hits.hits);
+  //     const resultarray = result.hits.hits.map((ele: any) => ({
+  //       id: ele._source.id,
+  //       companyName: ele._source.companyname,
+  //       department: ele._source.department,
+  //       name: ele._source.name,
+  //       classTitle: ele._source.classtitle,
+  //       classDescription: ele._source.classdescription,
+  //       rating: ele._source.rating,
+  //     }));
+  //     console.log(resultarray); 
+     
+  //     return resultarray;
+  // }
 
   @Query(() => [SearchLecture])
   async fetchSearchAuto(@Args('search') search: string) {
-    const searchCache = await this.cacheManager.get(`Lecture:${search}`);
-    if (searchCache) return searchCache;
-    else {
       const result = await this.elasticsearchService.search({
         index: 'lecture', // 테이블명
         from: 0,
@@ -123,11 +114,8 @@ export class LectureProductResolver {
         rating: ele._source.rating,
       }));
       console.log(resultarray);
-      await this.cacheManager.set(`Lecture:${search}`, resultarray, {
-        ttl: 10,
-      });
       return resultarray;
-    }
+    
   }
 
   // Create Class
@@ -139,13 +127,6 @@ export class LectureProductResolver {
     createLectureProductInput: CreateLectureProductInput,
     @CurrentUser() currentUser: IcurrentUser,
   ) {
-    // await this.elasticsearchService.create({
-    //   id: 'myid1', //nosql
-    //   index: 'lecture', // 테이블이나 컬렉션을 의미
-    //   document: {
-    //     ...createLectureProductInput,
-    //   },
-    // });
     return await this.lectureProductService.create({
       user: currentUser,
       createLectureProductInput,

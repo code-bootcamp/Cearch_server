@@ -6,8 +6,15 @@
     "analysis": {
       "analyzer": {
         "my_ngram_analyzer": {
-          "tokenizer": "whitespace",
-          "filter": ["lowercase", "snowball"]
+          "tokenizer": "my_ngram_tokenizer",
+          "filter": ["lowercase"]
+        }
+      },
+      "tokenizer": {
+        "my_ngram_tokenizer": {
+          "type": "nGram",
+          "min_gram": "2",
+          "max_gram": "10"
         }
       }
     },
