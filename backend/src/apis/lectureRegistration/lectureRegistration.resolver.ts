@@ -10,14 +10,12 @@ import { CreateLectureRegistrationInput } from './dto/createLectureRegistration.
 import { UpdateLectureRegistrationInput } from './dto/updateLectureRegistration.input';
 import { LectureRegistration } from './entitites/lectureRegistration.entity';
 import { LectureRegistrationService } from './lectureRegistration.service';
-
 @Resolver()
 export class LectureRegistrationResolver {
   constructor(
     private readonly lectureRegistrationService: LectureRegistrationService,
   ) {}
 
-  // Create Registration
   @Mutation(() => LectureRegistration)
   @UseGuards(GqlAccessGuard)
   async createLectureRegistration(
@@ -34,14 +32,12 @@ export class LectureRegistrationResolver {
     });
   }
 
-  // FindAll Registration
   @Query(() => [LectureRegistration])
   @UseGuards(GqlAccessGuard)
   async fetchlectureRegistrations(@CurrentUser() currentUser: IcurrentUser) {
     return await this.lectureRegistrationService.findAll({ currentUser });
   }
 
-  // FindOne Registration
   @Query(() => LectureRegistration)
   @UseGuards(GqlAccessGuard, RoleGuard)
   async fetchlectureRegistration(
@@ -52,7 +48,6 @@ export class LectureRegistrationResolver {
     });
   }
 
-  // Update Registration
   @UseGuards(GqlAccessGuard, RoleGuard)
   @Role(USER_ROLE.MENTEE)
   @Mutation(() => LectureRegistration)
@@ -66,7 +61,7 @@ export class LectureRegistrationResolver {
       updatelectureRegistrationInput,
     });
   }
-  // Delete Registration
+
   @Mutation(() => Boolean)
   @UseGuards(GqlAccessGuard, RoleGuard)
   @Role(USER_ROLE.MENTEE)

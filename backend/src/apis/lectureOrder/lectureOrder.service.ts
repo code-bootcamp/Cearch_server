@@ -10,8 +10,6 @@ import {
   REGISTRATION_STATUS_ENUM,
 } from './entities/lectureOrder.entity';
 import { IcurrentUser } from '../auth/auth.resolver';
-
-// Interface
 interface IFindOne {
   lectureorderId: string;
   currentUser: IcurrentUser;
@@ -36,19 +34,15 @@ export class LectureOrderService {
     private readonly connection: Connection,
   ) {}
 
-  // Placing order
   async create({ lectureRegistrationId, currentUser }) {
-    // 멘티가 신청서ID 중 하나를 찾아 맞으면 결제
     const queryRunner = this.connection.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction('REPEATABLE READ');
     try {
-      // Find currentuser
       console.log(currentUser);
       const user = await queryRunner.manager.findOne(User, {
         id: currentUser.id,
       });
-      // Find registrationId
       const order = await getRepository(LectureRegistration)
         .createQueryBuilder('lectureregistration')
         .leftJoinAndSelect('lectureregistration.product', 'lecproduct')
@@ -84,7 +78,7 @@ export class LectureOrderService {
       await queryRunner.release();
     }
   }
-  // finding all orders
+
   async findAll() {
     const findAllOrders = await this.lectureOrderRepository.find({
       take: 10,
@@ -92,13 +86,13 @@ export class LectureOrderService {
     });
     return findAllOrders;
   }
-  // finding one order
+
   async findOne({ lectureorderId }: IFindOne) {
     return await this.lectureOrderRepository.findOne({
       where: { id: lectureorderId },
     });
   }
-  // Update lectureOrder
+
   async update({ lectureOrderId }: IUpdate) {
     const currentlectureRegistration =
       await this.lectureOrderRepository.findOne({
@@ -109,7 +103,7 @@ export class LectureOrderService {
     };
     return await this.lectureOrderRepository.save(newlectureOrder);
   }
-  // Cancel order
+
   async delete({ lectureorderId }) {
     const result = await this.lectureOrderRepository.softDelete({
       id: lectureorderId,

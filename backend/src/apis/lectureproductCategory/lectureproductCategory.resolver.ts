@@ -11,8 +11,6 @@ export class LectureProductCategoryResolver {
   @Mutation(() => LectureProductCategory)
   async createlectureproductCategory(
     @Args('categoryname') categoryname: string,
-    // @Args('createLectureProductCategoryInput')
-    // createLectureProductCategoryInput: CreateLectureProductCategoryInput,
   ) {
     return await this.lectureproductCategoryService.create({
       categoryname,
@@ -26,7 +24,7 @@ export class LectureProductCategoryResolver {
 
   @Query(() => LectureProductCategory)
   async fetchLectureProduct(
-    @Args('lectureproductCategoryId') lectureproductCategoryId: string, //
+    @Args('lectureproductCategoryId') lectureproductCategoryId: string,
   ) {
     return await this.lectureproductCategoryService.findOne({
       lectureproductCategoryId,

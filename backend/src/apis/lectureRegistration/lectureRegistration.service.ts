@@ -34,7 +34,6 @@ export class LectureRegistrationService {
     private readonly connection: Connection,
   ) {}
 
-  // Create Registration Form
   async create({ user, createLectureRegistrationInput, productId }: ICreate) {
     const queryRunner = this.connection.createQueryRunner();
     await queryRunner.connect();
@@ -66,15 +65,13 @@ export class LectureRegistrationService {
     }
   }
 
-  // Find All Registration Forms: ReadAll
-
   async findAll({ currentUser }) {
     const result = await this.lectureRegistrationRepository
       .createQueryBuilder('registration')
       .leftJoinAndSelect('registration.user', 'user')
       .leftJoinAndSelect('registration.product', 'product')
-      .leftJoinAndSelect('product.joinproductandproductcategory', 'jlpc')
-      .leftJoinAndSelect('jlpc.lectureproductcategory', 'lpc')
+      .innerJoinAndSelect('product.joinproductandproductcategory', 'jlpc')
+      .innerJoinAndSelect('jlpc.lectureproductcategory', 'lpc')
       .leftJoinAndSelect('product.image', 'image')
       .where('user.id = :id', { id: currentUser.id })
       .getMany();
@@ -88,7 +85,6 @@ export class LectureRegistrationService {
     });
   }
 
-  // Update Registration Form
   async update({
     lectureRegistrationId,
     updatelectureRegistrationInput,
