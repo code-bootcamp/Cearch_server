@@ -1,5 +1,5 @@
 
-import { UseGuards } from '@nestjs/common';
+import { UseGuards, CACHE_MANAGER, Inject } from '@nestjs/common';
 import { Args, Mutation, Resolver, Query} from '@nestjs/graphql';
 import {
   CurrentUser,
@@ -9,19 +9,23 @@ import { Role } from 'src/common/auth/decorate/role.decorate';
 import { GqlAccessGuard } from 'src/common/auth/guard/gqlAuthGuard';
 import { RoleGuard } from 'src/common/auth/guard/roleGuard';
 import { IcurrentUser } from '../auth/auth.resolver';
-import { JoinLectureAndProductCategory } from '../lectureproductCategory/entities/lectureproductCagtegoryclassCategory.entity';
+
 import { USER_ROLE } from '../user/entities/user.entity';
 import { CreateLectureProductInput } from './dto/createLectureProduct.input';
 import { LectureProduct } from './entities/lectureProduct.entity';
 import { LectureProductService } from './lectureProduct.service';
 import { ElasticsearchService } from '@nestjs/elasticsearch';
 import { SearchLecture } from './entities/searchLecture.entity';
+import { Cache } from 'cache-manager';
 
 @Resolver()
 export class LectureProductResolver {
   constructor(
     private readonly lectureProductService: LectureProductService,
     private readonly elasticsearchService: ElasticsearchService,
+
+    @Inject(CACHE_MANAGER)
+    private readonly cacheManager: Cache,
   ) {}
 
   // Find Popular Classes
@@ -85,8 +89,10 @@ export class LectureProductResolver {
   // }
 
   @Query(() => [SearchLecture])
-
   async fetchSearchAuto(@Args('search') search: string) {
+    const searchCache = await this.cacheManager.get(`lecture:${search}`);
+    if (searchCache) return searchCache;
+    else {
       const result = await this.elasticsearchService.search({
         index: 'lecture', // 테이블명
         from: 0,
@@ -101,7 +107,6 @@ export class LectureProductResolver {
           },
         },
       });
-      // console.log(result.hits.hits);
       const resultarray = result.hits.hits.map((ele: any) => ({
         id: ele._source.id,
         companyName: ele._source.companyname,
@@ -112,11 +117,10 @@ export class LectureProductResolver {
         rating: ele._source.rating,
       }));
       console.log(resultarray);
+      await this.cacheManager.set(`lecture:${search}`, resultarray, { ttl: 600 });
       return resultarray;
-    
-
   }
-
+  }
   // Create Class
   @Mutation(() => LectureProduct)
   @UseGuards(GqlAccessGuard)
@@ -142,8 +146,6 @@ export class LectureProductResolver {
 
   // Find One Class : ReadOne
   @Query(() => LectureProduct)
-  // @UseGuards(GqlAccessGuard, RoleGuard)
-  // @Role(USER_ROLE.MENTOR, USER_ROLE.MENTEE)
   async fetchLectureProduct(
     @Args('lectureproductId') lectureproductId: string, //
     @Args('page') page: number,

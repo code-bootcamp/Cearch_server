@@ -384,59 +384,7 @@ export class UserService {
       await queryRunner.release();
     }
   }
-  // async findUserInterest({ currentUser, interestIds }) {
-  //   const queryRunner = this.connection.createQueryRunner();
-  //   await queryRunner.connect();
-  //   await queryRunner.startTransaction('REPEATABLE READ');
-  //   try {
-  //     const userFind = await queryRunner.manager.findOne(User, {
-  //       id: currentUser.id,
-  //     });
-  //     // const userinterestList = await this.joinUserAndProductCtgRepository
-  //     //   .createQueryBuilder('interest')
-  //     //   .leftJoinAndSelect(
-  //     //     'interest.linkedToLectureProductCategory',
-  //     //     'category',
-  //     //   )
-  //     //   .where('interest.user = :id', { id: userFind.id })
-  //     //   .getMany();
 
-  //     // console.log(userinterestList);
-  //     const joinedCtg = interestIds.map(async (interestId) => {
-  //       const userinterestList = await this.joinUserAndProductCtgRepository
-  //         .createQueryBuilder('interest')
-  //         .leftJoinAndSelect(
-  //           'interest.linkedToLectureProductCategory',
-  //           'category',
-  //         )
-  //         .where('interest.user = :id', { id: userFind.id })
-  //         .where('category.id = :cateId', { cateId: interestId })
-  //         .getOne();
-
-  //       console.log(userinterestList);
-  //       return userinterestList;
-  //       // const joinProductCtg = await queryRunner.manager.findOne(
-  //       //   JoinUserAndProductCategory,
-  //       //   {
-  //       //     id: interestId,
-  //       //     user: { id: currentUser.id },
-  //       //   },
-  //       // );
-
-  //       // return joinProductCtg;
-  //     });
-  //     const joinedCtgPromise = await Promise.all(joinedCtg);
-  //     console.log(joinedCtgPromise);
-
-  //     return joinedCtgPromise;
-  //   } catch (error) {
-  //     console.log(error);
-  //     await queryRunner.rollbackTransaction();
-  //     throw new UnprocessableEntityException('관심분야를 찾을 수 없습니다.');
-  //   } finally {
-  //     await queryRunner.release();
-  //   }
-  // }
   async permitLecture({ currentUser, mentorId, lectureId }) {
     const querryRunner = this.connection.createQueryRunner();
     await querryRunner.connect();
