@@ -73,7 +73,6 @@ import { MongooseModule } from '@nestjs/mongoose';
     MongooseModule.forRoot(`mongodb://my-mongo:27017`),
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '.env/.env',
     }),
   ],
   controllers: [AppController],

@@ -49,7 +49,6 @@ const s3 = new AWS.S3({
   secretAccessKey: process.env.AWS_S3_SECRETACCESS_KEY,
   region: process.env.AWS_S3_REGION,
   signatureVersion: process.env.AWS_S3_SIGNATUREVERSION,
-
 });
 
 @Injectable()
@@ -103,9 +102,8 @@ export class FileUploadService {
     const userFind = await this.userRepository.findOne({
       where: { id: user.id },
     });
-
-    const fileNamesList = userFinds.map((user) =>
-      s3.getSignedUrlPromise('getObject', {
+    if (userFind == undefined) {
+      const url = await s3.getSignedUrlPromise('getObject', {
         Bucket: process.env.AWC_S3_BUCKET,
 
         Expires: 120,

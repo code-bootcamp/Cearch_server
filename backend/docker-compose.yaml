@@ -7,12 +7,14 @@ services:
       dockerfile: Dockerfile
     # volumes:
     #   - ./src:/backend/src
+    env_file:
+      - './.env'
     ports:
       - '3000:3000'
       - '5001:5000'
     volumes:
       - ./src:/backend/src
-      - ./.env:/backend/.env
+      # - ./.env:/backend/.env
 
   my-db:
     platform: linux/amd64
@@ -34,7 +36,6 @@ services:
     ports:
       - '6000:6379'
 
-
   #   elasticsearch:
   #     image: elasticsearch:7.17.0
   #     environment:
@@ -42,12 +43,10 @@ services:
   #     ports:
   #       - 9200:9200
 
-
   my-mongo:
     image: 'mongo:latest'
     ports:
       - '27017:27017'
-
 
   # logstash:
   #   image: logstash:7.17.0

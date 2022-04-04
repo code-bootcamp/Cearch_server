@@ -1,8 +1,6 @@
 import { UseGuards } from '@nestjs/common';
 import { Args, Mutation, Resolver, Query } from '@nestjs/graphql';
-import {
-  CurrentUser,
-} from 'src/common/auth/decorate/currentuser.decorate';
+import { CurrentUser } from 'src/common/auth/decorate/currentuser.decorate';
 import { IcurrentUser } from '../auth/auth.resolver';
 import { Role } from 'src/common/auth/decorate/role.decorate';
 import { GqlAccessGuard } from 'src/common/auth/guard/gqlAuthGuard';
@@ -39,9 +37,8 @@ export class LectureRegistrationResolver {
   // FindAll Registration
   @Query(() => [LectureRegistration])
   @UseGuards(GqlAccessGuard)
-  async fetchlectureRegistrations(@CurrentUser() currentUser: ICurrentUser) {
+  async fetchlectureRegistrations(@CurrentUser() currentUser: IcurrentUser) {
     return await this.lectureRegistrationService.findAll({ currentUser });
-
   }
 
   // FindOne Registration

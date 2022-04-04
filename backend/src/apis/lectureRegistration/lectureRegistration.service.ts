@@ -11,7 +11,7 @@ import { LectureRegistration } from './entitites/lectureRegistration.entity';
 // Interface
 interface ICreate {
   createLectureRegistrationInput: CreateLectureRegistrationInput;
-  productId: string,
+  productId: string;
   user: IcurrentUser;
 }
 interface IFindOne {
@@ -35,30 +35,32 @@ export class LectureRegistrationService {
   ) {}
 
   // Create Registration Form
-  async create({user, createLectureRegistrationInput, productId}: ICreate) {
+  async create({ user, createLectureRegistrationInput, productId }: ICreate) {
     const queryRunner = this.connection.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction('REPEATABLE READ');
-    try{
+    try {
       const currentuser = await this.userRepository
         .createQueryBuilder('user')
         .where('user.id = :id', { id: user.id })
-        .getOne()
-      console.log('currentuser : ', currentuser)
+        .getOne();
+      console.log('currentuser : ', currentuser);
 
-      const product = await this.lectureproductRepository.findOne({id: productId})
+      const product = await this.lectureproductRepository.findOne({
+        id: productId,
+      });
       const result = await this.lectureRegistrationRepository.create({
         ...createLectureRegistrationInput,
         user: currentuser,
-        product: product
-      })
-      await queryRunner.manager.save(result)
-      await queryRunner.commitTransaction()
-      console.log('신청완료되었습니다')
-      return result
-    } catch(error){
-      await queryRunner.rollbackTransaction()
-      throw error
+        product: product,
+      });
+      await queryRunner.manager.save(result);
+      await queryRunner.commitTransaction();
+      console.log('신청완료되었습니다');
+      return result;
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
     } finally {
       await queryRunner.release();
     }
@@ -78,12 +80,11 @@ export class LectureRegistrationService {
       .getMany();
 
     return result;
-
   }
 
   async findOne({ lectureRegistrationId }: IFindOne) {
     return await this.lectureRegistrationRepository.findOne({
-      where: {id: lectureRegistrationId},
+      where: { id: lectureRegistrationId },
     });
   }
 
