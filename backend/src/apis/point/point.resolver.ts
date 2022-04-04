@@ -29,9 +29,9 @@ export class PointResolver {
     @CurrentUser() currentuser: ICurrentUser,
   ) {
     const token = await this.iamportService.getIamportToken();
-    console.log(token)
-    const aa =await this.iamportService.checkPaid({ impUid, myamount, token });
-    console.log("💕",aa)
+
+    await this.iamportService.checkPaid({ impUid, myamount, token });
+    
     return await this.pointService.create({ impUid, myamount, currentuser });
   }
 

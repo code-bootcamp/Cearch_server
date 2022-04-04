@@ -75,9 +75,9 @@ export class UserResolver {
       }));
       console.log(resultarray);
       await this.cacheManager.set(`mentor:${search}`, resultarray, {
-        ttl: 10,
+        ttl: 600,
       });
-      if (!resultarray) throw '검색결과가 없습니다.';
+      if (!resultarray) throw new UnprocessableEntityException('검색결과가 없습니다.');
       return resultarray;
     }
   }

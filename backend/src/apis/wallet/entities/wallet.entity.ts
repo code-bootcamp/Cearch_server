@@ -40,6 +40,6 @@ export class Wallet {
 
   @JoinColumn()
   @OneToOne(() => Point, (point) => point.wallet)
-  @Field(() => Wallet)
-  payment: Wallet;
+  @Field(() => Point)
+  payment: Point;
 }

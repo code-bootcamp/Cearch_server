@@ -55,16 +55,20 @@ export class PointService {
       const user = await queryRunner.manager.findOne(User, {
         where: { id: currentuser.id },
       });
-      await this.userRepository.save({
+      console.log("#",user)
+      const updateUser = await queryRunner.manager.save(User, {
         ...user,
         point: user.point + myamount,
       });
-      const pointHistory = this.walletRepository.create({
+
+      
+      // const promisePayment = await Promise.all(pointPayment);
+      const pointHistory = await this.walletRepository.create({
         division: '충전',
         description: '포인트를 충전하셨습니다.',
         point: +myamount,
-        user: user,
-        payment: pointPayment,
+        user: updateUser,
+        payment: pointPayment
       });
 
       await queryRunner.manager.save(pointHistory);
@@ -105,25 +109,25 @@ export class PointService {
       if (user.point < currentPoint.amount)
         throw new UnprocessableEntityException('포인트가 부족합니다.');
       //취소기록 생성
-      const pointCancel = await this.pointRepository.create({
+      const pointCancel = await await queryRunner.manager.save(Point,{
         impUid: impUid,
         user: currentuser,
         status: POINT_STATUS_ENUM.CANCEL,
         amount: -amount,
       });
+      await queryRunner.manager.save(pointCancel);
       await this.userRepository.save({
         ...user,
         point: user.point - amount,
       });
 
-      const pointHistory = this.walletRepository.create({
+      const pointHistory = await this.walletRepository.create({
         division: '환불',
         description: '포인트를 환불하셨습니다.',
         point: -amount,
         user: user,
       });
       await queryRunner.manager.save(pointHistory);
-      await queryRunner.manager.save(pointCancel);
       await queryRunner.commitTransaction();
       return pointCancel;
     } catch (error) {
