@@ -18,7 +18,6 @@ export class LectureOrderResolver {
     
   ) {}
 
-  // Placing Order
   @Mutation(() => LectureOrder)
   @UseGuards(GqlAccessGuard)
   async createlecturePayment(
@@ -31,14 +30,12 @@ export class LectureOrderResolver {
     });
   }
 
-  // Fetch Order
   @Query(() => [LectureOrder])
   @UseGuards(GqlAccessGuard)
   async fetchlectureOrders() {
     return await this.lectureOrderService.findAll();
   }
 
-  // Fetch Orders
   @Query(() => LectureOrder)
   @UseGuards(GqlAccessGuard)
   async fetchlectureOrder(
@@ -51,7 +48,6 @@ export class LectureOrderResolver {
     });
   }
 
-  // Update Order
   @UseGuards(GqlAccessGuard, RoleGuard)
   @Role(USER_ROLE.MENTEE)
   @Mutation(() => LectureOrder)
@@ -62,7 +58,7 @@ export class LectureOrderResolver {
       lectureOrderId,
     });
   }
-  // Cancel Order
+
   @Mutation(() => Boolean)
   @UseGuards(GqlAccessGuard, RoleGuard)
   @Role(USER_ROLE.MENTEE)

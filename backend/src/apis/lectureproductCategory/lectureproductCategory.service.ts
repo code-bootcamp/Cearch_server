@@ -3,8 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { LectureProductCategory } from './entities/lectureproductCategory.entity';
-
-// Interface
 interface IFindOne {
   lectureproductCategoryId: string;
 }
@@ -19,14 +17,14 @@ export class LectureProductCategoryService {
       categoryname,
     });
   }
-  // Find All Class : ReadAll
+
   async findAll() {
     const result = await this.lectureproductCategoryRepository.find({
       relations: ['lectureProductCategory'],
     });
     return await result;
   }
-  // Find One Class : ReadOne
+
   async findOne({ lectureproductCategoryId }: IFindOne) {
     return await this.lectureproductCategoryRepository.findOne({
       id: lectureproductCategoryId,
