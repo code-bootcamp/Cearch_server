@@ -84,14 +84,15 @@ export class AuthService {
   }
 
   async sendTokenPhone({ phoneNumber, authNumber }: ItokenPhone) {
-    const appKey = 'cM9mHyap4kUvjat4';
-    const secretKey = 'rheOIlML';
+    const appKey = process.env.SMS_APP_KEY
+    const XSecretKey = process.env.SMS_X_SECRET_KEY
+    const sender = process.env.SMS_SENDER
     try {
       const result = await axios.post(
         `https://api-sms.cloud.toast.com/sms/v3.0/appKeys/${appKey}/sender/sms`,
         {
           body: `안녕하세요. 인증번호는 ${authNumber}입니다.`,
-          sendNo: '01041598497',
+          sendNo: sender,
           recipientList: [
             {
               internationalRecipientNo: phoneNumber,
@@ -100,7 +101,7 @@ export class AuthService {
         },
         {
           headers: {
-            'X-Secret-Key': secretKey,
+            'X-Secret-Key': XSecretKey,
             'Content-Type': 'application/json;charset=UTF-8',
           },
         },
@@ -118,14 +119,15 @@ export class AuthService {
   }
 
   async sendTokenEmail({ email, authNumber }: ItokenEmail) {
-    const appKey = 'VlF4o7gU6bMSQokg';
-    const secretKey = 'nyR3UvXB';
+    const appKey = process.env.EMAIL_APP_KEY
+    const secretKey = process.env.EMAIL_X_SECRET_KEY
+    const sender = process.env.EMAIL_SENDER
     const template = getTemplate({ authNumber });
     try {
       const result = await axios.post(
         `https://api-mail.cloud.toast.com/email/v2.0/appKeys/${appKey}/sender/mail`,
         {
-          senderAddress: 'seunghyeonsu@gmail.com',
+          senderAddress: sender,
           title: 'Cearch 에서 귀하의 인증번호를 보냈습니다',
           body: template,
           receiverList: [
@@ -177,7 +179,7 @@ export class AuthService {
         role: user.role,
       },
       {
-        secret: 'myRefreshKey',
+        secret: process.env.REFRESH_KEY_TOKEN,
         expiresIn: '8h',
       },
     );
@@ -195,7 +197,7 @@ export class AuthService {
         role: user.role,
       },
       {
-        secret: 'myAccessKey',
+        secret: process.env.ACCESS_KEY_TOKEN,
         expiresIn: '1h',
       },
     );

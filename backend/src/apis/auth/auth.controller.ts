@@ -3,6 +3,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { Request, Response } from 'express';
 import { UserService } from '../user/user.service';
 import { AuthService } from './auth.service';
+import * as bcrypt from 'bcrypt';
 
 @Controller()
 export class AuthController {
@@ -17,7 +18,8 @@ export class AuthController {
     // 2.회원가입
     if (!user) {
       const { password, ...rest } = req.user;
-      const userForm = { ...rest, password };
+      const hashedPassword = await bcrypt.hash(String(password), 1);
+      const userForm = { ...rest, hashedPassword };
       await this.userService.saveForm({ userForm });
     }
     this.authService.setRefreshToken({ user, res });
@@ -30,8 +32,6 @@ export class AuthController {
     @Req() req: Request, //
     @Res() res: Response,
   ) {
-    // const user = await this.userService.findOne({ email: req.user.email })
-    // if(!user) return req.user
     return await this.login(req, res);
   }
 }

@@ -1,7 +1,8 @@
 import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
-import { Connection, getConnection, Repository } from 'typeorm';
+import { getToday } from 'src/utils/getToday';
+import { Connection, getConnection, Like, Raw, Repository } from 'typeorm';
 import { IcurrentUser } from '../auth/auth.resolver';
 import { CommentsModule } from '../comments/comments.module';
 import { LectureProduct } from '../lectureProduct/entities/lectureProduct.entity';
@@ -42,6 +43,14 @@ export class UserService {
     private readonly joinUserAndProductCtgRepository: Repository<JoinMentoAndProductCategory>,
     private readonly connection: Connection,
   ) {} //
+
+  async findSignInCount({ date }) {
+    const newUser = await this.userRepository.count({
+      createdAt: Like(`${date}%`),
+    });
+    console.log(`newUser: ${newUser}`);
+    return newUser;
+  }
 
   async findMentorCount() {
     const myMentor = await this.mentoInfoRepository.count({

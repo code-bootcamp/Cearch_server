@@ -51,11 +51,18 @@ export class LectureRegistrationService {
   }
 
   // Find All Registration Forms: ReadAll
-  async findAll() {
-    const result = await this.lectureRegistrationRepository.find({
-      relations: ['lectureRegistration'],
-    });
-    return await result;
+  async findAll({ currentUser }) {
+    const result = await this.lectureRegistrationRepository
+      .createQueryBuilder('registration')
+      .leftJoinAndSelect('registration.user', 'user')
+      .leftJoinAndSelect('registration.product', 'product')
+      .leftJoinAndSelect('product.joinproductandproductcategory', 'jlpc')
+      .leftJoinAndSelect('jlpc.lectureproductcategory', 'lpc')
+      .leftJoinAndSelect('product.image', 'image')
+      .where('user.id = :id', { id: currentUser.id })
+      .getMany();
+
+    return result;
   }
 
   async findOne({ lectureRegistrationId }: IFindOne) {

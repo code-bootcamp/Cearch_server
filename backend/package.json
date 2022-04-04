@@ -43,6 +43,7 @@
     "bcrypt": "^5.0.1",
     "cache-manager": "^3.6.0",
     "cache-manager-redis-store": "^2.0.0",
+    "config": "^3.3.7",
     "dotenv": "^16.0.0",
     "express": "^4.17.2",
     "graphql": "^15.8.0",
@@ -66,7 +67,7 @@
   },
   "devDependencies": {
     "@nestjs/cli": "^8.0.0",
-    "@nestjs/config": "^1.1.7",
+    "@nestjs/config": "^2.0.0",
     "@nestjs/schematics": "^8.0.0",
     "@nestjs/testing": "^8.0.0",
     "@nestjs/websockets": "^8.4.0",

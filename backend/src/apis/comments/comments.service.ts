@@ -238,31 +238,57 @@ export class CommentsService {
       console.log(post);
       if (!post) throw new UnprocessableEntityException('본인이 아닙니다.');
       //Pick 상태로 바꾸어주기
-      const pick = { ...selectComment, isPick: 1 };
-      const result = await this.commentsRepository.create(pick);
-      //포인트 플러스해주기~~
-      const commentUser = await queryRunner.manager.findOne(User, {
-        id: selectComment.user.id,
-      });
-      // console.log(`🔍`, commentUser);
-      // const { point, ...rest } = commentUser;
-      const plusPoint = this.userRepository.create({
-        ...commentUser,
-        point: commentUser.point + 200,
-        answerCount: commentUser.answerCount + 1,
-      });
+      if (selectComment.isPick === 0) {
+        const pick = { ...selectComment, isPick: 1 };
+        const result = await this.commentsRepository.create(pick);
+        //포인트 플러스해주기~~
+        const commentUser = await queryRunner.manager.findOne(User, {
+          id: selectComment.user.id,
+        });
 
-      const pointHistory = this.walletRepository.create({
-        division: '획득',
-        description: '답변이 선택되었습니다.',
-        point: +200,
-        user: plusPoint,
-      });
-      await queryRunner.manager.save(plusPoint);
-      await queryRunner.manager.save(pointHistory);
-      await queryRunner.manager.save(result);
-      await queryRunner.commitTransaction();
-      return result;
+        const plusPoint = this.userRepository.create({
+          ...commentUser,
+          point: commentUser.point + 200,
+          answerCount: commentUser.answerCount + 1,
+        });
+
+        const pointHistory = this.walletRepository.create({
+          division: '획득',
+          description: '답변이 선택되었습니다.',
+          point: +200,
+          user: plusPoint,
+        });
+        await queryRunner.manager.save(plusPoint);
+        await queryRunner.manager.save(pointHistory);
+        await queryRunner.manager.save(result);
+
+        await queryRunner.commitTransaction();
+        return result;
+      } else {
+        const result = await this.commentsRepository.create({
+          ...selectComment,
+          isPick: 0,
+        });
+        await queryRunner.manager.save(result);
+        const commentUser = await queryRunner.manager.findOne(User, {
+          id: selectComment.user.id,
+        });
+        const plusPoint = this.userRepository.create({
+          ...commentUser,
+          point: commentUser.point - 200,
+          answerCount: commentUser.answerCount - 1,
+        });
+        const pointHistory = this.walletRepository.create({
+          division: '취소',
+          description: '답변이 선택이 취소되었습니다.',
+          point: -200,
+          user: plusPoint,
+        });
+        await queryRunner.manager.save(plusPoint);
+        await queryRunner.manager.save(pointHistory);
+        await queryRunner.commitTransaction();
+        return result;
+      }
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;

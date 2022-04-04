@@ -1,4 +1,9 @@
-import { UseGuards, CACHE_MANAGER, Inject } from '@nestjs/common';
+import {
+  UseGuards,
+  CACHE_MANAGER,
+  Inject,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { Args, Mutation, Resolver, Query, ID } from '@nestjs/graphql';
 import { CurrentUser } from 'src/common/auth/decorate/currentuser.decorate';
 import { Role } from 'src/common/auth/decorate/role.decorate';
@@ -30,40 +35,79 @@ export class LectureProductResolver {
 
   @Query(() => [SearchLecture])
   async fetchLectureSearch(@Args('search') search: string) {
-    // const searchCache = await this.cacheManager.get(`Lecture:${search}`);
-    // if (searchCache) return searchCache;
-    // else {
-    const result = await this.elasticsearchService.search({
-      index: 'lecture', // 테이블명
-      from: 0,
-      size: 100,
-      query: {
-        bool: {
-          should: [
-            { match: { classtitle: search } },
-            { match: { classdescription: search } },
-            { match: { name: search } },
-          ],
+    if (search.length < 2)
+      throw new UnprocessableEntityException('두 글자 이상 입력해주세요');
+    const searchCache = await this.cacheManager.get(`Lecture:${search}`);
+    if (searchCache) return searchCache;
+    else {
+      const result = await this.elasticsearchService.search({
+        index: 'lecture', // 테이블명
+        from: 0,
+        size: 100,
+        query: {
+          bool: {
+            should: [
+              { match: { classtitle: search } },
+              { match: { classdescription: search } },
+              { match: { name: search } },
+            ],
+          },
         },
-      },
-    });
-    // console.log(result.hits.hits);
-    const resultarray = result.hits.hits.map((ele: any) => ({
-      id: ele._source.id,
-      companyName: ele._source.companyname,
-      department: ele._source.department,
-      name: ele._source.name,
-      classTitle: ele._source.classtitle,
-      classDescription: ele._source.classdescription,
-      rating: ele._source.rating,
-    }));
-    console.log(resultarray);
-    // await this.cacheManager.set(`Lecture:${search}`, resultarray, {
-    //   ttl: 60,
-    // });
-    return resultarray;
-    // }
+      });
+      // console.log(result.hits.hits);
+      const resultarray = result.hits.hits.map((ele: any) => ({
+        id: ele._source.id,
+        companyName: ele._source.companyname,
+        department: ele._source.department,
+        name: ele._source.name,
+        classTitle: ele._source.classtitle,
+        classDescription: ele._source.classdescription,
+        rating: ele._source.rating,
+      }));
+      console.log(resultarray);
+      await this.cacheManager.set(`Lecture:${search}`, resultarray, {
+        ttl: 10,
+      });
+      return resultarray;
+    }
   }
+
+  // @Query(() => [SearchLecture])
+  // async fetchSearchAuto(@Args('search') search: string) {
+  //   const searchCache = await this.cacheManager.get(`Lecture:${search}`);
+  //   if (searchCache) return searchCache;
+  //   else {
+  //     const result = await this.elasticsearchService.search({
+  //       index: 'lecture', // 테이블명
+  //       from: 0,
+  //       size: 100,
+  //       query: {
+  //         bool: {
+  //           should: [
+  //             { prefix: { classtitle: search } },
+  //             { prefix: { classdescription: search } },
+  //             { prefix: { name: search } },
+  //           ],
+  //         },
+  //       },
+  //     });
+  //     // console.log(result.hits.hits);
+  //     const resultarray = result.hits.hits.map((ele: any) => ({
+  //       id: ele._source.id,
+  //       companyName: ele._source.companyname,
+  //       department: ele._source.department,
+  //       name: ele._source.name,
+  //       classTitle: ele._source.classtitle,
+  //       classDescription: ele._source.classdescription,
+  //       rating: ele._source.rating,
+  //     }));
+  //     console.log(resultarray);
+  //     await this.cacheManager.set(`Lecture:${search}`, resultarray, {
+  //       ttl: 10,
+  //     });
+  //     return resultarray;
+  //   }
+  // }
 
   // Create Class
   @Mutation(() => LectureProduct)

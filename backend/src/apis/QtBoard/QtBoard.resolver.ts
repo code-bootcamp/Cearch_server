@@ -1,4 +1,4 @@
-import { UseGuards } from '@nestjs/common';
+import { UnprocessableEntityException, UseGuards } from '@nestjs/common';
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 import {
   CurrentUser,
@@ -26,8 +26,15 @@ export class QtBoardResolver {
     private readonly cacheManager: Cache,
   ) {}
 
+  @Query(() => Int)
+  async fetchNewPostCount(@Args('date') date: string) {
+    return await this.qtBoardService.findNewPostCount({ date });
+  }
+
   @Query(() => [QtBoard]) // Query graphql에서 임포트 되는지 잘 보자
   async searchQt(@Args('search') search: string) {
+    if (search.length < 2)
+      throw new UnprocessableEntityException('두 글자 이상 입력해주세요');
     const searchCache = await this.cacheManager.get(`qtBoard:${search}`);
     if (searchCache) return searchCache;
     else {

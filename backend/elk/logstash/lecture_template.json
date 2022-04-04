@@ -6,13 +6,14 @@
     "analysis": {
       "analyzer": {
         "my_ngram_analyzer": {
-          "tokenizer": "my_ngram_tokenizer"
+          "tokenizer": "my_ngram_tokenizer",
+          "filter": ["lowercase", "asciifolding"]
         }
       },
       "tokenizer": {
         "my_ngram_tokenizer": {
           "type": "nGram",
-          "min_gram": "1",
+          "min_gram": "2",
           "max_gram": "10"
         }
       }

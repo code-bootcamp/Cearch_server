@@ -19,7 +19,7 @@ declare module 'jsonwebtoken' {
 
 @WebSocketGateway(5000, {
   cors: {
-    origin: 'http://127.0.0.1:5500',
+    origin: process.env.SOCKET_GATEWAY_ORIGIN,
   },
 })
 export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -34,7 +34,9 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
       '',
     );
     try {
-      const result = <jwt.JwtPayload>jwt.verify(bearerToken, 'myAccessKey');
+      const result = <jwt.JwtPayload>(
+        jwt.verify(bearerToken, process.env.ACCESS_KEY_TOKEN)
+      );
       client.data.id = result.sub;
       client.data.name = result.name;
       await this.socketService.updateSocketId({

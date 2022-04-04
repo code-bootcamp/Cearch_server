@@ -4,7 +4,7 @@ import {
   UnprocessableEntityException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { getConnection, Repository } from 'typeorm';
+import { getConnection, Like, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { Comments } from '../comments/entities/comments.entity';
 import { User, USER_ROLE } from '../user/entities/user.entity';
@@ -43,6 +43,14 @@ export class QtBoardService {
     private readonly qtTagsRepository: Repository<JoinQtBoardAndProductCategory>,
   ) {}
 
+  async findNewPostCount({ date }) {
+    const newUser = await this.userRepository.count({
+      createdAt: Like(`${date}%`),
+    });
+    console.log(`newUser: ${newUser}`);
+    return newUser;
+  }
+
   //게시글 총 갯수
   async findCount() {
     const count = await this.qtBoardRepository.count();
@@ -62,26 +70,11 @@ export class QtBoardService {
 
   //게시글 1개 보기
   async findOne({ postId }: IFindOne) {
-    // const findOnePost = await this.qtBoardRepository
-    //   .createQueryBuilder('qtBoard')
-    //   .leftJoinAndSelect('qtBoard.comments', 'comment')
-    //   .leftJoinAndSelect('qtBoard.likes', 'likes')
-    //   .leftJoinAndSelect('qtBoard.qtTags', 'qtTags')
-    //   .leftJoinAndSelect('qtBoard.user', 'user')
-    //   .leftJoinAndSelect('comments.user')
-    //   .where('qtBoard.id = :id', { id: postId })
-    //   .andWhere(`comment.parent = :parent`, { parent: '1' }) //parent 가 1인 댓글만 찾기
-    //   .orderBy('comment.isPick', 'DESC')
-    //   .addOrderBy('comment.createdAt')
-    //   .getOne();
-    // console.log(findOnePost);
-    // if (findOnePost === undefined)
     return await this.qtBoardRepository.findOne({
       where: { id: postId },
       relations: ['user', 'likes', 'qtTags'],
     });
-    // console.log('😂', findOnePost);
-    // return findOnePost;
+
   }
 
   //공지사항 10개 가져오기
@@ -254,7 +247,7 @@ export class QtBoardService {
   async nonMembersUpdate({ postId, nonMembersQtInput }) {
     const { password, qtTags, ...userInfo } = nonMembersQtInput;
     const post = await this.qtBoardRepository.findOne({ id: postId });
-    const hashedPassword = await bcrypt.hash(String(password), 1);
+    // const hashedPassword = await bcrypt.hash(String(password), 1);
     console.log(post);
     const passwordCheck = await bcrypt.compare(password, post.password);
     console.log('passwordCheck : ', passwordCheck);
@@ -277,7 +270,6 @@ export class QtBoardService {
       ...post,
       ...nonMembersQtInput,
       qtTags: tags,
-      password: hashedPassword,
     };
     const result = await this.qtBoardRepository.save(newPost);
     console.log(result);

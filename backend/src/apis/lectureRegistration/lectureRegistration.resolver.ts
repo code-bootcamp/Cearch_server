@@ -39,13 +39,9 @@ export class LectureRegistrationResolver {
 
   // FindAll Registration
   @Query(() => [LectureRegistration])
-  @UseGuards(GqlAccessGuard, RoleGuard)
-  @Role(USER_ROLE.MENTEE)
-  async fetchlectureRegistrations(
-    @CurrentUser() currentuser: ICurrentUser,
-    @Args('search') search: string,
-  ) {
-    return await this.lectureRegistrationService.findAll();
+  @UseGuards(GqlAccessGuard)
+  async fetchlectureRegistrations(@CurrentUser() currentUser: ICurrentUser) {
+    return await this.lectureRegistrationService.findAll({ currentUser });
   }
 
   // FindOne Registration
