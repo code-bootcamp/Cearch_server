@@ -27,7 +27,6 @@ export class LectureProductCategory {
   @OneToMany(
     () => JoinLectureAndProductCategory,
     (category) => category.lectureproductcategory,
-    { nullable: true },
   )
   @Field(() => [JoinLectureAndProductCategory], { nullable: true })
   category: JoinLectureAndProductCategory[];
