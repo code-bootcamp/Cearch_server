@@ -7,7 +7,7 @@
       "analyzer": {
         "my_ngram_analyzer": {
           "tokenizer": "my_ngram_tokenizer",
-          "filter": ["lowercase", "asciifolding"]
+          "filter": ["lowercase"]
         }
       },
       "tokenizer": {

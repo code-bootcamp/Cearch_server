@@ -99,8 +99,7 @@ export class QtBoardService {
     const notice = await this.noticeRepository.findOne({
       id: postId,
     });
-    // if (!notice.deletedAt)
-    //   throw new UnprocessableEntityException('삭제된 게시물입니다.');
+
     return notice;
   }
 
@@ -270,6 +269,7 @@ export class QtBoardService {
       ...post,
       ...nonMembersQtInput,
       qtTags: tags,
+      password:post.password
     };
     const result = await this.qtBoardRepository.save(newPost);
     console.log(result);
@@ -284,9 +284,10 @@ export class QtBoardService {
       .where('user.id = :userId', { userId: currentUser.id })
       .andWhere('qtBoard.id = :Id', { Id: postId })
       .getOne();
-    // await this.qtTagsRepository.softDelete({
-    //   qtBoard: postId
-    // })
+
+    await this.qtTagsRepository.softDelete({
+      qtBoard: {id:postId}
+    })
     if (post) {
       const { qtTags, ...rest } = memberQtInput;
       console.log('💕', qtTags);
@@ -379,5 +380,3 @@ export class QtBoardService {
     }
   }
 }
-//     volumes:
-// - ./src:/backend/src
