@@ -35,8 +35,8 @@ export class QtBoardResolver {
   async searchQt(@Args('search') search: string) {
     if (search.length < 2)
       throw new UnprocessableEntityException('두 글자 이상 입력해주세요');
-      const searchCache = await this.cacheManager.get(`qtboard:${search}`);
-      if (searchCache) return searchCache;
+    const searchCache = await this.cacheManager.get(`qtboard:${search}`);
+    if (searchCache) return searchCache;
     else {
       const result = await this.elasticsearchService.search({
         index: 'qtboard', // 테이블명
@@ -58,8 +58,11 @@ export class QtBoardResolver {
         name: ele._source.name,
       }));
       console.log(resultarray);
-      await this.cacheManager.set(`qtboard:${search}`, resultarray, { ttl: 600 });
-      if (!resultarray) throw new UnprocessableEntityException('검색결과가 없습니다.');
+      await this.cacheManager.set(`qtboard:${search}`, resultarray, {
+        ttl: 600,
+      });
+      if (!resultarray)
+        throw new UnprocessableEntityException('검색결과가 없습니다.');
       return resultarray;
     }
   }
@@ -156,8 +159,6 @@ export class QtBoardResolver {
   async createNonMembersQtBoard(
     @Args('nonMembersQtInput') nonMembersQtInput: NonMembersQtInput,
   ) {
-
-
     return await this.qtBoardService.nonMemberCreate({
       nonMembersQtInput,
     });

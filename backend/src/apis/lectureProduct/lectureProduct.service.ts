@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Connection, getConnection,Repository } from 'typeorm';
+import { Connection, getConnection, Repository } from 'typeorm';
 import { IcurrentUser } from '../auth/auth.resolver';
 import { REGISTRATION_STATUS_ENUM } from '../lectureOrder/entities/lectureOrder.entity';
 import { JoinLectureAndProductCategory } from '../lectureproductCategory/entities/lectureproductCagtegoryclassCategory.entity';
@@ -8,20 +8,18 @@ import { LectureProductCategory } from '../lectureproductCategory/entities/lectu
 import { MentoInfo } from '../user/entities/mento.entity';
 import { User, USER_ROLE } from '../user/entities/user.entity';
 import { CreateLectureProductInput } from './dto/createLectureProduct.input';
-import {
-  LectureProduct,
-} from './entities/lectureProduct.entity';
+import { LectureProduct } from './entities/lectureProduct.entity';
 interface ICreate {
   createLectureProductInput: CreateLectureProductInput;
   user: IcurrentUser;
 }
 interface IFindOne {
   lectureproductId: string;
-  page: number
+  page: number;
 }
 interface IUpdate {
   lectureproductId: string;
-  createLectureProductInput
+  createLectureProductInput;
 }
 @Injectable()
 export class LectureProductService {
@@ -36,7 +34,7 @@ export class LectureProductService {
     private readonly mentoinfoRepository: Repository<MentoInfo>,
     @InjectRepository(JoinLectureAndProductCategory)
     private readonly joinlectureandproductRepository: Repository<JoinLectureAndProductCategory>,
-    
+
     private readonly connection: Connection,
   ) {}
 
@@ -45,38 +43,38 @@ export class LectureProductService {
     await queryRunner.connect();
     await queryRunner.startTransaction('REPEATABLE READ');
     try {
-      const { classCategories, ...rest } = createLectureProductInput
+      const { classCategories, ...rest } = createLectureProductInput;
       const query = await this.userRepository
         .createQueryBuilder('user')
-        .innerJoinAndSelect('user.mentor', 'mentor') 
+        .innerJoinAndSelect('user.mentor', 'mentor')
         .where('user.id = :id', { id: user.id })
         .getOne();
       const mentor = query.mentor;
-    
+
       const result = await this.lectureProductRepository.save({
         ...rest,
-        mentor:mentor
+        mentor: mentor,
       });
       const categories = [];
       for (let i = 0; i < classCategories.length; i++) {
         const lecturecategories = classCategories[i].replace('#', '');
         const prevTag = await this.lectureproductCategoryRepository.findOne({
           categoryname: lecturecategories,
-        })
+        });
 
         const join = await this.joinlectureandproductRepository.save({
-          lectureproductcategory:prevTag,
-          lectureproduct:result
-        })
-          categories.push(join);
+          lectureproductcategory: prevTag,
+          lectureproduct: result,
+        });
+        categories.push(join);
       }
       const result2 = await this.lectureProductRepository.create({
         ...result,
         joinproductandproductcategory: categories,
       });
-      await queryRunner.manager.save(result2)
+      await queryRunner.manager.save(result2);
       await queryRunner.commitTransaction();
-      return result2
+      return result2;
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;
@@ -108,13 +106,13 @@ export class LectureProductService {
       .leftJoinAndSelect('product.mentor', 'mentor')
       .leftJoinAndSelect('mentor.user', 'mentoruser')
       .leftJoinAndSelect('product.registration', 'registration')
-      .leftJoinAndSelect('registration.user','user')
+      .leftJoinAndSelect('registration.user', 'user')
       .where('user.id = :userId', { userId: currentuser.id })
       .getMany();
-      console.log('내가 신청한 강의', registeredlecturefinder)
+    console.log('내가 신청한 강의', registeredlecturefinder);
     return registeredlecturefinder;
   }
-  
+
   async findAll() {
     const result = await this.lectureProductRepository
       .createQueryBuilder('product')
@@ -169,10 +167,10 @@ export class LectureProductService {
   async fetchSelectedTagLectures({ lectureproductcategoryname, page }) {
     const selectedtag = await getConnection()
       .createQueryBuilder(LectureProduct, 'product')
-      .innerJoinAndSelect('product.joinproductandproductcategory','jointable',)
+      .innerJoinAndSelect('product.joinproductandproductcategory', 'jointable')
       .innerJoinAndSelect('product.mentor', 'mentor')
       .innerJoinAndSelect('mentor.user', 'user')
-      .innerJoinAndSelect('jointable.lectureproductcategory','category',)
+      .innerJoinAndSelect('jointable.lectureproductcategory', 'category')
       .where('category.categoryname = :categoryname', {
         categoryname: lectureproductcategoryname,
       })
@@ -189,7 +187,7 @@ export class LectureProductService {
     });
     const newlectureproduct = {
       ...currentlectureproduct,
-      createLectureProductInput
+      createLectureProductInput,
     };
     return await this.lectureProductRepository.save(newlectureproduct);
   }
@@ -198,10 +196,10 @@ export class LectureProductService {
     const deletelecture = await this.lectureProductRepository.softDelete({
       id: lectureproductId,
     });
-    console.log('삭제완료')
+    console.log('삭제완료');
     return deletelecture.affected ? true : false;
   }
-  
+
   async fetchLectureDetail({ lectureId }) {
     const lectureDetail = await this.lectureProductRepository
       .createQueryBuilder('lecture')
