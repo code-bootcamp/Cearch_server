@@ -24,7 +24,7 @@ import { JoinUserAndProductCategory } from './entities/interestUser.entity';
     ]),
     JwtModule.register({}),
     ElasticsearchModule.register({
-      node: 'http://elasticsearch:9200',
+      node: process.env.ELASTICSEARCH_URL,
     }),
   ],
   providers: [

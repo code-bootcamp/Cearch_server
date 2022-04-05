@@ -77,7 +77,8 @@ export class UserResolver {
       await this.cacheManager.set(`mentor:${search}`, resultarray, {
         ttl: 600,
       });
-      if (!resultarray) throw new UnprocessableEntityException('검색결과가 없습니다.');
+      if (!resultarray)
+        throw new UnprocessableEntityException('검색결과가 없습니다.');
       return resultarray;
     }
   }
@@ -175,7 +176,7 @@ export class UserResolver {
     return await this.userService.updatePassword({ email, newPassword });
   }
 
-  @Mutation(() => MentoInfo)
+  @Mutation(() => User)
   async authMentor(@Args('userId') userId: string) {
     return await this.userService.promoteMento({ userId });
   }

@@ -23,7 +23,7 @@ import { QtBoardService } from './QtBoard.service';
       JoinQtBoardAndProductCategory,
     ]),
     ElasticsearchModule.register({
-      node: 'http://elasticsearch:9200',
+      node: process.env.ELASTICSEARCH_URL,
     }),
   ],
 

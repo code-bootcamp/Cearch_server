@@ -152,14 +152,15 @@ export class UserService {
         ...userApplier.mentor,
         mentoStatus: MENTOR_AUTH.AUTHROIZED,
       });
-      await queryRunner.manager.save(User, {
+      const promotedUser = await queryRunner.manager.save(User, {
         ...userApplier,
         role: USER_ROLE.MENTOR,
         mentor: promotedMento,
       });
       await queryRunner.commitTransaction();
-      return promotedMento;
+      return promotedUser;
     } catch (error) {
+      await queryRunner.rollbackTransaction();
       throw new UnprocessableEntityException(
         'MYSQL CANT UPDATE MENTOR AUTHROIZED',
       );
@@ -224,6 +225,8 @@ export class UserService {
     const results = await this.mentoInfoRepository
       .createQueryBuilder('mentor')
       .innerJoinAndSelect('mentor.user', 'user')
+      .innerJoinAndSelect('mentor.work', 'work')
+      .innerJoinAndSelect('work.category', 'category')
       .where('mentor.mentoStatus = :status', { status: MENTOR_AUTH.AUTHROIZED })
       .take(40)
       .skip(40 * (page - 1))
