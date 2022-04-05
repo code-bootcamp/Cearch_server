@@ -130,13 +130,6 @@ export class UserResolver {
   async createUser(
     @Args('userForm') userForm: UserForm, //
   ) {
-    // await this.elasticsearchService.create({
-    //   id: 'myid1', //nosql
-    //   index: 'mentor', // 테이블이나 컬렉션을 의미
-    //   document: {
-    //     ...userForm,
-    //   },
-    // });
     return await this.userService.saveForm({ userForm });
   }
 

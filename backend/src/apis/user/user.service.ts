@@ -224,6 +224,8 @@ export class UserService {
     const results = await this.mentoInfoRepository
       .createQueryBuilder('mentor')
       .innerJoinAndSelect('mentor.user', 'user')
+      .innerJoinAndSelect('mentor.work', 'work')
+      .innerJoinAndSelect('work.category', 'ctg')
       .where('mentor.mentoStatus = :status', { status: MENTOR_AUTH.AUTHROIZED })
       .take(40)
       .skip(40 * (page - 1))
@@ -238,7 +240,7 @@ export class UserService {
       .createQueryBuilder('mento')
       .innerJoinAndSelect('mento.user', 'user')
       .innerJoinAndSelect('mento.work', 'work')
-      .innerJoin('work.category', 'ctg')
+      .innerJoinAndSelect('work.category', 'ctg')
       .where('ctg.categoryname = :categoryName', { categoryName })
       .take(40)
       .skip(40 * (page - 1))
