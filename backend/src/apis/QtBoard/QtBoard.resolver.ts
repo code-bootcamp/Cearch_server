@@ -34,10 +34,11 @@ export class QtBoardResolver {
   @Query(() => [QtBoard]) // Query graphql에서 임포트 되는지 잘 보자
   async searchQt(@Args('search') search: string) {
     if (search.length < 2)
-      throw new UnprocessableEntityException('두 글자 이상 입력해주세요');
-    //   const searchCache = await this.cacheManager.get(`qtboard:${search}`);
-    //   if (searchCache) return searchCache;
-    // else {
+      throw new UnprocessableEntityException('두 글자 이상 입력해주세요')
+    const searchCache = await this.cacheManager.get(`qtboard:${search}`);
+    if (searchCache) return searchCache;
+    else {
+
       const result = await this.elasticsearchService.search({
         index: 'qtboard', // 테이블명
         from: 0,
@@ -62,10 +63,13 @@ export class QtBoardResolver {
 
       }));
       console.log(resultarray);
-      // await this.cacheManager.set(`qtboard:${search}`, resultarray, { ttl: 600 });
-      if (!resultarray) throw new UnprocessableEntityException('검색결과가 없습니다.');
+      await this.cacheManager.set(`qtboard:${search}`, resultarray, {
+        ttl: 600,
+      });
+      if (!resultarray)
+        throw new UnprocessableEntityException('검색결과가 없습니다.');
       return resultarray;
-    // }
+    }
   }
 
   //총 게시글 수
@@ -160,8 +164,6 @@ export class QtBoardResolver {
   async createNonMembersQtBoard(
     @Args('nonMembersQtInput') nonMembersQtInput: NonMembersQtInput,
   ) {
-
-
     return await this.qtBoardService.nonMemberCreate({
       nonMembersQtInput,
     });
