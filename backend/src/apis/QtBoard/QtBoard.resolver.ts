@@ -34,10 +34,11 @@ export class QtBoardResolver {
   @Query(() => [QtBoard]) // Query graphql에서 임포트 되는지 잘 보자
   async searchQt(@Args('search') search: string) {
     if (search.length < 2)
-      throw new UnprocessableEntityException('두 글자 이상 입력해주세요');
+      throw new UnprocessableEntityException('두 글자 이상 입력해주세요')
     const searchCache = await this.cacheManager.get(`qtboard:${search}`);
     if (searchCache) return searchCache;
     else {
+
       const result = await this.elasticsearchService.search({
         index: 'qtboard', // 테이블명
         from: 0,
@@ -54,8 +55,12 @@ export class QtBoardResolver {
       const resultarray = result.hits.hits.map((ele: any) => ({
         id: ele._source.id,
         title: ele._source.title,
-        contents: ele._source.contents,
+        contents: ele._source.copycontents,
         name: ele._source.name,
+        createdAt: ele._source.createdat,
+        likescount: ele._source.likescount,
+        commentsCount:ele._source.commentscount
+
       }));
       console.log(resultarray);
       await this.cacheManager.set(`qtboard:${search}`, resultarray, {

@@ -19,11 +19,11 @@ export class AuthController {
     if (!user) {
       const { password, ...rest } = req.user;
       const hashedPassword = await bcrypt.hash(String(password), 1);
-      const userForm = { ...rest, hashedPassword };
+      const userForm = { password:hashedPassword, ...rest };
       await this.userService.saveForm({ userForm });
     }
     this.authService.setRefreshToken({ user, res });
-    res.redirect('http://localhost:5501/backend/frontend/login/index.html');
+    res.redirect('https://www.codesearch.shop');
   }
 
   @Get('/login/google/callback')

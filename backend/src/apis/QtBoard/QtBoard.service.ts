@@ -290,7 +290,6 @@ export class QtBoardService {
     })
     if (post) {
       const { qtTags, ...rest } = memberQtInput;
-      console.log('💕', qtTags);
       const tags = [];
       for (let i = 0; i < qtTags.length; i++) {
         const tagname = qtTags[i].replace('#', '');

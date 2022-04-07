@@ -253,11 +253,11 @@ export class UserService {
 
   async fetchAuthorMentor() {
     const MentoApply = await this.mentoInfoRepository
-      .createQueryBuilder('mento')
-      .innerJoinAndSelect('mento.user', 'user')
-      .innerJoinAndSelect('mento.work', 'work')
-      .innerJoin('work.category', 'ctg')
-      .where('mento.mentoStatus = :status', { status: MENTOR_AUTH.PENDING })
+      .createQueryBuilder('mentor')
+      .leftJoinAndSelect('mentor.user', 'user')
+      .innerJoinAndSelect('mentor.work', 'work')
+      .innerJoinAndSelect('work.category', 'ctg')
+      .where('mentor.mentoStatus = :status', { status: MENTOR_AUTH.PENDING })
       .getMany();
     console.log(MentoApply);
     return MentoApply;
