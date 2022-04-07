@@ -2,6 +2,7 @@
 /dist
 /node_modules
 mysql-connector-java-8.0.28.jar
+bionic-upgrade-341008-bd2df0296655.json
 .env
 # Logs
 logs
