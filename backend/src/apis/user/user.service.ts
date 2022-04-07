@@ -152,14 +152,15 @@ export class UserService {
         ...userApplier.mentor,
         mentoStatus: MENTOR_AUTH.AUTHROIZED,
       });
-      await queryRunner.manager.save(User, {
+      const promotedUser = await queryRunner.manager.save(User, {
         ...userApplier,
         role: USER_ROLE.MENTOR,
         mentor: promotedMento,
       });
       await queryRunner.commitTransaction();
-      return promotedMento;
+      return promotedUser;
     } catch (error) {
+      await queryRunner.rollbackTransaction();
       throw new UnprocessableEntityException(
         'MYSQL CANT UPDATE MENTOR AUTHROIZED',
       );
@@ -224,6 +225,8 @@ export class UserService {
     const results = await this.mentoInfoRepository
       .createQueryBuilder('mentor')
       .innerJoinAndSelect('mentor.user', 'user')
+      .innerJoinAndSelect('mentor.work', 'work')
+      .innerJoinAndSelect('work.category', 'ctg')
       .where('mentor.mentoStatus = :status', { status: MENTOR_AUTH.AUTHROIZED })
       .take(40)
       .skip(40 * (page - 1))
@@ -238,7 +241,7 @@ export class UserService {
       .createQueryBuilder('mento')
       .innerJoinAndSelect('mento.user', 'user')
       .innerJoinAndSelect('mento.work', 'work')
-      .innerJoin('work.category', 'ctg')
+      .innerJoinAndSelect('work.category', 'ctg')
       .where('ctg.categoryname = :categoryName', { categoryName })
       .take(40)
       .skip(40 * (page - 1))
@@ -384,59 +387,7 @@ export class UserService {
       await queryRunner.release();
     }
   }
-  // async findUserInterest({ currentUser, interestIds }) {
-  //   const queryRunner = this.connection.createQueryRunner();
-  //   await queryRunner.connect();
-  //   await queryRunner.startTransaction('REPEATABLE READ');
-  //   try {
-  //     const userFind = await queryRunner.manager.findOne(User, {
-  //       id: currentUser.id,
-  //     });
-  //     // const userinterestList = await this.joinUserAndProductCtgRepository
-  //     //   .createQueryBuilder('interest')
-  //     //   .leftJoinAndSelect(
-  //     //     'interest.linkedToLectureProductCategory',
-  //     //     'category',
-  //     //   )
-  //     //   .where('interest.user = :id', { id: userFind.id })
-  //     //   .getMany();
 
-  //     // console.log(userinterestList);
-  //     const joinedCtg = interestIds.map(async (interestId) => {
-  //       const userinterestList = await this.joinUserAndProductCtgRepository
-  //         .createQueryBuilder('interest')
-  //         .leftJoinAndSelect(
-  //           'interest.linkedToLectureProductCategory',
-  //           'category',
-  //         )
-  //         .where('interest.user = :id', { id: userFind.id })
-  //         .where('category.id = :cateId', { cateId: interestId })
-  //         .getOne();
-
-  //       console.log(userinterestList);
-  //       return userinterestList;
-  //       // const joinProductCtg = await queryRunner.manager.findOne(
-  //       //   JoinUserAndProductCategory,
-  //       //   {
-  //       //     id: interestId,
-  //       //     user: { id: currentUser.id },
-  //       //   },
-  //       // );
-
-  //       // return joinProductCtg;
-  //     });
-  //     const joinedCtgPromise = await Promise.all(joinedCtg);
-  //     console.log(joinedCtgPromise);
-
-  //     return joinedCtgPromise;
-  //   } catch (error) {
-  //     console.log(error);
-  //     await queryRunner.rollbackTransaction();
-  //     throw new UnprocessableEntityException('관심분야를 찾을 수 없습니다.');
-  //   } finally {
-  //     await queryRunner.release();
-  //   }
-  // }
   async permitLecture({ currentUser, mentorId, lectureId }) {
     const querryRunner = this.connection.createQueryRunner();
     await querryRunner.connect();

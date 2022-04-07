@@ -5,7 +5,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    # volumes:
+    # volumes:  
     #   - ./src:/backend/src
     env_file:
       - './.env'
@@ -36,13 +36,12 @@ services:
     ports:
       - '6000:6379'
 
-  #   elasticsearch:
-  #     image: elasticsearch:7.17.0
-  #     environment:
-  #       discovery.type: single-node
-  #     ports:
-  #       - 9200:9200
-
+  elasticsearch:
+    image: elasticsearch:7.17.0
+    environment:
+      discovery.type: single-node
+    ports:
+      - 9200:9200
   my-mongo:
     image: 'mongo:latest'
     ports:

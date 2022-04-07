@@ -21,10 +21,10 @@ import { ElasticsearchModule } from '@nestjs/elasticsearch';
       User,
       LectureProductCategory,
       MentoInfo,
-      JoinLectureAndProductCategory
+      JoinLectureAndProductCategory,
     ]),
     ElasticsearchModule.register({
-      node: 'http://elasticsearch:9200',
+      node: process.env.ELASTICSEARCH_URL,
     }),
   ],
   providers: [

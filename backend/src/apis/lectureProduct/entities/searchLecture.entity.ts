@@ -22,10 +22,6 @@ export class SearchLecture {
 
   @Column()
   @Field(() => String)
-  selfIntro!: string;
-
-  @Column()
-  @Field(() => String)
   classTitle: string;
 
   @Column()

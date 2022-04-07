@@ -75,9 +75,10 @@ export class UserResolver {
       }));
       console.log(resultarray);
       await this.cacheManager.set(`mentor:${search}`, resultarray, {
-        ttl: 10,
+        ttl: 600,
       });
-      if (!resultarray) throw '검색결과가 없습니다.';
+      if (!resultarray)
+        throw new UnprocessableEntityException('검색결과가 없습니다.');
       return resultarray;
     }
   }
@@ -130,13 +131,6 @@ export class UserResolver {
   async createUser(
     @Args('userForm') userForm: UserForm, //
   ) {
-    // await this.elasticsearchService.create({
-    //   id: 'myid1', //nosql
-    //   index: 'mentor', // 테이블이나 컬렉션을 의미
-    //   document: {
-    //     ...userForm,
-    //   },
-    // });
     return await this.userService.saveForm({ userForm });
   }
 
@@ -175,7 +169,7 @@ export class UserResolver {
     return await this.userService.updatePassword({ email, newPassword });
   }
 
-  @Mutation(() => MentoInfo)
+  @Mutation(() => User)
   async authMentor(@Args('userId') userId: string) {
     return await this.userService.promoteMento({ userId });
   }

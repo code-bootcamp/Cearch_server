@@ -1,10 +1,5 @@
-import {
-  Field,
-  Float,
-  Int,
-  ObjectType,
-} from '@nestjs/graphql';
-import { LectureImage } from 'src/apis/lectureImage/entities/lectureImage.entity';
+import { Field, Float, Int, ObjectType } from '@nestjs/graphql';
+import { LectureImage } from 'src/apis/LectureImage/entities/lectureImage.entity';
 import { JoinLectureAndProductCategory } from 'src/apis/lectureproductCategory/entities/lectureproductCagtegoryclassCategory.entity';
 import { LectureRegistration } from 'src/apis/lectureRegistration/entitites/lectureRegistration.entity';
 import { LectureReview } from 'src/apis/lectureReview/entities/lectureReview.entity';
@@ -62,7 +57,7 @@ export class LectureProduct {
 
   @Column()
   @Field(() => String, { nullable: true })
-  imageURL: string
+  imageURL: string;
 
   @CreateDateColumn()
   @Field(() => Date)
