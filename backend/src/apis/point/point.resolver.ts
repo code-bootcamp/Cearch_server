@@ -31,7 +31,7 @@ export class PointResolver {
     const token = await this.iamportService.getIamportToken();
 
     await this.iamportService.checkPaid({ impUid, myamount, token });
-    
+
     return await this.pointService.create({ impUid, myamount, currentuser });
   }
 

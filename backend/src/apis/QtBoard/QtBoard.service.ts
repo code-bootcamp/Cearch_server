@@ -74,7 +74,6 @@ export class QtBoardService {
       where: { id: postId },
       relations: ['user', 'likes', 'qtTags'],
     });
-
   }
 
   //공지사항 10개 가져오기
@@ -185,7 +184,6 @@ export class QtBoardService {
         tagname: tagname,
       });
       tags.push(newTag);
-
     }
     const hashedPassword = await bcrypt.hash(String(password), 1); // 해쉬로 비밀번호 바꿔서 저장
     nonMembersQtInput = {
@@ -269,7 +267,7 @@ export class QtBoardService {
       ...post,
       ...nonMembersQtInput,
       qtTags: tags,
-      password:post.password
+      password: post.password,
     };
     const result = await this.qtBoardRepository.save(newPost);
     console.log(result);
@@ -286,8 +284,8 @@ export class QtBoardService {
       .getOne();
 
     await this.qtTagsRepository.softDelete({
-      qtBoard: {id:postId}
-    })
+      qtBoard: { id: postId },
+    });
     if (post) {
       const { qtTags, ...rest } = memberQtInput;
       console.log('💕', qtTags);

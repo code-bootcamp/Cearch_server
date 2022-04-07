@@ -56,6 +56,9 @@ export class QtBoardResolver {
         title: ele._source.title,
         contents: ele._source.contents,
         name: ele._source.name,
+        createdAt: ele._source.createdat,
+        likescount: ele._source.likescount,
+        commentsCount: ele._source.commentscount,
       }));
       console.log(resultarray);
       await this.cacheManager.set(`qtboard:${search}`, resultarray, {

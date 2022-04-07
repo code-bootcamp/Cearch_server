@@ -25,23 +25,16 @@ export class JwtAccessStrategy extends PassportStrategy(
     });
   }
   async validate(req, payload) {
-    const Atoken = req.headers.authorization.replace('Bearer ', '');
-    
     try {
-      const checkToken = await this.cacheManager.get(`accessToken:${Atoken}`)
-        console.log(checkToken);
-        if (checkToken) {
-          return false;
-        }
-    // console.log(req.headers.cookie);
-    // const refreshToken = req.headers.cookie.replace('refreshToken=', '');
-    // console.log('strategy refresh : ', refreshToken);
-    // try {
-    //   const isRefresh = await this.cacheManager.get(`refresh:${refreshToken}`); // refresh가 없는경우 access 와 상관없이 false
-    //   console.log(isRefresh);
-    //   if (isRefresh) {
-    //     return false;
-    //   }
+      console.log(req.headers.cookie);
+      const refreshToken = req.headers.cookie.replace('refreshToken=', '');
+      console.log('strategy refresh : ', refreshToken);
+
+      const isRefresh = await this.cacheManager.get(`refresh:${refreshToken}`);
+      console.log(isRefresh);
+      if (isRefresh) {
+        return false;
+      }
       return {
         id: payload.sub,
         email: payload.email,

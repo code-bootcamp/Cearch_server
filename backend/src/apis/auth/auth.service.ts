@@ -84,9 +84,9 @@ export class AuthService {
   }
 
   async sendTokenPhone({ phoneNumber, authNumber }: ItokenPhone) {
-    const appKey = process.env.SMS_APP_KEY
-    const XSecretKey = process.env.SMS_X_SECRET_KEY
-    const sender = process.env.SMS_SENDER
+    const appKey = process.env.SMS_APP_KEY;
+    const XSecretKey = process.env.SMS_X_SECRET_KEY;
+    const sender = process.env.SMS_SENDER;
     try {
       const result = await axios.post(
         `https://api-sms.cloud.toast.com/sms/v3.0/appKeys/${appKey}/sender/sms`,
@@ -119,9 +119,9 @@ export class AuthService {
   }
 
   async sendTokenEmail({ email, authNumber }: ItokenEmail) {
-    const appKey = process.env.EMAIL_APP_KEY
-    const secretKey = process.env.EMAIL_X_SECRET_KEY
-    const sender = process.env.EMAIL_SENDER
+    const appKey = process.env.EMAIL_APP_KEY;
+    const secretKey = process.env.EMAIL_X_SECRET_KEY;
+    const sender = process.env.EMAIL_SENDER;
     const template = getTemplate({ authNumber });
     try {
       const result = await axios.post(
@@ -214,6 +214,7 @@ export class AuthService {
           ttl: user.exp - Math.ceil(Number(Date.now()) / 1000),
         },
       );
+
       return result;
     } catch (error) {
       console.log(error);

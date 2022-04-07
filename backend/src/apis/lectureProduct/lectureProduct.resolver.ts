@@ -1,9 +1,6 @@
-
 import { UseGuards, CACHE_MANAGER, Inject } from '@nestjs/common';
-import { Args, Mutation, Resolver, Query} from '@nestjs/graphql';
-import {
-  CurrentUser,
-} from 'src/common/auth/decorate/currentuser.decorate';
+import { Args, Mutation, Resolver, Query } from '@nestjs/graphql';
+import { CurrentUser } from 'src/common/auth/decorate/currentuser.decorate';
 
 import { Role } from 'src/common/auth/decorate/role.decorate';
 import { GqlAccessGuard } from 'src/common/auth/guard/gqlAuthGuard';
@@ -63,10 +60,11 @@ export class LectureProductResolver {
         rating: ele._source.rating,
       }));
       console.log(resultarray);
-      await this.cacheManager.set(`lecture:${search}`, resultarray, { ttl: 600 });
+      await this.cacheManager.set(`lecture:${search}`, resultarray, {
+        ttl: 600,
+      });
       return resultarray;
-  }
-
+    }
   }
 
   @Mutation(() => LectureProduct)
@@ -84,9 +82,7 @@ export class LectureProductResolver {
   }
 
   @Query(() => [LectureProduct])
-  async fetchlectureProducts(
-    @Args('page') page: number,
-  ) {
+  async fetchlectureProducts(@Args('page') page: number) {
     return await this.lectureProductService.findAll();
   }
 
@@ -108,7 +104,10 @@ export class LectureProductResolver {
     @Args('lectureproductcategoryname') lectureproductcategoryname: string,
     @Args('page') page: number,
   ) {
-    return await this.lectureProductService.fetchSelectedTagLectures({lectureproductcategoryname, page});
+    return await this.lectureProductService.fetchSelectedTagLectures({
+      lectureproductcategoryname,
+      page,
+    });
   }
 
   @Query(() => [LectureProduct])
@@ -132,11 +131,11 @@ export class LectureProductResolver {
   @UseGuards(GqlAccessGuard)
   async updateLectureProduct(
     @Args('lectureproductId') lectureproductId: string,
-    createLectureProductInput
+    createLectureProductInput,
   ) {
     return await this.lectureProductService.update({
       lectureproductId,
-      createLectureProductInput
+      createLectureProductInput,
     });
   }
 
@@ -146,13 +145,11 @@ export class LectureProductResolver {
   async deleteLectureProduct(
     @Args('lectureproductId') lectureproductId: string,
   ) {
-    return await this.lectureProductService.delete({ lectureproductId});
+    return await this.lectureProductService.delete({ lectureproductId });
   }
 
   @Query(() => LectureProduct)
-  async fetchLectureDetail(
-    @Args('lectureId') lectureId: string,
-  ) {
+  async fetchLectureDetail(@Args('lectureId') lectureId: string) {
     return await this.lectureProductService.fetchLectureDetail({ lectureId });
   }
 }
