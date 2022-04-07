@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { ElasticsearchModule } from '@nestjs/elasticsearch';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Comments } from '../comments/entities/comments.entity';
-import { LectureProductCategory } from '../lectureproductCategory/entities/lectureproductCategory.entity';
 import { PostImage } from '../postImage/entities/postImage.entity';
 import { User } from '../user/entities/user.entity';
 import { Notice } from './entities/notice.entity';

@@ -31,7 +31,7 @@ export class QtBoardResolver {
     return await this.qtBoardService.findNewPostCount({ date });
   }
 
-  @Query(() => [QtBoard]) // Query graphql에서 임포트 되는지 잘 보자
+  @Query(() => [QtBoard])
   async searchQt(@Args('search') search: string) {
     if (search.length < 2)
       throw new UnprocessableEntityException('두 글자 이상 입력해주세요');
@@ -54,13 +54,12 @@ export class QtBoardResolver {
       const resultarray = result.hits.hits.map((ele: any) => ({
         id: ele._source.id,
         title: ele._source.title,
-        contents: ele._source.contents,
+        contents: ele._source.copycontents,
         name: ele._source.name,
         createdAt: ele._source.createdat,
         likescount: ele._source.likescount,
         commentsCount: ele._source.commentscount,
       }));
-      console.log(resultarray);
       await this.cacheManager.set(`qtboard:${search}`, resultarray, {
         ttl: 600,
       });
