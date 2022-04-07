@@ -19,7 +19,7 @@ export class AuthController {
     if (!user) {
       const { password, ...rest } = req.user;
       const hashedPassword = await bcrypt.hash(String(password), 1);
-      const userForm = { ...rest, password:hashedPassword };
+      const userForm = { password:hashedPassword, ...rest };
       await this.userService.saveForm({ userForm });
     }
     this.authService.setRefreshToken({ user, res });
